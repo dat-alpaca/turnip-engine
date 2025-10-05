@@ -1,24 +1,24 @@
-#include "pch.hpp"
 #include "scene_editor.hpp"
-#include "utils/gui_utils.hpp"
 #include "event/scene_editor_events.hpp"
+#include "utils/gui_utils.hpp"
 
 using namespace tur;
 
-void SceneEditor::initialize(NON_OWNING GraphicsDevice* graphicsDevice, NON_OWNING GUISystem* guiSystem, NON_OWNING SceneData* sceneData)
+void SceneEditor::initialize(NON_OWNING GraphicsDevice* graphicsDevice, NON_OWNING GUISystem* guiSystem,
+							 NON_OWNING SceneData* sceneData)
 {
 	r_GraphicsDevice = graphicsDevice;
 	r_SceneData = sceneData;
 	r_GUISystem = guiSystem;
 }
- 
+
 void SceneEditor::on_render_gui()
 {
 	if (!isOpen)
 		return;
 
 	ImGui::Begin("Scene Editor", &isOpen);
-	
+
 	ImVec2 dimensions = ImGui::GetWindowSize();
 	if (m_LatestSize.x != dimensions.x || m_LatestSize.y != dimensions.y && dimensions.x > 0 && dimensions.y > 0)
 	{
@@ -37,7 +37,7 @@ void SceneEditor::on_render_gui()
 		callback(editorMoved);
 	}
 
-	r_GUISystem->texture(r_SceneData->sceneTexture, m_LatestSize, { 0.0f, 1.0f }, { 1.0f, 0.0f });
+	r_GUISystem->texture(r_SceneData->sceneTexture, m_LatestSize, {0.0f, 1.0f}, {1.0f, 0.0f});
 
 	if (ImGui::IsItemHovered() && ImGui::IsMouseClicked(ImGuiMouseButton_Left))
 	{
@@ -62,17 +62,13 @@ void SceneEditor::on_render_gui()
 		ImGuizmo::OPERATION operation = ImGuizmo::UNIVERSAL;
 		ImGuizmo::MODE mode = ImGuizmo::LOCAL;
 
-		bool manipulated = ImGuizmo::Manipulate(
-			&r_SceneData->editorCamera.camera.view()[0][0],
-			&r_SceneData->editorCamera.camera.projection()[0][0],
-			operation,
-			mode,
-			&transform.raw_transform()[0][0]
-		);
+		bool manipulated = ImGuizmo::Manipulate(&r_SceneData->editorCamera.camera.view()[0][0],
+												&r_SceneData->editorCamera.camera.projection()[0][0], operation, mode,
+												&transform.raw_transform()[0][0]);
 
-		if(manipulated)
+		if (manipulated)
 			transform.decompose_transform();
 	}
-	
+
 	ImGui::End();
 }

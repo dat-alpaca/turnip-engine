@@ -1,6 +1,5 @@
-#include "pch.hpp"
-#include "common.hpp"
 #include "cpu_info.hpp"
+#include "common.hpp"
 
 namespace tur
 {
@@ -23,16 +22,28 @@ namespace tur
 		}
 
 	public:
-		const u32& eax() const { return registers[0]; }
+		const u32& eax() const
+		{
+			return mRegisters[0];
+		}
 
-		const u32& ebx() const { return registers[1]; }
+		const u32& ebx() const
+		{
+			return mRegisters[1];
+		}
 
-		const u32& ecx() const { return registers[2]; }
+		const u32& ecx() const
+		{
+			return mRegisters[2];
+		}
 
-		const u32& edx() const { return registers[3]; }
+		const u32& edx() const
+		{
+			return mRegisters[3];
+		}
 
 	public:
-		u32 registers[4] = { 0, 0, 0, 0 };
+		u32 mRegisters[4] = {0, 0, 0, 0};
 	};
 }
 
@@ -49,25 +60,22 @@ namespace tur
 	{
 		CPU_ID cpuID(0x0);
 
-		m_Vendor += std::string(reinterpret_cast<const char*>(&cpuID.ebx()), 4);
-		m_Vendor += std::string(reinterpret_cast<const char*>(&cpuID.edx()), 4);
-		m_Vendor += std::string(reinterpret_cast<const char*>(&cpuID.ecx()), 4);
+		mVendor += std::string(reinterpret_cast<const char*>(&cpuID.ebx()), 4);
+		mVendor += std::string(reinterpret_cast<const char*>(&cpuID.edx()), 4);
+		mVendor += std::string(reinterpret_cast<const char*>(&cpuID.ecx()), 4);
 
 		const std::unordered_map<std::string, std::string> vendorMap = {
-			{ "AMDisbetter!", "AMD" },
-			{ "AuthenticAMD!", "AMD" },
-			{ "GenuineIntel", "Intel" }
-		};
+			{"AMDisbetter!", "AMD"}, {"AuthenticAMD!", "AMD"}, {"GenuineIntel", "Intel"}};
 
-		if (vendorMap.find(m_Vendor) != vendorMap.end())
+		if (vendorMap.find(mVendor) != vendorMap.end())
 		{
-			m_Vendor = vendorMap.at(m_Vendor);
+			mVendor = vendorMap.at(mVendor);
 			return;
 		}
 
-		m_Vendor = "Unknown Vendor";
-		m_IsAMD = m_Vendor == "AMD";
-		m_IsIntel = m_Vendor == "Intel";
+		mVendor = "Unknown Vendor";
+		mIsAMD = mVendor == "AMD";
+		mIsIntel = mVendor == "Intel";
 	}
 
 	std::string CPU_Information::brand() const
@@ -82,23 +90,13 @@ namespace tur
 		CPU_ID cpuID_Part1 = CPU_ID(0x80000003);
 		CPU_ID cpuID_Part2 = CPU_ID(0x80000004);
 
-		memcpy(
-			str, 
-			reinterpret_cast<u32*>(cpuID_Part0.registers),
-			sizeof(cpuID_Part0.registers)
-		);
+		memcpy(str, reinterpret_cast<u32*>(cpuID_Part0.mRegisters), sizeof(cpuID_Part0.mRegisters));
 
-		memcpy(
-			str + sizeof(cpuID_Part0.registers), 
-			reinterpret_cast<u32*>(cpuID_Part1.registers),
-			sizeof(cpuID_Part1.registers)
-		);
+		memcpy(str + sizeof(cpuID_Part0.mRegisters), reinterpret_cast<u32*>(cpuID_Part1.mRegisters),
+			   sizeof(cpuID_Part1.mRegisters));
 
-		memcpy(
-			str + sizeof(cpuID_Part0.registers) + sizeof(cpuID_Part1.registers), 
-			reinterpret_cast<u32*>(cpuID_Part2.registers),
-			sizeof(cpuID_Part2.registers)
-		);
+		memcpy(str + sizeof(cpuID_Part0.mRegisters) + sizeof(cpuID_Part1.mRegisters),
+			   reinterpret_cast<u32*>(cpuID_Part2.mRegisters), sizeof(cpuID_Part2.mRegisters));
 
 		str[sizeof(str) - 1] = '\0';
 		return std::string(str);
@@ -107,25 +105,25 @@ namespace tur
 	void CPU_Information::prepare_functions()
 	{
 		CPU_ID cpuID(0x1);
-		m_Function_eax1_ECX = cpuID.ecx();
-		m_Function_eax1_EDX = cpuID.edx();
+		mFunction_eax1_ECX = cpuID.ecx();
+		mFunction_eax1_EDX = cpuID.edx();
 
 		cpuID = CPU_ID(0x7, 0x0);
-		m_Function_eax7_ecx0_EBX = cpuID.ebx();
-		m_Function_eax7_ecx0_ECX = cpuID.ecx();
-		m_Function_eax7_ecx0_EDX = cpuID.edx();
+		mFunction_eax7_ecx0_EBX = cpuID.ebx();
+		mFunction_eax7_ecx0_ECX = cpuID.ecx();
+		mFunction_eax7_ecx0_EDX = cpuID.edx();
 
 		cpuID = CPU_ID(0x7, 0x1);
-		m_Function_eax7_ecx1_EAX = cpuID.eax();
-		m_Function_eax7_ecx1_EBX = cpuID.ebx();
-		m_Function_eax7_ecx1_EDX = cpuID.edx();
+		mFunction_eax7_ecx1_EAX = cpuID.eax();
+		mFunction_eax7_ecx1_EBX = cpuID.ebx();
+		mFunction_eax7_ecx1_EDX = cpuID.edx();
 
 		cpuID = CPU_ID(0x7, 0x2);
-		m_Function_eax7_ecx2_EDX = cpuID.edx();
+		mFunction_eax7_ecx2_EDX = cpuID.edx();
 
 		cpuID = CPU_ID(0x80000001);
-		m_Function_81h_ECX = cpuID.ecx();
-		m_Function_81h_EDX = cpuID.edx();
+		mFunction_81h_ECX = cpuID.ecx();
+		mFunction_81h_EDX = cpuID.edx();
 	}
 }
 
@@ -135,9 +133,7 @@ namespace tur
 	{
 		CPU_Information information;
 
-		auto supported = [](bool supported) -> const char* {
-			return supported ? "Yes" : "No";
-		};
+		auto supported = [](bool supported) -> const char* { return supported ? "Yes" : "No"; };
 
 		TUR_LOG_DEBUG("{} {}", information.vendor(), information.brand());
 		TUR_LOG_DEBUG("Instructions:");

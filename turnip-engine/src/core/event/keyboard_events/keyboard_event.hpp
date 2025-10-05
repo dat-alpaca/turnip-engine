@@ -4,7 +4,9 @@
 #include <vector>
 
 #include "core/event/event.hpp"
-#define __TRANSLATE_KEY(keyMacro) if (key == keyMacro) return #keyMacro;
+#define __TRANSLATE_KEY(keyMacro)                                                                                      \
+	if (key == keyMacro)                                                                                               \
+		return #keyMacro;
 
 namespace tur
 {
@@ -34,9 +36,9 @@ namespace tur
 		KEY_SEMICOLON,
 		KEY_EQUAL,
 
-		KEY_A =  97U,
-		KEY_B =  98U,
-		KEY_C =  99U,
+		KEY_A = 97U,
+		KEY_B = 98U,
+		KEY_C = 99U,
 		KEY_D = 100U,
 		KEY_E = 101U,
 		KEY_F = 102U,
@@ -64,7 +66,7 @@ namespace tur
 		KEY_LEFT_BRACKET = 20U,
 		KEY_RIGHT_BRACKET,
 
-		KEY_GRAVE_ACCENT,				/* ` */
+		KEY_GRAVE_ACCENT, /* ` */
 
 		KEY_ESCAPE,
 		KEY_ENTER,
@@ -151,12 +153,12 @@ namespace tur
 
 	enum class KeyboardMods : u32
 	{
-		KEY_MOD_SHIFT			= 1 << 0,
-		KEY_MOD_CTRL			= 1 << 1,
-		KEY_MOD_ALT				= 1 << 2,
-		KEY_MOD_SUPER			= 1 << 3,
-		KEY_MOD_CAPS_LOCK		= 1 << 4,
-		KEY_MOD_NUM_LOCK		= 1 << 5,
+		KEY_MOD_SHIFT = 1 << 0,
+		KEY_MOD_CTRL = 1 << 1,
+		KEY_MOD_ALT = 1 << 2,
+		KEY_MOD_SUPER = 1 << 3,
+		KEY_MOD_CAPS_LOCK = 1 << 4,
+		KEY_MOD_NUM_LOCK = 1 << 5,
 	};
 
 	inline std::string get_keyboard_mod_names(KeyboardMods mods)

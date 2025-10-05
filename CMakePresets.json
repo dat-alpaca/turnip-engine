@@ -1,0 +1,28 @@
+{
+    "version": 8,
+    "buildPresets": [
+        {
+            "name": "turnip-build",
+            "displayName": "Turnip Build: GCC 11.4.0 x86_64-linux-gnu",
+            "description": "Build with GCC",
+            "configurePreset": "turnip",
+            "jobs": 24
+        }
+    ],
+    "configurePresets": [
+        {
+            "name": "turnip",
+            "displayName": "Turnip Default Configuration",
+            "description": "Configure with GCC compiler",
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}/",
+            "cacheVariables": {
+                "CMAKE_INSTALL_PREFIX": "${sourceDir}/build/install/${presetName}",
+                "CMAKE_C_COMPILER": "/usr/bin/gcc",
+                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
+            }
+        }
+    ]
+}

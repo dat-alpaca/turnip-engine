@@ -1,3 +1,3 @@
-#include "pch.hpp"
-#define STB_IMAGE_IMPLEMENTATION
+#pragma
 #include <stb_image.h>
+#define STB_IMAGE_IMPLEMENTATION

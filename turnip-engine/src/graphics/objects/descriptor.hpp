@@ -1,30 +1,35 @@
 #pragma once
 #include "common.hpp"
-#include "graphics/objects/pipeline_stage.hpp"
-
-namespace tur
-{
-    enum class DescriptorType
-    {
-        INVALID = 0,
-        COMBINED_IMAGE_SAMPLER,
-        UNIFORM_BUFFER,
-        STORAGE_BUFFER
-    };
-}
+#include "graphics/types/pipeline_stage.hpp"
+#include <span>
 
 namespace tur
 {
 	using descriptor_handle = handle_type;
+
+	enum class DescriptorType
+	{
+		INVALID = 0,
+		COMBINED_IMAGE_SAMPLER,
+		UNIFORM_BUFFER,
+		STORAGE_BUFFER
+	};
+}
+
+namespace tur
+{
 	using descriptor_set_handle = handle_type;
 
-    struct DescriptorSetLayoutEntry
-    {
-        u32 binding = 0;
-        u32 amount = 1;
-        DescriptorType type = DescriptorType::INVALID;
-        PipelineStage stage = PipelineStage::NONE;
-    };
+	struct DescriptorSetLayoutEntry
+	{
+		u32 binding;
+		u32 amount;
+		DescriptorType type;
+		PipelineStage stage;
+	};
 
-    using DescriptorSetLayoutDescriptor = std::vector<DescriptorSetLayoutEntry>;
+	struct DescriptorSetLayout
+	{
+		std::span<const DescriptorSetLayoutEntry> entries;
+	};
 }

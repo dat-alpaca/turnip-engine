@@ -1,4 +1,3 @@
-#include "pch.hpp"
 #include "worker_pool.hpp"
 
 namespace tur
@@ -6,30 +5,33 @@ namespace tur
 	WorkerPool::~WorkerPool()
 	{
 		{
-			std::unique_lock<std::mutex> lock(m_QueueMutex);
-			m_StopExecution = true;
+			std::unique_lock<std::mutex> lock(mQueueMutex);
+			mStopExecution = true;
 		}
 
-		m_ConditionalVar.notify_all();
+		mConditionalVar.notify_all();
 
-		for (auto& thread : m_Threads)
+		for (auto& thread : mThreads)
 			thread.join();
 	}
 
-	void WorkerPool::initialize(u64 threadAmount)
+	void WorkerPool::initialize(const WorkerConfig& workerConfig)
 	{
+		u64 threadAmount =
+			(workerConfig.threadAmount == 0) ? std::thread::hardware_concurrency() : workerConfig.threadAmount;
+
 		for (size_t i = 0; i < threadAmount; ++i)
-			m_Threads.emplace_back(std::bind(&WorkerPool::worker_function, this));
+			mThreads.emplace_back(std::bind(&WorkerPool::worker_function, this));
 	}
 
 	void WorkerPool::poll_tasks()
 	{
-		std::unique_lock<std::mutex> lock(m_QueueMutex);
+		std::unique_lock<std::mutex> lock(mQueueMutex);
 
-		for (const auto& task : m_Callbacks)
+		for (const auto& task : mCallbacks)
 			task();
 
-		m_Callbacks.clear();
+		mCallbacks.clear();
 	}
 
 	void WorkerPool::worker_function()
@@ -39,17 +41,15 @@ namespace tur
 			task_t task;
 
 			{
-				std::unique_lock<std::mutex> lock(m_QueueMutex);
+				std::unique_lock<std::mutex> lock(mQueueMutex);
 
-				m_ConditionalVar.wait(lock, [this] {
-					return !m_Tasks.empty() || m_StopExecution;
-				});
+				mConditionalVar.wait(lock, [this] { return !mTasks.empty() || mStopExecution; });
 
-				if (m_StopExecution && m_Tasks.empty())
+				if (mStopExecution && mTasks.empty())
 					return;
 
-				task = std::move(m_Tasks.front());
-				m_Tasks.pop_front();
+				task = std::move(mTasks.front());
+				mTasks.pop_front();
 			}
 
 			task();

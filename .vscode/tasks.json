@@ -1,0 +1,43 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "cmake",
+			"label": "CMake: configure",
+			"command": "configure",
+			"preset": "turnip",
+			"problemMatcher": [],
+			"detail": "CMake configure task"
+		},
+		{
+			"type": "cmake",
+			"label": "CMake: build",
+			"command": "build",
+			"targets": [
+				"all"
+			],
+			"preset": "turnip-build",
+			"group": "build",
+			"problemMatcher": [],
+			"detail": "CMake template build task",
+			"dependsOn": "CMake: configure"
+		},
+		{
+			"type": "cppbuild",
+			"label": "valgrind",
+			"command": "valgrind",
+			"args": [
+				"--tool=memcheck",
+				"--leak-check=yes",
+				"${workspaceFolder}/build/turnip/turnip-sandbox/turnip-sandbox"
+			],
+			"options": {
+				"cwd": "${workspaceFolder}"
+			},
+			"problemMatcher": [
+				"$gcc"
+			],
+			"group": "build",
+		}
+	]
+}

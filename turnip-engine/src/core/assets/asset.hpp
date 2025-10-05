@@ -1,4 +1,6 @@
 #pragma once
+#include "utils/uuid/uuid.hpp"
+#include <filesystem>
 
 namespace tur
 {
@@ -8,6 +10,12 @@ namespace tur
 	{
 		NONE = 0,
 		TEXTURE
+	};
+
+	struct AssetMetadata
+	{
+		std::filesystem::path filepath;
+		UUID uuid;
 	};
 
 	static inline constexpr const char* get_asset_type_name(AssetType type)

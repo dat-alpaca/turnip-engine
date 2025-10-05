@@ -1,15 +1,16 @@
 #pragma once
+#include <atomic>
 #include <condition_variable>
 #include <functional>
 #include <future>
-#include <thread>
-#include <vector>
-#include <atomic>
 #include <mutex>
-#include <tuple>
 #include <queue>
+#include <thread>
+#include <tuple>
+#include <vector>
 
-#include "Common.hpp"
+#include "common.hpp"
+#include "config/worker_config.hpp"
 
 namespace tur
 {
@@ -21,37 +22,39 @@ namespace tur
 		~WorkerPool();
 
 	public:
-		void initialize(u64 threadAmount = std::thread::hardware_concurrency());
+		void initialize(const WorkerConfig& workerConfig);
 
 		void poll_tasks();
 
 	public:
-		template<typename ReturnType>
+		template <typename ReturnType>
 		void submit(std::function<ReturnType()> task, std::function<void(ReturnType)> callback = {})
 		{
 			{
-				std::unique_lock<std::mutex> lock(m_QueueMutex);
+				std::unique_lock<std::mutex> lock(mQueueMutex);
 
-				m_Tasks.emplace_back([&, callback, task]() {
-					ReturnType returnValue = task();
-					m_Callbacks.push_back([callback, returnValue]() { callback(returnValue); });
-				});
+				mTasks.emplace_back(
+					[&, callback, task]()
+					{
+						ReturnType returnValue = task();
+						mCallbacks.push_back([callback, returnValue]() { callback(returnValue); });
+					});
 			}
 
-			m_ConditionalVar.notify_one();
+			mConditionalVar.notify_one();
 		}
 
 	private:
 		void worker_function();
 
 	private:
-		std::vector<std::thread> m_Threads;
-		std::vector<task_t> m_Callbacks;
-		std::deque<task_t> m_Tasks;
+		std::vector<std::thread> mThreads;
+		std::vector<task_t> mCallbacks;
+		std::deque<task_t> mTasks;
 
-		std::condition_variable m_ConditionalVar;
-		std::mutex m_QueueMutex;
+		std::condition_variable mConditionalVar;
+		std::mutex mQueueMutex;
 
-		bool m_StopExecution = false;
+		bool mStopExecution = false;
 	};
 }

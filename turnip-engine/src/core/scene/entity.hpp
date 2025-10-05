@@ -1,9 +1,9 @@
 #pragma once
 #include <entt/entt.hpp>
 
-#include "scene.hpp"
 #include "common.hpp"
 #include "common_components.hpp"
+#include "scene.hpp"
 
 namespace tur
 {
@@ -12,61 +12,58 @@ namespace tur
 	public:
 		Entity() = default;
 
-		Entity(entt::entity entityHandle, Scene* sceneHandle)
-			: m_EntityHandle(entityHandle)
-			, m_Scene(sceneHandle)
-		{
-
-		}
+		Entity(entt::entity entityHandle, Scene* sceneHandle) : mEntityHandle(entityHandle), rScene(sceneHandle) {}
 
 	public:
-		template<typename T, typename... Args>
+		template <typename T, typename... Args>
 		T& add_component(Args&&... args)
 		{
-			// Todo: check whether the component accepts duplicates.
-
-			T& component = m_Scene->m_Registry.emplace<T>(m_EntityHandle, std::forward<Args>(args)...);
+			T& component = rScene->mRegistry.emplace<T>(mEntityHandle, std::forward<Args>(args)...);
 			return component;
 		}
 
-		template<typename T>
+		template <typename T>
 		void remove_component()
 		{
 			if (has_component<T>())
-				return TUR_LOG_WARN("Component already added");
+			{
+				TUR_LOG_WARN("Component already added");
+				return;
+			}
 
-			m_Scene->m_Registry.remove<T>(m_EntityHandle);
+			rScene->mRegistry.remove<T>(mEntityHandle);
 		}
 
-		template<typename T>
+		template <typename T>
 		const T& get_component() const
 		{
-			return m_Scene->m_Registry.get<T>(m_EntityHandle);
+			return rScene->mRegistry.get<T>(mEntityHandle);
 		}
 
-		template<typename T>
+		template <typename T>
 		T& get_component()
 		{
-			return m_Scene->m_Registry.get<T>(m_EntityHandle);
+			return rScene->mRegistry.get<T>(mEntityHandle);
 		}
 
-		template<typename T>
+		template <typename T>
 		bool has_component() const
 		{
-			return m_Scene->m_Registry.all_of<T>(m_EntityHandle);
+			return rScene->mRegistry.all_of<T>(mEntityHandle);
 		}
 
 	public:
-		inline bool is_valid() const { return m_EntityHandle != entt::null; }
-		inline UUID UUID() const { return get_component<UUIDComponent>().uuid; }
+		inline bool is_valid() const { return mEntityHandle != entt::null; }
+		inline UUID get_uuid() const { return get_component<UUIDComponent>().uuid; }
 		inline std::string name() const { return get_component<NameComponent>().name; }
 
 	public:
-		operator entt::entity() const { return m_EntityHandle; }
-		entt::entity get_handle() const { return m_EntityHandle; }
+		operator entt::entity() const { return mEntityHandle; }
+		entt::entity get_handle() const { return mEntityHandle; }
+		NON_OWNING Scene* get_scene() const { return rScene; }
 
 	private:
-		entt::entity m_EntityHandle = entt::null;
-		NON_OWNING Scene* m_Scene = nullptr;
+		entt::entity mEntityHandle = entt::null;
+		NON_OWNING Scene* rScene = nullptr;
 	};
 }

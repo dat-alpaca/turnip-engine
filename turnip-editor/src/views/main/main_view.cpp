@@ -1,4 +1,3 @@
-#include "pch.hpp"
 #include "main_view.hpp"
 #include "event/events.hpp"
 
@@ -25,7 +24,6 @@ void MainView::set_project_data(const ProjectData& projectData)
 
 	SceneDeserializer deserializer(&scene, projectData.projectPath / "scene.json");
 	deserializer.deserialize();
-
 
 	// Project Data:
 	{
@@ -67,7 +65,7 @@ void MainView::on_update()
 {
 	scene.on_update_runtime();
 
-	if (m_UpdateRenderCalled) 
+	if (m_UpdateRenderCalled)
 	{
 		auto size = m_SceneEditor.get_size();
 		update_render_target(static_cast<u32>(size.x), static_cast<u32>(size.y));
@@ -103,46 +101,58 @@ void MainView::on_event(Event& event)
 {
 	Subscriber subscriber(event);
 
-	subscriber.subscribe<OnProjectEdited>([&](OnProjectEdited&) -> bool {
-		append_window_title(m_ProjectData.projectName + "*");
-		return false;
-	});
-
-	subscriber.subscribe<OnProjectSaved>([&](OnProjectSaved&) -> bool {
-		SceneSerializer serializer(&scene, m_ProjectData.projectPath / "scene.json");
-		serializer.serialize();
-
-		save_project_data(m_ProjectData, &engine->assetLibrary);
-
-		append_window_title(m_ProjectData.projectName);
-		return false;
-	});
-
-	subscriber.subscribe<OnEntityInspectorInitialize>([&](const OnEntityInspectorInitialize&) -> bool {
-		TUR_LOG_INFO("Inspector initialized");
-		return false;
-	});
-
-	subscriber.subscribe<SceneEditorResized>([&](const SceneEditorResized& resizeEvent) -> bool {
-		if (resizeEvent.width <= 0 || resizeEvent.height <= 0)
+	subscriber.subscribe<OnProjectEdited>(
+		[&](OnProjectEdited&) -> bool
+		{
+			append_window_title(m_ProjectData.projectName + "*");
 			return false;
-		
-		// Render target:
-		call_update_render();
-		
-		// Viewport:
-		if(r_QuadRenderer)
-			renderer_set_viewport(r_QuadRenderer, { 0.0f, 0.0f, (float)resizeEvent.width, (float)resizeEvent.height });
-		
-		// Camera:
-		m_SceneData.editorCamera.camera.set_orthogonal(0.f, (float)resizeEvent.width, 0.f, (float)resizeEvent.height, -1.f, 1.f);
-		return false;
-	});
+		});
 
-	subscriber.subscribe<SceneEditorClicked>([&](const SceneEditorClicked& clickEvent) -> bool {
-		// Select object on view:
-		return false;
-	});
+	subscriber.subscribe<OnProjectSaved>(
+		[&](OnProjectSaved&) -> bool
+		{
+			SceneSerializer serializer(&scene, m_ProjectData.projectPath / "scene.json");
+			serializer.serialize();
+
+			save_project_data(m_ProjectData, &engine->assetLibrary);
+
+			append_window_title(m_ProjectData.projectName);
+			return false;
+		});
+
+	subscriber.subscribe<OnEntityInspectorInitialize>(
+		[&](const OnEntityInspectorInitialize&) -> bool
+		{
+			TUR_LOG_INFO("Inspector initialized");
+			return false;
+		});
+
+	subscriber.subscribe<SceneEditorResized>(
+		[&](const SceneEditorResized& resizeEvent) -> bool
+		{
+			if (resizeEvent.width <= 0 || resizeEvent.height <= 0)
+				return false;
+
+			// Render target:
+			call_update_render();
+
+			// Viewport:
+			if (r_QuadRenderer)
+				renderer_set_viewport(r_QuadRenderer,
+									  {0.0f, 0.0f, (float)resizeEvent.width, (float)resizeEvent.height});
+
+			// Camera:
+			m_SceneData.editorCamera.camera.set_orthogonal(0.f, (float)resizeEvent.width, 0.f,
+														   (float)resizeEvent.height, -1.f, 1.f);
+			return false;
+		});
+
+	subscriber.subscribe<SceneEditorClicked>(
+		[&](const SceneEditorClicked& clickEvent) -> bool
+		{
+			// Select object on view:
+			return false;
+		});
 
 	m_EntityInspector.on_event(event);
 	m_SceneEditor.on_event(event);
@@ -152,10 +162,10 @@ void MainView::on_render()
 	quad_renderer_system_begin(engine->quadRendererSystem, m_SceneData.sceneRenderTarget);
 	quad_renderer_system_render(engine->quadRendererSystem);
 	quad_renderer_system_end(engine->quadRendererSystem);
-	
-	//instanced_quad_system_begin(engine->instancedQuadSystem);
-	//instanced_quad_system_render(engine->instancedQuadSystem, m_SceneData.sceneRenderTarget);
-	//instanced_quad_system_end(engine->instancedQuadSystem);
+
+	// instanced_quad_system_begin(engine->instancedQuadSystem);
+	// instanced_quad_system_render(engine->instancedQuadSystem, m_SceneData.sceneRenderTarget);
+	// instanced_quad_system_end(engine->instancedQuadSystem);
 }
 
 void MainView::initialize_textures()
@@ -178,7 +188,7 @@ void MainView::initialize_renderer_system()
 	r_InstancedRenderer = &engine->instancedQuadSystem.renderer;
 	r_QuadRenderer = &engine->quadRendererSystem.renderer;
 
-	const Color& color = { 40, 40, 40, 255 };
+	const Color& color = {40, 40, 40, 255};
 
 	// Main:
 	{
@@ -193,9 +203,9 @@ void MainView::initialize_renderer_system()
 
 		instanced_quad_system_set_scene(engine->instancedQuadSystem, &scene);
 		instanced_quad_system_set_camera(engine->instancedQuadSystem, &m_SceneData.editorCamera.camera);
-		
+
 		renderer_set_clear_color(r_InstancedRenderer, color);
-		renderer_set_viewport(r_InstancedRenderer, { 0.f, 0.f, (float)windowSize.x, (float)windowSize.y });
+		renderer_set_viewport(r_InstancedRenderer, {0.f, 0.f, (float)windowSize.x, (float)windowSize.y});
 	}
 
 	// GUI:

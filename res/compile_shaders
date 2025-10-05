@@ -1,0 +1,8 @@
+glslc ./shaders/quad/quad_vk.vert -o ./shaders/quad/quad_vk_vert.spv
+glslc ./shaders/quad/quad_vk.frag -o ./shaders/quad/quad_vk_frag.spv
+
+glslc ./shaders/instanced/iquad_vk.vert -o ./shaders/instanced/iquad_vk_vert.spv
+glslc ./shaders/instanced/iquad_vk.frag -o ./shaders/instanced/iquad_vk_frag.spv
+
+glslc ./shaders/basic/basic_vk.vert -o ./shaders/basic/basic_vert.spv
+glslc ./shaders/basic/basic_vk.frag -o ./shaders/basic/basic_frag.spv

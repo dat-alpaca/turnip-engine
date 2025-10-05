@@ -1,16 +1,34 @@
 #pragma once
-#include "texture.hpp"
+#include "common.hpp"
+#include "graphics/objects/texture.hpp"
+#include <vector>
 
 namespace tur
 {
-	using render_target_handle = handle_type;
+	enum class LoadOp
+	{
+		LOAD,
+		CLEAR,
+		DONT_CARE
+	};
+
+	enum class StoreOp
+	{
+		STORE,
+		DONT_CARE
+	};
+
+	struct AttachmentDescription
+	{
+		TextureDescriptor textureDescriptor;
+		LoadOp loadOp = LoadOp::LOAD;
+		StoreOp storeOp = StoreOp::STORE;
+	};
 
 	struct RenderTargetDescriptor
 	{
-		u32 width;
-		u32 height;
-
-		std::vector<texture_handle> colorAttachments;
-		texture_handle depthAttachment = invalid_handle;
+		std::vector<AttachmentDescription> attachmentDescriptions = {};
 	};
+
+	using render_target_handle = handle_type;
 }

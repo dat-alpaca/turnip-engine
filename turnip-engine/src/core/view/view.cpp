@@ -1,6 +1,5 @@
-#include "pch.hpp"
 #include "view.hpp"
-#include "core/engine/engine.hpp"
+#include "engine/turnip_engine.hpp"
 
 namespace tur
 {
@@ -8,38 +7,33 @@ namespace tur
 	{
 		this->engine = engine;
 	}
-	void View::set_handle(view_handle textureHandle)
+	void View::set_handle(view_handle viewHandle)
 	{
-		viewHandle = textureHandle;
-	}
-
-	EventCallback View::get_main_event_callback() const
-	{
-		return engine->mainEventCallback;
+		viewHandle = viewHandle;
 	}
 }
 
 namespace tur
 {
-	view_handle view_system_add(ViewSystem* system, tur_unique<View> view)
+	view_handle ViewSystem::add(tur_unique<View> view)
 	{
 		view->on_view_added();
-		system->views.push_back(std::move(view));
+		mViews.push_back(std::move(view));
 
-		u32 textureHandle = static_cast<view_handle>(system->views.size() - 1);
-		system->views[textureHandle]->set_handle(textureHandle);
+		u32 viewHandle = static_cast<view_handle>(mViews.size() - 1);
+		mViews[viewHandle]->set_handle(viewHandle);
 
-		return textureHandle;
+		return viewHandle;
 	}
-	void view_system_remove(ViewSystem* system, view_handle textureHandle)
+	void ViewSystem::remove(view_handle handle)
 	{
-		auto viewSystemIterator = system->views.begin() + textureHandle;
+		auto viewSystemIterator = mViews.begin() + handle;
 		viewSystemIterator->get()->on_view_removed();
 
-		system->views.erase(viewSystemIterator);
+		mViews.erase(viewSystemIterator);
 	}
-	tur_unique<View>& view_system_get(ViewSystem* system, view_handle textureHandle)
+	tur_unique<View>& ViewSystem::get(view_handle handle)
 	{
-		return system->views[textureHandle];
+		return mViews[handle];
 	}
 }

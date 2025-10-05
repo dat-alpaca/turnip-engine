@@ -1,54 +1,49 @@
 #pragma once
-#include <vulkan/vulkan.hpp>
 #include <filesystem>
+#include <vulkan/vulkan.hpp>
 
-#include "graphics/graphics_api.hpp"
 #include "common.hpp"
+#include "graphics/graphics_api.hpp"
 
-#include "application_configuration.hpp"
-#include "engine_configuration.hpp"
-#include "window_configuration.hpp"
-#include "graphics_configuration.hpp"
-#include "vulkan_configuration.hpp"
-#include "quad_renderer_configuration.hpp"
-#include "instanced_quad_renderer_configuration.hpp"
+#include "application_config.hpp"
+#include "engine_config.hpp"
+#include "vulkan_config.hpp"
+//#include "instanced_quad_renderer_configuration.hpp"
+//#include "quad_renderer_configuration.hpp"
 #include "scripting_data.hpp"
+#include "window_config.hpp"
+#include "worker_config.hpp"
 
 #include "utils/json/json_file.hpp"
+
+// TODO: reimplement leftovers
 
 namespace tur
 {
 	struct ConfigData
 	{
-		EngineSpecification engineSpecification;
-		ApplicationSpecification applicationSpecification;
+		EngineSpecification engineSpecs;
+		ApplicationSpecification applicationSpecs;
 		WindowProperties windowProperties;
-		GraphicsSpecification graphicsSpecification;
-		QuadRendererInformation quadRendererInformation;
-		InstancedQuadRendererInformation instancedQuadRendererInformation;
-		vulkan::VulkanConfiguration vulkanConfiguration;
+		WindowingCapabilities windowingCapabilities;
+		// QuadRendererInformation quadRendererInformation;
+		// InstancedQuadRendererInformation instancedQuadRendererInformation;
 		ScriptingInfo scriptingInfo;
+		vulkan::VulkanConfig vulkanConfig;
+		WorkerConfig workerConfig;
 
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConfigData, 
-			engineSpecification, 
-			applicationSpecification, 
-			windowProperties,
-			graphicsSpecification,
-			quadRendererInformation,
-			instancedQuadRendererInformation,
-			vulkanConfiguration,
-			scriptingInfo
-		);
+		NLOHMANN_DEFINE_TYPE_INTRUSIVE(ConfigData, engineSpecs, applicationSpecs, windowProperties,
+									   windowingCapabilities, scriptingInfo, vulkanConfig, workerConfig);
 	};
 
 	inline void initialize_config_data(const std::filesystem::path& filepath)
 	{
-		if (!std::filesystem::exists(filepath))
-		{
-			std::ofstream file(filepath.string());
+		if (std::filesystem::exists(filepath))
+			return;
 
-			ConfigData defaultData;
-			json_write_file(filepath, defaultData);
-		}
+		std::ofstream file(filepath.string());
+
+		ConfigData defaultData;
+		json_write_file(filepath, defaultData);
 	}
 }
