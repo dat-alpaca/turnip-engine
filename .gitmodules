@@ -1,37 +1,40 @@
-[submodule "vendor/glfw"]
-	path = vendor/glfw
-	url = https://github.com/glfw/glfw
-[submodule "vendor/spdlog"]
-	path = vendor/spdlog
-	url = https://github.com/gabime/spdlog
-[submodule "vendor/glm"]
-	path = vendor/glm
-	url = https://github.com/g-truc/glm
-[submodule "vendor/entt"]
-	path = vendor/entt
-	url = https://github.com/skypjack/entt
-[submodule "vendor/VulkanMemoryAllocator"]
-	path = vendor/VulkanMemoryAllocator
-	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
-[submodule "vendor/Vulkan-Headers"]
-	path = vendor/Vulkan-Headers
-	url = https://github.com/KhronosGroup/Vulkan-Headers
-[submodule "vendor/glad-premake"]
-	path = vendor/glad-premake
-	url = https://github.com/premake-libs/glad
-[submodule "vendor/json"]
-	path = vendor/json
-	url = https://github.com/nlohmann/json
-[submodule "vendor/stb"]
-	path = vendor/stb
+[submodule "extern/pfd"]
+	path = extern/pfd
+	url = https://github.com/samhocevar/portable-file-dialogs
+[submodule "extern/sol2"]
+	path = extern/sol2
+	url = https://github.com/ThePhD/sol2.git
+[submodule "extern/stb"]
+	path = extern/stb
 	url = https://github.com/nothings/stb
-[submodule "vendor/imgui"]
-	path = vendor/imgui
+[submodule "extern/spdlog"]
+	path = extern/spdlog
+	url = https://github.com/gabime/spdlog
+[submodule "extern/json"]
+	path = extern/json
+	url = https://github.com/nlohmann/json
+[submodule "extern/glm"]
+	path = extern/glm
+	url = https://github.com/g-truc/glm
+[submodule "extern/entt"]
+	path = extern/entt
+	url = https://github.com/skypjack/entt.git
+[submodule "extern/vma"]
+	path = extern/vma
+	url = https://github.com/GPUOpen-LibrariesAndSDKs/VulkanMemoryAllocator
+[submodule "extern/glfw"]
+	path = extern/glfw
+	url = https://github.com/glfw/glfw
+[submodule "extern/glad"]
+	path = extern/glad
+	url = https://github.com/Dav1dde/glad
+[submodule "extern/imguizmo"]
+	path = extern/imguizmo
+	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "imgui"]
+	path = extern/imgui
 	url = https://github.com/ocornut/imgui
 	branch = docking
-[submodule "vendor/pfd"]
-	path = vendor/pfd
-	url = https://github.com/samhocevar/portable-file-dialogs
-[submodule "vendor/imguizmo"]
-	path = vendor/imguizmo
-	url = https://github.com/CedricGuillemet/ImGuizmo
+[submodule "extern/lua"]
+	path = extern/lua
+	url = https://github.com/marovira/lua
