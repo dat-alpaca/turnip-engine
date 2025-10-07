@@ -6,7 +6,8 @@
             "displayName": "Turnip Build: GCC 11.4.0 x86_64-linux-gnu",
             "description": "Build with GCC",
             "configurePreset": "turnip",
-            "jobs": 24
+            "jobs": 12,
+            "verbose": true
         }
     ],
     "configurePresets": [
@@ -21,7 +22,9 @@
                 "CMAKE_C_COMPILER": "/usr/bin/gcc",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
                 "CMAKE_BUILD_TYPE": "Debug",
-                "CMAKE_POLICY_VERSION_MINIMUM": "3.5"
+                "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
+                "CMAKE_COLOR_DIAGNOSTICS": "ON",
+                "CMAKE_COLOR_MAKEFILE": "ON"
             }
         }
     ]

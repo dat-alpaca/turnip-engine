@@ -17,27 +17,13 @@
 				"all"
 			],
 			"preset": "turnip-build",
-			"group": "build",
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
 			"problemMatcher": [],
 			"detail": "CMake template build task",
 			"dependsOn": "CMake: configure"
-		},
-		{
-			"type": "cppbuild",
-			"label": "valgrind",
-			"command": "valgrind",
-			"args": [
-				"--tool=memcheck",
-				"--leak-check=yes",
-				"${workspaceFolder}/build/turnip/turnip-sandbox/turnip-sandbox"
-			],
-			"options": {
-				"cwd": "${workspaceFolder}"
-			},
-			"problemMatcher": [
-				"$gcc"
-			],
-			"group": "build",
 		}
 	]
 }
