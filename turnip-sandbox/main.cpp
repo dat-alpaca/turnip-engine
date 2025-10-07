@@ -43,11 +43,12 @@ public:
 
 				// Pipeline:
 				// TODO: fix clang-format
-				PipelineDescriptor pipelineDescriptor = {.vertexInputStage = vertexInput,
-														 .vertexShader = vertexShader,
-														 .fragmentShader = fragmentShader,
-														 .dynamicStates = std::to_array<const DynamicState>(
-															 {DynamicState::VIEWPORT, DynamicState::SCISSOR})};
+				PipelineDescriptor pipelineDescriptor = {
+					.vertexInputStage = vertexInput,
+					.dynamicStates = std::to_array<const DynamicState>({DynamicState::VIEWPORT, DynamicState::SCISSOR}),
+					.vertexShader = vertexShader,
+					.fragmentShader = fragmentShader,
+				};
 
 				pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
 

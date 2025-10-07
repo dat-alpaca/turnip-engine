@@ -263,7 +263,7 @@ namespace tur::vulkan
 	{
 		vk::PipelineMultisampleStateCreateInfo multisampleCreateInfo = {};
 
-		// TODO: descriptor.
+		// TODO: add parameters to the descriptor.
 		multisampleCreateInfo.flags = vk::PipelineMultisampleStateCreateFlags();
 		multisampleCreateInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
 
@@ -286,7 +286,7 @@ namespace tur::vulkan
 	{
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {};
 		{
-			// TODO: use descriptor
+			// TODO: use descriptor parameters
 
 			vk::ColorComponentFlags colorComponentFlags(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
 														| vk::ColorComponentFlagBits::eB
@@ -367,8 +367,10 @@ namespace tur::vulkan
 		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment();
 		vk::PipelineColorBlendStateCreateInfo colorBlending = create_color_blend_state(colorAttachment);
 
-		auto setLayout = allocate_descriptor_set_layout(rhi->get_state().logicalDevice, descriptor.descriptorSetLayout);
-		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout);
+		pipeline.setLayout =
+			allocate_descriptor_set_layout(rhi->get_state().logicalDevice, descriptor.descriptorSetLayout);
+		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&pipeline.setLayout);
+
 		try
 		{
 			pipeline.layout = device.createPipelineLayout(pipelineLayout);
@@ -379,7 +381,7 @@ namespace tur::vulkan
 		}
 
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):
-		// TODO: rendering info
+		// TODO: add rendering info to descriptor parameters
 		vk::PipelineRenderingCreateInfo renderingInfo = {};
 		{
 			vk::Format format = swapchainFormat.format;

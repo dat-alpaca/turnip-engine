@@ -143,6 +143,11 @@ namespace tur
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
 
+		// Viewport & Scissor:
+		std::vector<Viewport> viewports = {};
+		std::vector<Extent2D> scissors = {};
+		std::span<const DynamicState> dynamicStates = {};
+
 		DescriptorSetLayout descriptorSetLayout;
 
 		shader_handle vertexShader = invalid_handle;
@@ -150,11 +155,5 @@ namespace tur
 		shader_handle tesselationEvaluationShader = invalid_handle;
 		shader_handle geometryShader = invalid_handle;
 		shader_handle fragmentShader = invalid_handle;
-
-		// Viewport & Scissor:
-		std::vector<Viewport> viewports = {};
-		std::vector<Extent2D> scissors = {};
-
-		std::span<const DynamicState> dynamicStates = {};
 	};
 }

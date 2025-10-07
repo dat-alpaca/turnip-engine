@@ -75,6 +75,7 @@ namespace tur::vulkan
 			Pipeline& pipeline = pipelines.get(pipelineHandle);
 			device.destroyPipelineLayout(pipeline.layout);
 			device.destroyPipeline(pipeline.pipeline);
+			device.destroyDescriptorSetLayout(pipeline.setLayout);
 		}
 		mPipelineHandles.clear();
 	}
