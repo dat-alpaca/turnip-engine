@@ -16,3 +16,4 @@ AllowShortBlocksOnASingleLine: false
 AllowShortFunctionsOnASingleLine: InlineOnly
 IndentCaseLabels: true
 PackConstructorInitializers: Never
+AlignAfterOpenBracket: BlockIndent

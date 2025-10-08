@@ -91,9 +91,10 @@ namespace tur::vulkan
 {
 	using dynamic_states = std::vector<vk::DynamicState>;
 
-	static vk::PipelineDynamicStateCreateInfo create_dynamic_states(const PipelineDescriptor& descriptor)
+	static vk::PipelineDynamicStateCreateInfo
+	create_dynamic_states(const PipelineDescriptor& descriptor, dynamic_states& states)
 	{
-		dynamic_states dynamicStates = {};
+		states.reserve(descriptor.dynamicStates.size());
 
 		vk::PipelineDynamicStateCreateInfo dynamicStateCreateInfo = {};
 		{
@@ -104,17 +105,17 @@ namespace tur::vulkan
 				switch (descriptor)
 				{
 					case DynamicState::VIEWPORT:
-						dynamicStates.push_back(vk::DynamicState::eViewport);
+						states.push_back(vk::DynamicState::eViewport);
 						break;
 
 					case DynamicState::SCISSOR:
-						dynamicStates.push_back(vk::DynamicState::eScissor);
+						states.push_back(vk::DynamicState::eScissor);
 						break;
 				}
 			}
 
-			dynamicStateCreateInfo.dynamicStateCount = static_cast<u32>(dynamicStates.size());
-			dynamicStateCreateInfo.pDynamicStates = dynamicStates.data();
+			dynamicStateCreateInfo.dynamicStateCount = static_cast<u32>(states.size());
+			dynamicStateCreateInfo.pDynamicStates = states.data();
 		}
 
 		return dynamicStateCreateInfo;
@@ -124,8 +125,13 @@ namespace tur::vulkan
 // Viewport & Scissor:
 namespace tur::vulkan
 {
-	static vk::PipelineViewportStateCreateInfo create_viewport_state(const PipelineDescriptor& descriptor)
+	static vk::PipelineViewportStateCreateInfo create_viewport_state(
+		const PipelineDescriptor& descriptor, std::vector<vk::Viewport>& viewports, std::vector<vk::Rect2D>& scissors
+	)
 	{
+		viewports.clear();
+		scissors.clear();
+
 		vk::PipelineViewportStateCreateInfo pipelineViewportState = {};
 
 		pipelineViewportState.flags = vk::PipelineViewportStateCreateFlags();
@@ -133,7 +139,6 @@ namespace tur::vulkan
 		pipelineViewportState.viewportCount = descriptor.viewports.size();
 
 		// Viewports:
-		std::vector<vk::Viewport> viewports;
 		for (const auto& viewport : descriptor.viewports)
 			viewports.push_back(vk::Viewport{viewport.x, viewport.y, viewport.width, viewport.height});
 
@@ -144,10 +149,8 @@ namespace tur::vulkan
 			pipelineViewportState.pViewports = viewports.data();
 
 		// Scissors:
-		std::vector<vk::Rect2D> scissors;
 		for (const auto& scissor : descriptor.scissors)
-			scissors.push_back(
-				vk::Rect2D{{(float)scissor.x, (float)scissor.y}, {(float)scissor.width, (float)scissor.height}});
+			scissors.push_back(vk::Rect2D{{(i32)scissor.x, (i32)scissor.y}, {(u32)scissor.width, (u32)scissor.height}});
 
 		pipelineViewportState.scissorCount = static_cast<u32>(scissors.size());
 		pipelineViewportState.pScissors = nullptr;
@@ -162,30 +165,33 @@ namespace tur::vulkan
 // Input State
 namespace tur::vulkan
 {
-	static vk::PipelineVertexInputStateCreateInfo create_input_info(const PipelineDescriptor& descriptor)
+	using vertex_input_bindings = std::vector<vk::VertexInputBindingDescription>;
+	using attribute_bindings = std::vector<vk::VertexInputAttributeDescription>;
+
+	static vk::PipelineVertexInputStateCreateInfo create_input_info(
+		const PipelineDescriptor& descriptor, vertex_input_bindings& bindingDescriptions,
+		attribute_bindings& attributeDescriptions
+	)
 	{
-		// Vertex Input:
-		std::vector<vk::VertexInputBindingDescription> bindingDescriptions;
+		bindingDescriptions.clear();
+		attributeDescriptions.clear();
+
+		// Bindings:
+		const auto& bindings = descriptor.vertexInputStage.vertexBindings;
+		bindingDescriptions.reserve(bindings.size());
+		for (const auto& binding : bindings)
 		{
-			// Bindings:
-			const auto& bindings = descriptor.vertexInputStage.vertexBindings;
-			bindingDescriptions.reserve(bindings.size());
-			for (const auto& binding : bindings)
-			{
-				vk::VertexInputBindingDescription bindingDescription = {};
-				bindingDescription.binding = binding.binding;
-				bindingDescription.stride = binding.stride;
+			vk::VertexInputBindingDescription bindingDescription = {};
+			bindingDescription.binding = binding.binding;
+			bindingDescription.stride = binding.stride;
 
-				bool isVertexRate = binding.inputRate == InputRate::VERTEX;
-				bindingDescription.inputRate =
-					isVertexRate ? vk::VertexInputRate::eVertex : vk::VertexInputRate::eInstance;
+			bool isVertexRate = binding.inputRate == InputRate::VERTEX;
+			bindingDescription.inputRate = isVertexRate ? vk::VertexInputRate::eVertex : vk::VertexInputRate::eInstance;
 
-				bindingDescriptions.push_back(bindingDescription);
-			}
+			bindingDescriptions.push_back(bindingDescription);
 		}
 
 		// Attributes:
-		std::vector<vk::VertexInputAttributeDescription> attributeDescriptions;
 		{
 			const auto& attributes = descriptor.vertexInputStage.attributes;
 			attributeDescriptions.reserve(attributes.size());
@@ -288,9 +294,10 @@ namespace tur::vulkan
 		{
 			// TODO: use descriptor parameters
 
-			vk::ColorComponentFlags colorComponentFlags(vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG
-														| vk::ColorComponentFlagBits::eB
-														| vk::ColorComponentFlagBits::eA);
+			vk::ColorComponentFlags colorComponentFlags(
+				vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB
+				| vk::ColorComponentFlagBits::eA
+			);
 
 			colorBlendAttachmentState.blendEnable = false;
 			colorBlendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eOne;
@@ -357,9 +364,18 @@ namespace tur::vulkan
 
 		pipeline_shaders shaders = create_shaders(rhi->get_resource_handler(), descriptor);
 
-		vk::PipelineDynamicStateCreateInfo dynamicStates = create_dynamic_states(descriptor);
-		vk::PipelineViewportStateCreateInfo viewportStates = create_viewport_state(descriptor);
-		vk::PipelineVertexInputStateCreateInfo vertexInput = create_input_info(descriptor);
+		dynamic_states dynamicStatesList;
+		vk::PipelineDynamicStateCreateInfo dynamicStates = create_dynamic_states(descriptor, dynamicStatesList);
+
+		std::vector<vk::Viewport> viewports;
+		std::vector<vk::Rect2D> scissors;
+		vk::PipelineViewportStateCreateInfo viewportStates = create_viewport_state(descriptor, viewports, scissors);
+
+		vertex_input_bindings bindingDescriptions;
+		attribute_bindings attributes;
+		vk::PipelineVertexInputStateCreateInfo vertexInput =
+			create_input_info(descriptor, bindingDescriptions, attributes);
+
 		vk::PipelineInputAssemblyStateCreateInfo inputAssembly = create_input_assembly(descriptor);
 		vk::PipelineRasterizationStateCreateInfo rasterizer = create_rasterizer(descriptor);
 		vk::PipelineMultisampleStateCreateInfo multisample = create_multisample();
@@ -383,8 +399,9 @@ namespace tur::vulkan
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):
 		// TODO: add rendering info to descriptor parameters
 		vk::PipelineRenderingCreateInfo renderingInfo = {};
+		vk::Format format = vk::Format::eR8G8B8A8Unorm;
 		{
-			vk::Format format = swapchainFormat.format;
+			// vk::Format format = swapchainFormat.format;
 			renderingInfo.colorAttachmentCount = 1;
 			renderingInfo.pColorAttachmentFormats = &format;
 		}
@@ -421,7 +438,8 @@ namespace tur::vulkan
 
 				case vk::Result::ePipelineCompileRequiredEXT:
 					TUR_LOG_CRITICAL(
-						"VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT_EXT on PipelineCreateInfo");
+						"VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT_EXT on PipelineCreateInfo"
+					);
 					break;
 
 				default:

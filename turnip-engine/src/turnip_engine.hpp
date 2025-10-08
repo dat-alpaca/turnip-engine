@@ -3,6 +3,8 @@
 #include "core/config/config_data.hpp"
 #include "core/engine/turnip_engine.hpp"
 
+#include "graphics/renderer/imm_quad_renderer.hpp"
+
 #include "core/event/event.hpp"
 #include "core/event/event_type.hpp"
 

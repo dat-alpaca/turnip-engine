@@ -10,6 +10,7 @@ namespace tur
 		COLOR = 1 << 0,
 		DEPTH = 1 << 1,
 		STENCIL = 1 << 1,
+		ALL = COLOR | DEPTH | STENCIL
 	};
 
 	struct ClearColor

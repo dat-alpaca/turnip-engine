@@ -47,8 +47,8 @@ namespace tur
 
 	struct VertexInputDescriptor
 	{
-		std::vector<BindingDescriptor> vertexBindings;
-		std::vector<Attribute> attributes;
+		std::span<const BindingDescriptor> vertexBindings;
+		std::span<const Attribute> attributes;
 	};
 }
 
@@ -144,8 +144,8 @@ namespace tur
 		RasterizerDescriptor rasterizerStage;
 
 		// Viewport & Scissor:
-		std::vector<Viewport> viewports = {};
-		std::vector<Extent2D> scissors = {};
+		std::span<const Viewport> viewports = {};
+		std::span<const Extent2D> scissors = {};
 		std::span<const DynamicState> dynamicStates = {};
 
 		DescriptorSetLayout descriptorSetLayout;

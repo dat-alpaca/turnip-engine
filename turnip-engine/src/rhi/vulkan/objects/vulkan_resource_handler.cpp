@@ -83,8 +83,12 @@ namespace tur::vulkan
 		rRHI->get_deletion_queue().submit_pipeline(pipelineHandle);
 	}
 
-	buffer_handle ResourceHandler::create_buffer(const BufferDescriptor& descriptor, const std::vector<byte>& data)
+	buffer_handle ResourceHandler::create_buffer(const BufferDescriptor& descriptor, const void* data, Range range)
 	{
+		TUR_ASSERT(data, "Invalid data pointer");
+		TUR_ASSERT(range.size > 0, "Invalid range size");
+		TUR_ASSERT(range.offset >= 0, "Invalid offset size");
+
 		auto& vmaAllocator = rRHI->get_state().vmaAllocator;
 
 		// Source Buffer:
@@ -94,7 +98,7 @@ namespace tur::vulkan
 			srcDescriptor.type = descriptor.type | BufferType::TRANSFER_DST;
 			srcDescriptor.memoryUsage = BufferMemoryUsage::GPU_ONLY;
 		}
-		Buffer buffer = allocate_buffer(vmaAllocator, srcDescriptor, data.size());
+		Buffer buffer = allocate_buffer(vmaAllocator, srcDescriptor, range.size);
 
 		// Staging buffer:
 		BufferDescriptor stagingDescriptor = {};
@@ -102,30 +106,32 @@ namespace tur::vulkan
 			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
 			stagingDescriptor.type = BufferType::TRANSFER_SRC;
 		}
-		Buffer stagingBuffer = allocate_buffer(vmaAllocator, stagingDescriptor, data.size());
+		Buffer stagingBuffer = allocate_buffer(vmaAllocator, stagingDescriptor, range.size);
 
 		// Buffer data:
-		if (data.data())
+		if (data)
 		{
 			void* bufferData = nullptr;
 			vmaMapMemory(vmaAllocator, stagingBuffer.allocation, &bufferData);
-			std::memcpy(bufferData, (u8*)data.data(), data.size());
+			std::memcpy(bufferData, (byte*)(data) + range.offset, range.size);
 			vmaUnmapMemory(vmaAllocator, stagingBuffer.allocation);
 		}
 
 		// Buffer copy:
-		utils::submit_immediate_command(*rRHI,
-										[&](vk::CommandBuffer commandBuffer)
-										{
-											vk::BufferCopy region;
-											{
-												region.dstOffset = 0;
-												region.srcOffset = 0;
-												region.size = data.size();
-											}
+		utils::submit_immediate_command(
+			*rRHI,
+			[&](vk::CommandBuffer commandBuffer)
+			{
+				vk::BufferCopy region;
+				{
+					region.dstOffset = 0;
+					region.srcOffset = 0;
+					region.size = range.size;
+				}
 
-											commandBuffer.copyBuffer(stagingBuffer.buffer, buffer.buffer, region);
-										});
+				commandBuffer.copyBuffer(stagingBuffer.buffer, buffer.buffer, region);
+			}
+		);
 
 		vmaDestroyBuffer(vmaAllocator, stagingBuffer.buffer, stagingBuffer.allocation);
 		return mBuffers.add(buffer);
@@ -134,8 +140,14 @@ namespace tur::vulkan
 	{
 		return mBuffers.add(allocate_buffer(rRHI->get_state().vmaAllocator, descriptor, size));
 	}
-	void ResourceHandler::update_buffer(buffer_handle bufferHandle, const std::vector<byte>& data, u32 offset)
+	void ResourceHandler::update_buffer(buffer_handle bufferHandle, const void* data, Range range)
 	{
+		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer handle");
+
+		TUR_ASSERT(data, "Invalid data pointer");
+		TUR_ASSERT(range.size > 0, "Invalid range size");
+		TUR_ASSERT(range.offset >= 0, "Invalid offset size");
+
 		const Buffer& targetBuffer = mBuffers.get(bufferHandle);
 		auto& vmaAllocator = rRHI->get_state().vmaAllocator;
 
@@ -145,84 +157,91 @@ namespace tur::vulkan
 			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
 			stagingDescriptor.type = BufferType::TRANSFER_SRC;
 		}
-		Buffer stagingBuffer = allocate_buffer(vmaAllocator, stagingDescriptor, data.size());
+		Buffer stagingBuffer = allocate_buffer(vmaAllocator, stagingDescriptor, range.size);
 
 		{
 			void* bufferData = nullptr;
 			vmaMapMemory(vmaAllocator, stagingBuffer.allocation, &bufferData);
-			std::memcpy(bufferData, (u8*)data.data() + offset, data.size());
+			std::memcpy(bufferData, (byte*)(data) + range.offset, range.size);
 			vmaUnmapMemory(vmaAllocator, stagingBuffer.allocation);
 		}
 
 		// Buffer copy:
-		utils::submit_immediate_command(*rRHI,
-										[&](vk::CommandBuffer commandBuffer)
-										{
-											vk::BufferCopy region;
-											{
-												region.dstOffset = 0;
-												region.srcOffset = 0;
-												region.size = data.size();
-											}
+		utils::submit_immediate_command(
+			*rRHI,
+			[&](vk::CommandBuffer commandBuffer)
+			{
+				vk::BufferCopy region;
+				{
+					region.dstOffset = 0;
+					region.srcOffset = 0;
+					region.size = range.size;
+				}
 
-											commandBuffer.copyBuffer(stagingBuffer.buffer, targetBuffer.buffer, region);
-										});
+				commandBuffer.copyBuffer(stagingBuffer.buffer, targetBuffer.buffer, region);
+			}
+		);
 
 		vmaDestroyBuffer(vmaAllocator, stagingBuffer.buffer, stagingBuffer.allocation);
 	}
-	void ResourceHandler::copy_buffer(buffer_handle source, buffer_handle destination, u32 size, u32 srcOffset,
-									  u32 dstOffset)
+	void ResourceHandler::copy_buffer(
+		buffer_handle source, buffer_handle destination, u32 size, u32 srcOffset, u32 dstOffset
+	)
 	{
-		utils::submit_immediate_command(*rRHI,
-										[&](vk::CommandBuffer commandBuffer)
-										{
-											vk::BufferCopy region;
-											{
-												region.dstOffset = dstOffset;
-												region.srcOffset = srcOffset;
-												region.size = size;
-											}
+		utils::submit_immediate_command(
+			*rRHI,
+			[&](vk::CommandBuffer commandBuffer)
+			{
+				vk::BufferCopy region;
+				{
+					region.dstOffset = dstOffset;
+					region.srcOffset = srcOffset;
+					region.size = size;
+				}
 
-											commandBuffer.copyBuffer(mBuffers.get(source).buffer,
-																	 mBuffers.get(destination).buffer, region);
-										});
+				commandBuffer.copyBuffer(mBuffers.get(source).buffer, mBuffers.get(destination).buffer, region);
+			}
+		);
 	}
-	void ResourceHandler::copy_buffer_to_texture(buffer_handle source, texture_handle destination, u32 width,
-												 u32 height, u32 depth)
+	void ResourceHandler::copy_buffer_to_texture(
+		buffer_handle source, texture_handle destination, u32 width, u32 height, u32 depth
+	)
 	{
 		const Buffer& buffer = mBuffers.get(source);
 		const Texture& texture = mTextures.get(destination);
 
-		utils::submit_immediate_command(*rRHI,
-										[&](vk::CommandBuffer commandBuffer)
-										{
-											vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
+		utils::submit_immediate_command(
+			*rRHI,
+			[&](vk::CommandBuffer commandBuffer)
+			{
+				vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
 
-											vk::BufferImageCopy2 region;
-											{
-												region.bufferOffset = 0;
-												region.bufferRowLength = 0;
-												region.bufferImageHeight = 0;
+				vk::BufferImageCopy2 region;
+				{
+					region.bufferOffset = 0;
+					region.bufferRowLength = 0;
+					region.bufferImageHeight = 0;
 
-												region.imageSubresource.aspectMask = aspectMask;
-												region.imageSubresource.mipLevel = 0;
-												region.imageSubresource.baseArrayLayer = 0;
-												region.imageSubresource.layerCount = 1;
-												region.imageOffset = vk::Offset3D(0, 0, 0);
-												region.imageExtent = vk::Extent3D(width, height, depth);
-											}
+					region.imageSubresource.aspectMask = aspectMask;
+					region.imageSubresource.mipLevel = 0;
+					region.imageSubresource.baseArrayLayer = 0;
+					region.imageSubresource.layerCount = 1;
+					region.imageOffset = vk::Offset3D(0, 0, 0);
+					region.imageExtent = vk::Extent3D(width, height, depth);
+				}
 
-											vk::CopyBufferToImageInfo2 copyInfo = {};
-											{
-												copyInfo.srcBuffer = buffer.buffer;
-												copyInfo.dstImage = texture.image;
-												copyInfo.dstImageLayout = vk::ImageLayout::eTransferDstOptimal;
-												copyInfo.regionCount = 1;
-												copyInfo.pRegions = &region;
-											}
+				vk::CopyBufferToImageInfo2 copyInfo = {};
+				{
+					copyInfo.srcBuffer = buffer.buffer;
+					copyInfo.dstImage = texture.image;
+					copyInfo.dstImageLayout = vk::ImageLayout::eTransferDstOptimal;
+					copyInfo.regionCount = 1;
+					copyInfo.pRegions = &region;
+				}
 
-											commandBuffer.copyBufferToImage2(copyInfo);
-										});
+				commandBuffer.copyBufferToImage2(copyInfo);
+			}
+		);
 	}
 	void ResourceHandler::destroy_buffer(buffer_handle bufferHandle)
 	{
@@ -248,7 +267,8 @@ namespace tur::vulkan
 	texture_handle ResourceHandler::create_empty_texture(const TextureDescriptor& descriptor)
 	{
 		return mTextures.add(
-			allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor));
+			allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor)
+		);
 	}
 	void ResourceHandler::update_texture(texture_handle textureHandle, const TextureAsset& asset)
 	{
@@ -259,7 +279,8 @@ namespace tur::vulkan
 			stagingDescriptor.type = BufferType::TRANSFER_SRC | BufferType::TRANSFER_DST;
 		}
 
-		buffer_handle stagingBufferHandle = create_buffer(stagingDescriptor, asset.data);
+		buffer_handle stagingBufferHandle =
+			create_buffer(stagingDescriptor, asset.data.data(), {.size = asset.data.size()});
 
 		// TODO: prepare other image layouts
 		{

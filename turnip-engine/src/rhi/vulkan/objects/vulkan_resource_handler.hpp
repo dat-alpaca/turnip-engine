@@ -12,6 +12,7 @@
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 
+#include <span>
 #include <unordered_map>
 #include <vulkan/vulkan.hpp>
 
@@ -38,13 +39,13 @@ namespace tur::vulkan
 		void destroy_graphics_pipeline(pipeline_handle pipelineHandle);
 
 	public:
-		buffer_handle create_buffer(const BufferDescriptor& descriptor, const std::vector<byte>& data);
+		buffer_handle create_buffer(const BufferDescriptor& descriptor, const void* data, Range range);
 		buffer_handle create_empty_buffer(const BufferDescriptor& descriptor, u32 size);
-		void update_buffer(buffer_handle bufferHandle, const std::vector<byte>& data, u32 offset);
+		void update_buffer(buffer_handle bufferHandle, const void* data, Range range);
 		void* map_buffer(buffer_handle bufferHandle, u32 offset, u32 length, AccessFlags flags) { return nullptr; }
 		void copy_buffer(buffer_handle source, buffer_handle destination, u32 size, u32 srcOffset, u32 dstOffset);
-		void copy_buffer_to_texture(buffer_handle source, texture_handle destination, u32 width, u32 height,
-									u32 depth = 1);
+		void
+		copy_buffer_to_texture(buffer_handle source, texture_handle destination, u32 width, u32 height, u32 depth = 1);
 		void destroy_buffer(buffer_handle bufferHandle);
 
 	public:

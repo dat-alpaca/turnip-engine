@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/objects/command_buffer.hpp"
+#include "rhi/vulkan/objects/buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 #include <vulkan/vulkan.hpp>
 
@@ -17,23 +18,28 @@ namespace tur::vulkan
 
 	public:
 		void reset(vk::CommandBuffer commandBuffer);
-		void set_clear_color(const ClearColor& clearColor);
 
 	public:
 		void begin(render_target_handle renderTargetHandle = invalid_handle);
 		void end();
 
+	public:
+		void clear(const ClearColor& clearColor, ClearFlags flags);
+		void set_viewport(const Viewport& viewport);
+		void set_scissor(const Extent2D& scissor);
+
+	public:
+		void bind_vertex_buffer(buffer_handle bufferHandle, u32 binding);
+		void bind_index_buffer(buffer_handle bufferHandle, BufferIndexType type);
+
+		void bind_pipeline(pipeline_handle pipelineHandle);
+
 		/*
 				protected:
-					void set_viewport(const Viewport& viewport);
-					void set_scissor(const Rect2D& scissor);
-					void clear(ClearFlags flags, const ClearValue& clearValue);
+					void bind_pipeline(pipeline_handle );
+					void bind_descriptor_set(descriptor_set_handle );
 
-				protected:
-					void bind_pipeline(pipeline_handle textureHandle);
-					void bind_descriptor_set(descriptor_set_handle textureHandle);
-					void bind_vertex_buffer(buffer_handle textureHandle, u32 binding, u32 stride);
-					void bind_index_buffer(buffer_handle textureHandle, BufferIndexType type);
+					void bind_index_buffer(buffer_handle , BufferIndexType type);
 
 				protected:
 					void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);

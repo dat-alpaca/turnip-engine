@@ -144,7 +144,6 @@ namespace tur::vulkan
 
 		if (imageResult.result == vk::Result::eErrorOutOfDateKHR)
 			utils::recreate_swapchain(*this);
-
 		else if (imageResult.result != vk::Result::eSuccess && imageResult.result != vk::Result::eSuboptimalKHR)
 			TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 
@@ -294,8 +293,17 @@ namespace tur::vulkan::utils
 		if (!queueOpt.has_value())
 			return TUR_LOG_ERROR("Invalid immediate command transfer queue fetched.");
 
-		queueOpt.value().queue.submit2(submitInfo, fence);
-		auto _ = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
+		auto& queue = queueOpt.value().queue;
+
+		try
+		{
+			queue.submit2(submitInfo, fence);
+			auto _ = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
+		}
+		catch (vk::SystemError& err)
+		{
+			TUR_LOG_CRITICAL("Failed to submit immediate command: {}", err.what());
+		}
 	}
 
 	void recreate_swapchain(RenderInterfaceVulkan& rhi)
@@ -327,6 +335,9 @@ namespace tur::vulkan::utils
 
 	void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, vk::ImageLayout newLayout)
 	{
+		if (texture.layout == newLayout)
+			return;
+
 		utils::submit_immediate_command(
 			rhi,
 			[&](vk::CommandBuffer commandBuffer)
@@ -344,7 +355,6 @@ namespace tur::vulkan::utils
 
 					imageBarrier.oldLayout = texture.layout;
 					imageBarrier.newLayout = newLayout;
-					texture.layout = newLayout;
 
 					if (newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
 						aspectMask = vk::ImageAspectFlagBits::eDepth;
@@ -371,6 +381,9 @@ namespace tur::vulkan::utils
 				{
 					TUR_LOG_CRITICAL("Failed to issue transition image layout command. {}", err.what());
 				}
-			});
+
+				texture.layout = newLayout;
+			}
+		);
 	}
 }
