@@ -6,8 +6,7 @@
             "displayName": "Turnip Build: GCC 11.4.0 x86_64-linux-gnu",
             "description": "Build with GCC",
             "configurePreset": "turnip",
-            "jobs": 12,
-            "verbose": true
+            "jobs": 12
         }
     ],
     "configurePresets": [

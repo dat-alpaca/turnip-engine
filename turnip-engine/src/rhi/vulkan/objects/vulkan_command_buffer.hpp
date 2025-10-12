@@ -34,12 +34,12 @@ namespace tur::vulkan
 
 		void bind_pipeline(pipeline_handle pipelineHandle);
 
+	public:
+		void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
+
 		/*
 				protected:
-					void bind_pipeline(pipeline_handle );
-					void bind_descriptor_set(descriptor_set_handle );
-
-					void bind_index_buffer(buffer_handle , BufferIndexType type);
+						void bind_descriptor_set(descriptor_set_handle );
 
 				protected:
 					void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);

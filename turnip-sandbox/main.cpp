@@ -27,11 +27,7 @@ public:
 
 	void on_view_removed() override { TUR_LOG_DEBUG("MainView Removed"); }
 
-	void on_render() override
-	{
-		mRenderer.render();
-		return;
-	}
+	void on_render() override { mRenderer.render(); }
 	void on_render_gui() override {}
 
 	void on_update() override

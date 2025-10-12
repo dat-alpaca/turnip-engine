@@ -57,22 +57,42 @@ namespace tur::vulkan
 
 	static VKAPI_ATTR VkBool32 VKAPI_CALL default_debug_callback(
 		VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType,
-		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData)
+		const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData
+	)
 	{
 		auto severity = get_message_severity_name(messageSeverity);
 		auto type = get_message_type_name(messageType);
 
-		TUR_LOG_ERROR("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
+		switch (messageSeverity)
+		{
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT:
+				TUR_LOG_DEBUG("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
+				break;
+
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT:
+				TUR_LOG_INFO("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
+				break;
+
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT:
+				TUR_LOG_WARN("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
+				break;
+
+			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
+				TUR_LOG_ERROR("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
+				break;
+		}
+
 		return VK_FALSE;
 	}
 
-	static void destroy_messenger_ext(vk::Instance instance, vk::DebugUtilsMessengerEXT debugMessenger,
-									  const VkAllocationCallbacks* pAllocator)
+	static void destroy_messenger_ext(
+		vk::Instance instance, vk::DebugUtilsMessengerEXT debugMessenger, const VkAllocationCallbacks* pAllocator
+	)
 	{
 		auto func =
 			(PFN_vkDestroyDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkDestroyDebugUtilsMessengerEXT");
 
-		if (func != nullptr)
+		if (func)
 			func(instance, debugMessenger, pAllocator);
 	}
 }
@@ -92,16 +112,13 @@ namespace tur::vulkan
 		state.requiresDrawing = instanceConfig.enableDrawing;
 		state.validationEnabled = instanceConfig.enableValidationLayers;
 
-#ifdef TUR_DEBUG
-		state.validationEnabled = true;
-#endif
-
 		// Application information:
 		vk::ApplicationInfo applicationInformation = vk::ApplicationInfo(
 			appConfig.applicationName.c_str(),
 			VK_MAKE_API_VERSION(appConfig.variant, appConfig.major, appConfig.minor, appConfig.patch), TUR_ENGINE_NAME,
 			VK_MAKE_API_VERSION(engineConfig.variant, engineConfig.major, engineConfig.minor, engineConfig.patch),
-			state.apiVersion);
+			state.apiVersion
+		);
 
 		// Extensions & Layers:
 		std::vector<const char*> layers;
@@ -152,7 +169,8 @@ namespace tur::vulkan
 		// Instance:
 		vk::InstanceCreateInfo createInfo = vk::InstanceCreateInfo(
 			vk::InstanceCreateFlags(), &applicationInformation, static_cast<uint32_t>(layers.size()), layers.data(),
-			static_cast<uint32_t>(extensions.size()), extensions.data());
+			static_cast<uint32_t>(extensions.size()), extensions.data()
+		);
 
 		try
 		{
@@ -168,9 +186,10 @@ namespace tur::vulkan
 		if (!state.validationEnabled)
 			return;
 
-		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo =
-			vk::DebugUtilsMessengerCreateInfoEXT(vk::DebugUtilsMessengerCreateFlagsEXT(), DefaultDebugMessageSeverity,
-												 DefaultDebugMessageType, default_debug_callback, nullptr);
+		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = vk::DebugUtilsMessengerCreateInfoEXT(
+			vk::DebugUtilsMessengerCreateFlagsEXT(), DefaultDebugMessageSeverity, DefaultDebugMessageType,
+			default_debug_callback, nullptr
+		);
 
 		vk::DispatchLoaderDynamic DLDI(state.instance, vkGetInstanceProcAddr);
 		state.debugMessenger = state.instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, DLDI);

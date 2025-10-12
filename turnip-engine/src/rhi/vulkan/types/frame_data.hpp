@@ -16,7 +16,7 @@ namespace tur::vulkan
 	struct FrameDataHolder
 	{
 	public:
-		explicit FrameDataHolder(u32 totalAllocatedFrames = 3)
+		explicit FrameDataHolder(u32 totalAllocatedFrames = 2)
 		{
 			mData.clear();
 			mData.resize(totalAllocatedFrames);

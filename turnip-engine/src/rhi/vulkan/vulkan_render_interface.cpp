@@ -138,14 +138,27 @@ namespace tur::vulkan
 
 		mDeletionQueue.flush();
 
-		auto imageResult =
-			device.acquireNextImageKHR(swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore);
-		mFrameDataHolder.set_image_buffer_index(imageResult.value);
+		// Acquiring swapchain:
+		{
+			auto imageResult =
+				device.acquireNextImageKHR(swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore);
+			mFrameDataHolder.set_image_buffer_index(imageResult.value);
 
-		if (imageResult.result == vk::Result::eErrorOutOfDateKHR)
-			utils::recreate_swapchain(*this);
-		else if (imageResult.result != vk::Result::eSuccess && imageResult.result != vk::Result::eSuboptimalKHR)
-			TUR_LOG_CRITICAL("Failed to acquire swapchain image");
+			if (imageResult.result == vk::Result::eErrorOutOfDateKHR)
+				utils::recreate_swapchain(*this);
+
+			else if (imageResult.result != vk::Result::eSuccess && imageResult.result != vk::Result::eSuboptimalKHR)
+			{
+				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
+			}
+
+			else if (imageResult.result == vk::Result::eSuccess)
+			{
+			}
+
+			else
+				TUR_LOG_WARN("Acquire returned error");
+		}
 
 		vk::CommandBufferBeginInfo beginInfo = {};
 		{
@@ -171,8 +184,8 @@ namespace tur::vulkan
 		vk::Queue queue = mState.queueList.get_queue(graphicsQueue).queue;
 		auto& frameData = mFrameDataHolder.get_current_frame_data();
 
-		vk::Semaphore signalSemaphores[] = {frameData.renderFinishedSemaphore};
 		vk::Semaphore waitSemaphores[] = {frameData.imageAvailableSemaphore};
+		vk::Semaphore signalSemaphores[] = {frameData.renderFinishedSemaphore};
 		vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 		vk::SubmitInfo submitInfo = {};
 		{
@@ -199,20 +212,19 @@ namespace tur::vulkan
 	}
 	void RenderInterfaceVulkan::present(queue_handle presentQueue)
 	{
-		// Submits a present command using "presentQueue", and the internal swapchain
+		// Submits a present command using "presentQueue" and the internal swapchain
 
 		vk::Queue queue = mState.queueList.get_queue(presentQueue).queue;
 		auto& frameHolder = mFrameDataHolder;
 		const auto& frameData = frameHolder.get_current_frame_data();
 
-		vk::Semaphore signalSemaphores[] = {frameData.renderFinishedSemaphore};
-		vk::Semaphore waitSemaphores[] = {frameData.imageAvailableSemaphore};
+		vk::Semaphore waitSemaphores[] = {frameData.renderFinishedSemaphore};
 
 		u32 imageIndices[] = {frameHolder.get_image_buffer_index()};
 		vk::PresentInfoKHR presentInfo = {};
 		{
 			presentInfo.waitSemaphoreCount = 1;
-			presentInfo.pWaitSemaphores = signalSemaphores;
+			presentInfo.pWaitSemaphores = waitSemaphores;
 			presentInfo.swapchainCount = 1;
 			presentInfo.pSwapchains = &mState.swapchain;
 			presentInfo.pImageIndices = imageIndices;
@@ -298,16 +310,29 @@ namespace tur::vulkan::utils
 		try
 		{
 			queue.submit2(submitInfo, fence);
-			auto _ = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
+		}
+		catch (vk::DeviceLostError& err)
+		{
+			TUR_LOG_CRITICAL("Failed to submit immediate command: {}", err.what());
 		}
 		catch (vk::SystemError& err)
 		{
 			TUR_LOG_CRITICAL("Failed to submit immediate command: {}", err.what());
 		}
+
+		try
+		{
+			auto _ = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
+		}
+		catch (vk::SystemError& err)
+		{
+			TUR_LOG_CRITICAL("Failed to wait for queue: {}", err.what());
+		}
 	}
 
 	void recreate_swapchain(RenderInterfaceVulkan& rhi)
 	{
+		TUR_LOG_DEBUG("RECREATE");
 		auto& state = rhi.get_state();
 		auto* window = rhi.get_window();
 
@@ -333,57 +358,58 @@ namespace tur::vulkan::utils
 		rhi.create_main_render_target();
 	}
 
-	void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, vk::ImageLayout newLayout)
+	void transition_texture_layout(
+		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
+	)
 	{
-		if (texture.layout == newLayout)
+		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
+
+		if (texture.layout == description.newLayout)
+		{
+			TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
+		}
 
-		utils::submit_immediate_command(
-			rhi,
-			[&](vk::CommandBuffer commandBuffer)
-			{
-				vk::ImageAspectFlags aspectMask;
-				vk::ImageSubresourceRange subresourceRange;
+		vk::ImageAspectFlags aspectMask;
+		vk::ImageSubresourceRange subresourceRange;
 
-				vk::ImageMemoryBarrier2 imageBarrier = {};
-				{
-					imageBarrier.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands; // TODO: restrict
-					imageBarrier.srcAccessMask = vk::AccessFlagBits2::eMemoryRead;
+		vk::ImageMemoryBarrier2 imageBarrier = {};
+		{
+			imageBarrier.srcStageMask = description.srcStageMask;
+			imageBarrier.srcAccessMask = description.srcAccessMask;
 
-					imageBarrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands; // TODO: restrict
-					imageBarrier.dstAccessMask = vk::AccessFlagBits2::eMemoryWrite | vk::AccessFlagBits2::eMemoryRead;
+			imageBarrier.dstStageMask = description.dstStageMask;
+			imageBarrier.dstAccessMask = description.dstAccessMask;
 
-					imageBarrier.oldLayout = texture.layout;
-					imageBarrier.newLayout = newLayout;
+			imageBarrier.oldLayout = texture.layout;
+			imageBarrier.newLayout = description.newLayout;
 
-					if (newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
-						aspectMask = vk::ImageAspectFlagBits::eDepth;
-					else
-						aspectMask = vk::ImageAspectFlagBits::eColor;
+			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			else
+				aspectMask = vk::ImageAspectFlagBits::eColor;
 
-					subresourceRange.aspectMask = aspectMask;
-					subresourceRange.baseMipLevel = 0;
-					subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
-					subresourceRange.baseArrayLayer = 0;
-					subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+			subresourceRange.aspectMask = aspectMask;
+			subresourceRange.baseMipLevel = 0;
+			subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+			subresourceRange.baseArrayLayer = 0;
+			subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
 
-					imageBarrier.subresourceRange = subresourceRange;
-					imageBarrier.image = texture.image;
-				}
+			imageBarrier.subresourceRange = subresourceRange;
+			imageBarrier.image = texture.image;
+		}
 
-				vk::DependencyInfo dependencyInfo = vk::DependencyInfo().setImageMemoryBarriers(imageBarrier);
+		vk::DependencyInfo dependencyInfo = vk::DependencyInfo().setImageMemoryBarriers(imageBarrier);
 
-				try
-				{
-					commandBuffer.pipelineBarrier2(dependencyInfo);
-				}
-				catch (vk::SystemError& err)
-				{
-					TUR_LOG_CRITICAL("Failed to issue transition image layout command. {}", err.what());
-				}
+		try
+		{
+			commandBuffer.pipelineBarrier2(dependencyInfo);
+		}
+		catch (vk::SystemError& err)
+		{
+			TUR_LOG_CRITICAL("Failed to issue transition image layout command. {}", err.what());
+		}
 
-				texture.layout = newLayout;
-			}
-		);
+		texture.layout = description.newLayout;
 	}
 }

@@ -64,8 +64,15 @@ namespace tur::vulkan
 	constexpr static inline VmaAllocationCreateFlags get_buffer_memory_flags(BufferUsage usage)
 	{
 		VmaAllocationCreateFlags flags = 0;
+
+		if (static_cast<u32>(usage) & static_cast<u32>(BufferUsage::WRITE))
+			flags |= VMA_ALLOCATION_CREATE_HOST_ACCESS_SEQUENTIAL_WRITE_BIT;
+
 		if (static_cast<u32>(usage) & static_cast<u32>(BufferUsage::PERSISTENT))
 			flags |= VMA_ALLOCATION_CREATE_MAPPED_BIT;
+
+		if (static_cast<u32>(usage) & static_cast<u32>(BufferUsage::COHERENT))
+			flags |= VK_MEMORY_PROPERTY_HOST_COHERENT_BIT;
 
 		return flags;
 	}
@@ -87,7 +94,7 @@ namespace tur::vulkan
 				return VMA_MEMORY_USAGE_CPU_TO_GPU;
 		}
 
-		TUR_LOG_ERROR("Invalid buffer memory usage: {}. Default: VMA_CPU_ONLY", static_cast<u32>(memoryUsage));
-		return VMA_MEMORY_USAGE_CPU_ONLY;
+		TUR_LOG_INFO("Using default memory usage: AUTO", static_cast<u32>(memoryUsage));
+		return VMA_MEMORY_USAGE_AUTO;
 	}
 }

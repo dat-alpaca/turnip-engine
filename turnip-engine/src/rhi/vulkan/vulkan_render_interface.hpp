@@ -15,24 +15,37 @@ namespace tur::vulkan
 {
 	namespace utils
 	{
+		struct ImageTransitionDescription
+		{
+			vk::ImageLayout newLayout;
+			vk::PipelineStageFlags2 srcStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+			vk::AccessFlags2 srcAccessMask = vk::AccessFlagBits2::eMemoryRead;
+
+			vk::PipelineStageFlags2 dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+			vk::AccessFlags2 dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+		};
+
 		using immediate_cmd_function = std::function<void(vk::CommandBuffer recordingBuffer)>;
 
 		void submit_immediate_command(RenderInterfaceVulkan& rhi, immediate_cmd_function&& command);
 
 		void recreate_swapchain(RenderInterfaceVulkan& rhi);
 
-		void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, vk::ImageLayout newLayout);
+		void transition_texture_layout(
+			RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
+		);
 	}
 
 	class RenderInterfaceVulkan
 	{
-		friend void utils::submit_immediate_command(RenderInterfaceVulkan& rhi,
-													utils::immediate_cmd_function&& command);
+		friend void
+		utils::submit_immediate_command(RenderInterfaceVulkan& rhi, utils::immediate_cmd_function&& command);
 
 		friend void utils::recreate_swapchain(RenderInterfaceVulkan& rhi);
 
-		friend void utils::transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture,
-													 vk::ImageLayout newLayout);
+		friend void utils::transition_texture_layout(
+			RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description
+		);
 
 	public:
 		void initialize(const ConfigData& configData, Window& window);

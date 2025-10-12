@@ -9,6 +9,8 @@
 
 namespace tur
 {
+	// TODO: number -> parameter names
+
 	// clang-format off
 	template <typename T, typename CommandBufferType>
 	concept IsCommandBuffer = requires(T t, CommandBufferType commandBuffer)
@@ -42,6 +44,11 @@ namespace tur
 	requires(T t, pipeline_handle pipelineHandle)
 	{
         { t.bind_pipeline(pipelineHandle) };
+	} &&
+
+	requires(T t, u32 number)
+	{
+        { t.draw(number, number, number, number) };
 	};
 	// clang-format on
 

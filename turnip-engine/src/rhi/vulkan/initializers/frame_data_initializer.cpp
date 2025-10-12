@@ -5,6 +5,8 @@
 
 namespace tur::vulkan
 {
+	// TODO: set a flag in frame data holder indicating it's been initialized.
+	// TODO: private constructor
 	void initialize_frame_data(VulkanState& state, FrameDataHolder& holder)
 	{
 		// Swapchain Images:

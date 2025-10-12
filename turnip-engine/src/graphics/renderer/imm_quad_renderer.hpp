@@ -25,24 +25,38 @@ namespace tur
 			auto& rhi = *rRHI;
 
 			rhi.begin_frame();
+			TUR_LOG_WARN("FRAME START()");
+
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
 
 			mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});
 			mCommandBuffer.set_scissor(Extent2D{0, 0, 640, 480});
 			{
 				mCommandBuffer.begin();
-				mCommandBuffer.bind_pipeline(pipeline);
-				mCommandBuffer.bind_vertex_buffer(vbo, 0);
+				TUR_LOG_WARN("BEGIN()");
 
-				// bind_resources()
-				// draw()
+				mCommandBuffer.bind_vertex_buffer(vbo, 0);
+				TUR_LOG_WARN("VBO()");
+
+				mCommandBuffer.bind_pipeline(pipeline);
+				TUR_LOG_WARN("PIPE()");
+
+				mCommandBuffer.draw(3, 1, 0, 0);
+				TUR_LOG_WARN("DRAW()");
 
 				mCommandBuffer.end();
+				TUR_LOG_WARN("END()");
 			}
 
 			rhi.end_frame();
+			TUR_LOG_WARN("FRAME END()");
+
 			rhi.submit(graphicsQueue);
+			TUR_LOG_WARN("SUB()");
+
 			rhi.present(presentQueue);
+			TUR_LOG_WARN("PRESENT()");
+			TUR_LOG_WARN("------------------");
 		}
 
 	private:
@@ -63,18 +77,15 @@ namespace tur
 
 			{
 				BufferDescriptor descriptor = {
-					.type = BufferType::VERTEX_BUFFER | BufferType::TRANSFER_DST,
+					.type = BufferType::VERTEX_BUFFER,
 				};
-
-				std::array<Vertex, 4> vertices = {
-					Vertex{glm::vec3{-0.5f, -0.5f, 0.0f}},
-					Vertex{glm::vec3{0.5f, -0.5f, 0.0f}},
+				std::array<Vertex, 3> vertices = {
+					Vertex{glm::vec3{-0.5f, -0.5f, 0.0f}}, Vertex{glm::vec3{0.5f, -0.5f, 0.0f}},
 					Vertex{glm::vec3{0.5f, 0.5f, 0.0f}},
-					Vertex{glm::vec3{-0.5f, 0.5f, 0.0f}},
+					// Vertex{glm::vec3{-0.5f, 0.5f, 0.0f}},
 				};
 
-				vbo = resources.create_empty_buffer(descriptor, sizeof(vertices) * 4);
-				resources.update_buffer(vbo, vertices.data(), {.size = sizeof(vertices)});
+				vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 3});
 			}
 		}
 
@@ -124,10 +135,15 @@ namespace tur
 					.attributes = Attributes
 				},
 
+				.inputAssemblyStage = 
+				{
+					.topology = PrimitiveTopology::TRIANGLES,
+					.primitiveRestartEnable = false
+				},
 				.rasterizerStage = 
 				{
 					.frontFace = FrontFace::COUNTER_CLOCKWISE, 
-					.cullMode = CullMode::FRONT
+					.cullMode = CullMode::FRONT,
 				},
 				.viewports = Viewports,
 				.scissors = Scissors,

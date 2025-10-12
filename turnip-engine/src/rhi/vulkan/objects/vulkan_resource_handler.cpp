@@ -1,5 +1,8 @@
 #include "vulkan_resource_handler.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+#include <vk_mem_alloc.h>
+
+// TODO: asserts
 
 namespace tur::vulkan
 {
@@ -88,14 +91,15 @@ namespace tur::vulkan
 		TUR_ASSERT(data, "Invalid data pointer");
 		TUR_ASSERT(range.size > 0, "Invalid range size");
 		TUR_ASSERT(range.offset >= 0, "Invalid offset size");
+		TUR_ASSERT(range.offset + range.size <= range.size, "Invalid range offset");
 
 		auto& vmaAllocator = rRHI->get_state().vmaAllocator;
 
 		// Source Buffer:
 		BufferDescriptor srcDescriptor = {};
 		{
-			srcDescriptor.usage = descriptor.usage;
 			srcDescriptor.type = descriptor.type | BufferType::TRANSFER_DST;
+			srcDescriptor.usage = descriptor.usage | BufferUsage::PERSISTENT;
 			srcDescriptor.memoryUsage = BufferMemoryUsage::GPU_ONLY;
 		}
 		Buffer buffer = allocate_buffer(vmaAllocator, srcDescriptor, range.size);
@@ -103,17 +107,23 @@ namespace tur::vulkan
 		// Staging buffer:
 		BufferDescriptor stagingDescriptor = {};
 		{
-			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
 			stagingDescriptor.type = BufferType::TRANSFER_SRC;
+			stagingDescriptor.usage = BufferUsage::PERSISTENT;
+			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
 		}
+
 		Buffer stagingBuffer = allocate_buffer(vmaAllocator, stagingDescriptor, range.size);
 
 		// Buffer data:
 		if (data)
 		{
 			void* bufferData = nullptr;
-			vmaMapMemory(vmaAllocator, stagingBuffer.allocation, &bufferData);
-			std::memcpy(bufferData, (byte*)(data) + range.offset, range.size);
+
+			VkResult mapResult = vmaMapMemory(vmaAllocator, stagingBuffer.allocation, &bufferData);
+			if (mapResult != VK_SUCCESS || !bufferData)
+				TUR_LOG_CRITICAL("Failed to map memory from staging buffer");
+
+			std::memcpy(bufferData, (byte*)data + range.offset, range.size);
 			vmaUnmapMemory(vmaAllocator, stagingBuffer.allocation);
 		}
 
@@ -260,7 +270,8 @@ namespace tur::vulkan
 			update_texture(handle, asset);
 
 		else
-			utils::transition_texture_layout(*rRHI, texture, vk::ImageLayout::eShaderReadOnlyOptimal);
+			// TODO: proper masks
+			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal});
 
 		return handle;
 	}
@@ -284,11 +295,13 @@ namespace tur::vulkan
 
 		// TODO: prepare other image layouts
 		{
-			utils::transition_texture_layout(*rRHI, texture, vk::ImageLayout::eTransferDstOptimal);
+			// TODO: proper masks
+			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eTransferDstOptimal});
 
 			copy_buffer_to_texture(stagingBufferHandle, textureHandle, asset.width, asset.height);
 
-			utils::transition_texture_layout(*rRHI, texture, vk::ImageLayout::eShaderReadOnlyOptimal);
+			// TODO: proper masks
+			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal});
 		}
 
 		destroy_buffer(stagingBufferHandle);

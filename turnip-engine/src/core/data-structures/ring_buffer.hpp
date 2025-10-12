@@ -22,7 +22,7 @@ namespace tur
 		constexpr void set(const T& data, u64 index) { mData[index] = data; }
 		constexpr void set(T&& data, u64 index) { mData[index] = std::move(data); }
 
-		constexpr inline void advance() noexcept { mCurrentIndex = (++mCurrentIndex) % mSize; }
+		constexpr inline void advance() noexcept { mCurrentIndex = (mCurrentIndex + 1) % mSize; }
 
 		inline void clear() noexcept { mData.clear(); }
 		inline void resize(size_type size) noexcept

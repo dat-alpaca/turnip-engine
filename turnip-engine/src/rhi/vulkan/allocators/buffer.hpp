@@ -24,9 +24,10 @@ namespace tur::vulkan
 		Buffer buffer = {};
 		buffer.size = size;
 
-		VkResult result =
-			vmaCreateBuffer(allocator, reinterpret_cast<VkBufferCreateInfo*>(&createInfo), &vmaAllocationCreateInfo,
-							reinterpret_cast<VkBuffer*>(&buffer.buffer), &buffer.allocation, &buffer.allocationInfo);
+		VkResult result = vmaCreateBuffer(
+			allocator, reinterpret_cast<VkBufferCreateInfo*>(&createInfo), &vmaAllocationCreateInfo,
+			reinterpret_cast<VkBuffer*>(&buffer.buffer), &buffer.allocation, &buffer.allocationInfo
+		);
 
 		if (result != VK_SUCCESS)
 			TUR_LOG_CRITICAL("Failed to create buffer.");

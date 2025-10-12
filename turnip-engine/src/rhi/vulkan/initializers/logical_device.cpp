@@ -2,7 +2,6 @@
 
 #include "rhi/vulkan/types/queue_family.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
-//#include "rhi/vulkan/vulkan_helpers.hpp"
 
 namespace tur::vulkan
 {
@@ -69,7 +68,8 @@ namespace tur::vulkan
 		vk::DeviceCreateInfo deviceInfo = vk::DeviceCreateInfo(
 			vk::DeviceCreateFlags(), static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(),
 			static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data(),
-			&deviceFeatures, &vulkan12Features);
+			&deviceFeatures, &vulkan12Features
+		);
 
 		try
 		{
@@ -81,10 +81,28 @@ namespace tur::vulkan
 		}
 
 		// Queue Creation:
+		// TODO: improve this mess
+		queue_family_index graphicsIndex, presentIndex;
+		bool graphicsSet = false, presentSet = false;
 		for (const auto& [queueFamilyIndex, operation] : queueFamilies)
 		{
-			vk::Queue queue = state.logicalDevice.getQueue(queueFamilyIndex, 0);
-			state.queueList.register_queue({queue, operation, queueFamilyIndex});
+			if ((operation & QueueOperation::GRAPHICS) && !graphicsSet)
+			{
+				graphicsIndex = queueFamilyIndex;
+				graphicsSet = true;
+			}
+			if ((operation & QueueOperation::PRESENT) && !presentSet)
+			{
+				presentIndex = queueFamilyIndex;
+				presentSet = true;
+			}
 		}
+
+		vk::Queue queue = state.logicalDevice.getQueue(graphicsIndex, 0);
+		QueueOperation operation = (QueueOperation)(QueueOperation::GRAPHICS | QueueOperation::TRANSFER);
+		state.queueList.register_queue({queue, operation, graphicsIndex});
+
+		queue = state.logicalDevice.getQueue(presentIndex, 0);
+		state.queueList.register_queue({queue, QueueOperation::PRESENT, presentIndex});
 	}
 }
