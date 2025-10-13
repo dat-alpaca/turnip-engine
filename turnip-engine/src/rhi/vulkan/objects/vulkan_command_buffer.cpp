@@ -194,18 +194,16 @@ namespace tur::vulkan
 			{.newLayout = vk::ImageLayout::eTransferSrcOptimal,
 			 .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
 			 .srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
-			 .dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+			 .dstStageMask = vk::PipelineStageFlagBits2::eBlit,
 			 .dstAccessMask = vk::AccessFlagBits2::eTransferRead}
 		);
 
 		utils::transition_texture_layout(
 			*rRHI, swapchainTexture,
 			{.newLayout = vk::ImageLayout::eTransferDstOptimal,
-			 .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput | vk::PipelineStageFlagBits2::eCopy
-							 | vk::PipelineStageFlagBits2::eResolve | vk::PipelineStageFlagBits2::eBlit
-							 | vk::PipelineStageFlagBits2::eClear,
-			 .srcAccessMask = vk::AccessFlagBits2::eMemoryRead,
-			 .dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+			 .srcStageMask = vk::PipelineStageFlagBits2::eAllCommands,
+			 .srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
+			 .dstStageMask = vk::PipelineStageFlagBits2::eBlit,
 			 .dstAccessMask = vk::AccessFlagBits2::eTransferWrite}
 		);
 
@@ -214,10 +212,27 @@ namespace tur::vulkan
 			swapchainExtent
 		);
 
+		// TODO: Organize barriers
+		vk::MemoryBarrier2 memory_barrier = {};
+		{
+			memory_barrier.srcStageMask = vk::PipelineStageFlagBits2::eBlit;
+			memory_barrier.srcAccessMask = vk::AccessFlagBits2::eTransferWrite;
+			memory_barrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
+			memory_barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
+		}
+
+		vk::DependencyInfo dependencyInfo = {};
+		{
+			dependencyInfo.memoryBarrierCount = 1;
+			dependencyInfo.pMemoryBarriers = &memory_barrier;
+		}
+
+		mCommandBuffer.pipelineBarrier2(&dependencyInfo);
+
 		utils::transition_texture_layout(
 			*rRHI, swapchainTexture,
 			{.newLayout = vk::ImageLayout::ePresentSrcKHR,
-			 .srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+			 .srcStageMask = vk::PipelineStageFlagBits2::eBlit,
 			 .srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
 			 .dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
 			 .dstAccessMask = vk::AccessFlagBits2::eNone}

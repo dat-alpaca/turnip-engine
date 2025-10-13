@@ -104,7 +104,7 @@ namespace tur::vulkan
 		RenderTargetDescriptor descriptor;
 		{
 			TextureDescriptor textureDesc;
-			textureDesc.format = get_texture_format(mState.swapchainFormat.format);
+			textureDesc.format = TextureFormat::RGBA8_UNORM; // TODO: add a global variable to it
 			textureDesc.width = mState.swapchainExtent.width;
 			textureDesc.height = mState.swapchainExtent.height;
 
@@ -125,7 +125,6 @@ namespace tur::vulkan
 
 		mFrameDataHolder.advance();
 		auto& frameData = mFrameDataHolder.get_current_frame_data();
-		TUR_LOG_DEBUG("FRAME: {}", mFrameDataHolder.mData.mCurrentIndex);
 
 		try
 		{
@@ -387,9 +386,9 @@ namespace tur::vulkan::utils
 
 			subresourceRange.aspectMask = aspectMask;
 			subresourceRange.baseMipLevel = 0;
-			subresourceRange.levelCount = VK_REMAINING_MIP_LEVELS;
+			subresourceRange.levelCount = texture.descriptor.mipLevels;
 			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = VK_REMAINING_ARRAY_LAYERS;
+			subresourceRange.layerCount = 1; // TODO: change to texture.layers
 
 			imageBarrier.subresourceRange = subresourceRange;
 			imageBarrier.image = texture.image;

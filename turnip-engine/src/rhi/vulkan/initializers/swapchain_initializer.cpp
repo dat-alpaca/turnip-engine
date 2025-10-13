@@ -86,6 +86,7 @@ namespace tur::vulkan
 			createInfo.oldSwapchain = requirements.oldSwapchain;
 		}
 
+		// TODO: make it explicit that these queues are the ones responsible for the main operations.
 		// Queues:
 		auto graphicsQueueOpt = state.queueList.get_queue(QueueOperation::GRAPHICS);
 		if (!graphicsQueueOpt.has_value())

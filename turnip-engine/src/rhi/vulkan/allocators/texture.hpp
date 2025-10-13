@@ -9,7 +9,7 @@ namespace tur::vulkan
 {
 	inline Texture allocate_texture(vk::Device device, VmaAllocator allocator, const TextureDescriptor& descriptor)
 	{
-		Texture texture;
+		Texture texture = {};
 		texture.format = get_texture_format(descriptor.format);
 		texture.extent = vk::Extent3D{descriptor.width, descriptor.height, descriptor.depth};
 		texture.layout = vk::ImageLayout::eUndefined;
@@ -77,9 +77,10 @@ namespace tur::vulkan
 			imageAllocationInfo.requiredFlags = VkMemoryPropertyFlags(VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 		}
 
-		if (vmaCreateImage(allocator, reinterpret_cast<const VkImageCreateInfo*>(&imageCreateInfo),
-						   &imageAllocationInfo, reinterpret_cast<VkImage*>(&texture.image), &texture.allocation,
-						   nullptr)
+		if (vmaCreateImage(
+				allocator, reinterpret_cast<const VkImageCreateInfo*>(&imageCreateInfo), &imageAllocationInfo,
+				reinterpret_cast<VkImage*>(&texture.image), &texture.allocation, nullptr
+			)
 			!= VK_SUCCESS)
 		{
 			TUR_LOG_ERROR("Failed to create image");

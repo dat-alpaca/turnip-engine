@@ -280,8 +280,14 @@ namespace tur::vulkan
 // Depth & Stencil
 namespace tur::vulkan
 {
-	static void create_depth_stencil_objects()
+	static vk::PipelineDepthStencilStateCreateInfo create_depth_stencil_objects()
 	{
+		vk::PipelineDepthStencilStateCreateInfo depthStencil = {};
+		depthStencil.depthTestEnable = false;
+		depthStencil.depthWriteEnable = false;
+		depthStencil.depthCompareOp = vk::CompareOp::eAlways;
+
+		return depthStencil;
 	}
 }
 
@@ -291,34 +297,31 @@ namespace tur::vulkan
 	static vk::PipelineColorBlendAttachmentState create_color_blend_attachment()
 	{
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {};
-		{
-			// TODO: use descriptor parameters
+		// TODO: use descriptor parameters
 
-			vk::ColorComponentFlags colorComponentFlags(
-				vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB
-				| vk::ColorComponentFlagBits::eA
-			);
+		vk::ColorComponentFlags colorComponentFlags(
+			vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB
+			| vk::ColorComponentFlagBits::eA
+		);
 
-			colorBlendAttachmentState.blendEnable = false;
-			colorBlendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eOne;
-			colorBlendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eZero;
+		colorBlendAttachmentState.blendEnable = false;
+		colorBlendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eOne;
+		colorBlendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eZero;
 
-			colorBlendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
+		colorBlendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
 
-			colorBlendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOne;
-			colorBlendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
+		colorBlendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOne;
+		colorBlendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
 
-			colorBlendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
-			colorBlendAttachmentState.colorWriteMask = colorComponentFlags;
-		}
+		colorBlendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
+		colorBlendAttachmentState.colorWriteMask = colorComponentFlags;
 
 		return colorBlendAttachmentState;
 	}
 
 	static vk::PipelineColorBlendStateCreateInfo
-	create_color_blend_state(vk::PipelineColorBlendAttachmentState colorBlendAttachmentState)
+	create_color_blend_state(const vk::PipelineColorBlendAttachmentState& colorBlendAttachmentState)
 	{
-
 		vk::PipelineColorBlendStateCreateInfo pipelineColorBlendStateCreateInfo = {};
 		{
 			pipelineColorBlendStateCreateInfo.flags = vk::PipelineColorBlendStateCreateFlags();
@@ -382,6 +385,8 @@ namespace tur::vulkan
 		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment();
 		vk::PipelineColorBlendStateCreateInfo colorBlending = create_color_blend_state(colorAttachment);
 
+		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects();
+
 		pipeline.setLayout =
 			allocate_descriptor_set_layout(rhi->get_state().logicalDevice, descriptor.descriptorSetLayout);
 		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&pipeline.setLayout);
@@ -398,7 +403,7 @@ namespace tur::vulkan
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):
 		// TODO: add rendering info to descriptor parameters
 		vk::PipelineRenderingCreateInfo renderingInfo = {};
-		vk::Format format = swapchainFormat.format;
+		vk::Format format = get_texture_format(descriptor.targetFormat);
 		{
 			renderingInfo.colorAttachmentCount = 1;
 			renderingInfo.pColorAttachmentFormats = &format;
@@ -419,7 +424,7 @@ namespace tur::vulkan
 			pipelineInfo.pInputAssemblyState = &inputAssembly;
 			pipelineInfo.pRasterizationState = &rasterizer;
 			pipelineInfo.pMultisampleState = &multisample;
-			pipelineInfo.pDepthStencilState = nullptr;
+			pipelineInfo.pDepthStencilState = &depthStencil;
 			pipelineInfo.pColorBlendState = &colorBlending;
 
 			pipelineInfo.layout = pipeline.layout;

@@ -38,10 +38,10 @@ namespace tur
 				mCommandBuffer.bind_vertex_buffer(vbo, 0);
 				TUR_LOG_WARN("VBO()");
 
-				// mCommandBuffer.bind_pipeline(pipeline);
+				mCommandBuffer.bind_pipeline(pipeline);
 				TUR_LOG_WARN("PIPE()");
 
-				// mCommandBuffer.draw(3, 1, 0, 0);
+				mCommandBuffer.draw(3, 1, 0, 0);
 				TUR_LOG_WARN("DRAW()");
 
 				mCommandBuffer.end();

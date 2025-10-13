@@ -3,6 +3,7 @@
 
 #include "common.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/texture.hpp"
 #include "graphics/types/pipeline_stage.hpp"
 #include "graphics/types/pipeline_type.hpp"
 
@@ -155,5 +156,8 @@ namespace tur
 		shader_handle tesselationEvaluationShader = invalid_handle;
 		shader_handle geometryShader = invalid_handle;
 		shader_handle fragmentShader = invalid_handle;
+
+		// Work image texture format:
+		TextureFormat targetFormat = TextureFormat::RGBA8_UNORM;
 	};
 }
