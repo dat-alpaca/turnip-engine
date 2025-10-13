@@ -16,13 +16,26 @@ namespace tur::vulkan
 	struct FrameDataHolder
 	{
 	public:
-		explicit FrameDataHolder(u32 totalAllocatedFrames = 2)
+		void initialize(vk::Device device, vk::CommandPool commandPool, u32 totalAllocatedFrames)
 		{
-			mData.clear();
+			shutdown(device);
 			mData.resize(totalAllocatedFrames);
+
+			// Command buffers:
+			for (auto& frame : mData.get_data())
+				frame.commandBuffer = allocate_single_primary_command_buffer(device, commandPool);
+
+			// Synchonization primitives:
+			for (auto& frame : mData.get_data())
+				frame.recordingFence = allocate_signaled_fence(device);
+
+			for (auto& frame : mData.get_data())
+			{
+				frame.imageAvailableSemaphore = allocate_semaphore(device);
+				frame.renderFinishedSemaphore = allocate_semaphore(device);
+			}
 		}
 
-	public:
 		void shutdown(vk::Device& device)
 		{
 			for (const auto& frame : mData)

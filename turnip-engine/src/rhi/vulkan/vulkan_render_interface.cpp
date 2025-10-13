@@ -41,7 +41,7 @@ namespace tur::vulkan
 		}
 
 		// Frame Data:
-		initialize_frame_data(mState, mFrameDataHolder);
+		mFrameDataHolder.initialize(mState.logicalDevice, mState.commandPool, mState.swapChainImages.size());
 
 		// Main Render Target:
 		create_main_render_target();
@@ -353,8 +353,7 @@ namespace tur::vulkan::utils
 			initialize_swapchain(state, requirements);
 		}
 
-		initialize_frame_data(state, rhi.mFrameDataHolder);
-
+		rhi.mFrameDataHolder.initialize(state.logicalDevice, state.commandPool, state.swapChainImages.size());
 		rhi.create_main_render_target();
 	}
 
