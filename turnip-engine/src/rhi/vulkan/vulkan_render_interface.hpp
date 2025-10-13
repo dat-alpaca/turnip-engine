@@ -50,6 +50,7 @@ namespace tur::vulkan
 	public:
 		void initialize(const ConfigData& configData, Window& window);
 		void shutdown();
+		void on_event(Event& event);
 
 	public:
 		void begin_frame();
@@ -86,6 +87,9 @@ namespace tur::vulkan
 		vk::Fence mImmFence;
 		vk::CommandPool mImmCommandPool;
 		vk::CommandBuffer mImmCommandBuffer;
+
+	private:
+		bool mWindowResized = false;
 
 	private:
 		static inline constexpr u32 RecordingFenceTimeout = UINT32_MAX;

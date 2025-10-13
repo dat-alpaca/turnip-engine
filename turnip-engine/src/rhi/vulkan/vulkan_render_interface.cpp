@@ -76,6 +76,17 @@ namespace tur::vulkan
 		platform::WindowingSystem::get_binder().destroy_vulkan_surface(mState.instance, mState.surface);
 		mState.instance.destroy();
 	}
+	void RenderInterfaceVulkan::on_event(Event& event)
+	{
+		Subscriber subscriber(event);
+		subscriber.subscribe<WindowFramebufferEvent>(
+			[&](const WindowFramebufferEvent&) -> bool
+			{
+				mWindowResized = true;
+				return false;
+			}
+		);
+	}
 
 	CommandBuffer RenderInterfaceVulkan::create_command_buffer()
 	{
@@ -129,7 +140,6 @@ namespace tur::vulkan
 		try
 		{
 			auto result = device.waitForFences({frameData.recordingFence}, true, RecordingFenceTimeout);
-			device.resetFences({frameData.recordingFence});
 		}
 		catch (vk::SystemError& err)
 		{
@@ -144,17 +154,18 @@ namespace tur::vulkan
 				device.acquireNextImageKHR(swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore);
 			mFrameDataHolder.set_image_buffer_index(imageResult.value);
 
-			if (imageResult.result == vk::Result::eErrorOutOfDateKHR)
+			if (imageResult.result == vk::Result::eErrorOutOfDateKHR
+				|| imageResult.result == vk::Result::eSuboptimalKHR)
 				utils::recreate_swapchain(*this);
 
-			else if (imageResult.result != vk::Result::eSuccess && imageResult.result != vk::Result::eSuboptimalKHR)
+			else if (imageResult.result != vk::Result::eSuccess)
 			{
 				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 			}
-
-			else
-				TUR_LOG_WARN("Acquire returned error. Code: {}", imageResult.value);
 		}
+
+		// Begin:
+		device.resetFences({frameData.recordingFence});
 
 		vk::CommandBufferBeginInfo beginInfo = {};
 		{
@@ -226,20 +237,21 @@ namespace tur::vulkan
 			presentInfo.pImageIndices = imageIndices;
 		}
 
-		// TODO: framebuffer resized event
-		// bool& framebufferResized = r_Window->data.framebufferResized;
-
 		vk::Result presentResult = {};
 		try
 		{
 			presentResult = queue.presentKHR(presentInfo);
 		}
+		catch (vk::OutOfDateKHRError& outOfDate)
+		{
+			utils::recreate_swapchain(*this);
+		}
 		catch (vk::SystemError& err)
 		{
-			if (presentResult == vk::Result::eErrorOutOfDateKHR || presentResult == vk::Result::eSuboptimalKHR)
-			// || framebufferResized)
+			if (presentResult == vk::Result::eErrorOutOfDateKHR || presentResult == vk::Result::eSuboptimalKHR
+				|| mWindowResized)
 			{
-				// framebufferResized = false;
+				mWindowResized = false;
 				utils::recreate_swapchain(*this);
 			}
 			else if (presentResult != vk::Result::eSuccess)
@@ -328,12 +340,10 @@ namespace tur::vulkan::utils
 
 	void recreate_swapchain(RenderInterfaceVulkan& rhi)
 	{
-		TUR_LOG_DEBUG("RECREATE");
 		auto& state = rhi.get_state();
 		auto* window = rhi.get_window();
 
 		glm::vec2 size = window->get_dimensions();
-
 		while (size.x == 0 || size.y == 0)
 		{
 			size = window->get_dimensions();

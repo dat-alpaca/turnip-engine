@@ -25,38 +25,23 @@ namespace tur
 			auto& rhi = *rRHI;
 
 			rhi.begin_frame();
-			TUR_LOG_WARN("FRAME START()");
-
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
 
 			mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});
 			mCommandBuffer.set_scissor(Extent2D{0, 0, 640, 480});
 			{
 				mCommandBuffer.begin();
-				TUR_LOG_WARN("BEGIN()");
 
 				mCommandBuffer.bind_vertex_buffer(vbo, 0);
-				TUR_LOG_WARN("VBO()");
-
 				mCommandBuffer.bind_pipeline(pipeline);
-				TUR_LOG_WARN("PIPE()");
 
 				mCommandBuffer.draw(3, 1, 0, 0);
-				TUR_LOG_WARN("DRAW()");
-
 				mCommandBuffer.end();
-				TUR_LOG_WARN("END()");
 			}
 
 			rhi.end_frame();
-			TUR_LOG_WARN("FRAME END()");
-
 			rhi.submit(graphicsQueue);
-			TUR_LOG_WARN("SUB()");
-
 			rhi.present(presentQueue);
-			TUR_LOG_WARN("PRESENT()");
-			TUR_LOG_WARN("------------------");
 		}
 
 	private:

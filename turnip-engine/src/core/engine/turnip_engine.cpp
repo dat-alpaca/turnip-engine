@@ -34,6 +34,8 @@ namespace tur::engine
 
 	static void on_event(Event& event, TurnipEngine& engine)
 	{
+		engine.get_render_interface().on_event(event);
+
 		for (const auto& view : engine.get_view_system().get_views())
 			view->on_event(event);
 	}
@@ -54,8 +56,9 @@ namespace tur
 		{
 			if (!configDataResult.has_value())
 			{
-				TUR_LOG_CRITICAL("Failed to parse the configuration from the specified filepath: {}",
-								 configFilepath.string());
+				TUR_LOG_CRITICAL(
+					"Failed to parse the configuration from the specified filepath: {}", configFilepath.string()
+				);
 				return;
 			}
 		}
