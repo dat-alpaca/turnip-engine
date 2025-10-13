@@ -70,7 +70,7 @@ namespace tur::vulkan
 			else
 				desiredImages = requirements.imageCount;
 
-			createInfo.minImageCount = desiredImages;
+			createInfo.minImageCount = std::min(desiredImages, swapchainCapabilities.surfaceCapabilities.maxImageCount);
 			createInfo.imageArrayLayers = 1;
 
 			createInfo.imageFormat = surfaceFormat.format;
@@ -124,18 +124,20 @@ namespace tur::vulkan
 
 		// Retrieve Images:
 		{
-			state.swapChainImages = state.logicalDevice.getSwapchainImagesKHR(state.swapchain);
+			const auto& images = state.logicalDevice.getSwapchainImagesKHR(state.swapchain);
+			state.swapchainTextures.resize(images.size());
+
+			for (u64 i = 0; i < images.size(); ++i)
+				state.swapchainTextures[i].image = images[i];
 		}
 
 		// Create Image Views:
 		{
-			state.swapChainImageViews.resize(state.swapChainImages.size());
-
-			for (size_t i = 0; i < state.swapChainImageViews.size(); ++i)
+			for (size_t i = 0; i < state.swapchainTextures.size(); ++i)
 			{
 				vk::ImageViewCreateInfo imageCreateInfo = {};
 
-				imageCreateInfo.image = state.swapChainImages[i];
+				imageCreateInfo.image = state.swapchainTextures[i].image;
 				imageCreateInfo.viewType = vk::ImageViewType::e2D;
 				imageCreateInfo.format = state.swapchainFormat.format;
 
@@ -162,7 +164,7 @@ namespace tur::vulkan
 					imageCreateInfo.pNext = &usageCreateInfo;
 				}
 
-				state.swapChainImageViews[i] = state.logicalDevice.createImageView(imageCreateInfo);
+				state.swapchainTextures[i].imageView = state.logicalDevice.createImageView(imageCreateInfo);
 			}
 		}
 	}
@@ -171,8 +173,8 @@ namespace tur::vulkan
 	{
 		auto& device = state.logicalDevice;
 
-		for (auto imageView : state.swapChainImageViews)
-			device.destroyImageView(imageView);
+		for (auto texture : state.swapchainTextures)
+			device.destroyImageView(texture.imageView);
 
 		device.destroySwapchainKHR(state.swapchain);
 	}

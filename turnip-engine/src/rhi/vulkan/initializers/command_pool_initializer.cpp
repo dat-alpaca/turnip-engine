@@ -8,7 +8,7 @@ namespace tur::vulkan
 		{
 			poolCreateInfo.flags = vk::CommandPoolCreateFlags() | vk::CommandPoolCreateFlagBits::eResetCommandBuffer;
 
-			auto transferQueueOpt = state.queueList.get_queue(QueueOperation::TRANSFER);
+			auto transferQueueOpt = state.queueList.get_queue(QueueOperation::GRAPHICS);
 			if (!transferQueueOpt.has_value())
 				TUR_LOG_CRITICAL("Error when trying to retrieve a queue that supports TRANSFER operations");
 

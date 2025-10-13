@@ -360,7 +360,6 @@ namespace tur::vulkan
 
 		Pipeline pipeline;
 		pipeline.type = PipelineType::GRAPHICS;
-		pipeline.descriptor = descriptor;
 
 		pipeline_shaders shaders = create_shaders(rhi->get_resource_handler(), descriptor);
 

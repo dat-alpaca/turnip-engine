@@ -48,9 +48,10 @@ namespace tur
 		constexpr inline size_type current_index() const { return mCurrentIndex; }
 		constexpr inline size_type capacity() const { return mSize; }
 
-	private:
+		// TODO:
+	public:
 		std::vector<T> mData;
 		size_type mCurrentIndex = 0;
-		size_type mSize;
+		size_type mSize = 0;
 	};
 }

@@ -182,7 +182,7 @@ namespace tur::vulkan
 	void CommandBufferVulkan::blit_onto_swapchain()
 	{
 		const auto& currentImage = rRHI->get_frame_data().get_image_buffer_index();
-		auto& swapchainImages = rRHI->get_state().swapChainImages;
+		auto& swapchainTexture = rRHI->get_state().swapchainTextures.at(currentImage);
 		auto& swapchainExtent = rRHI->get_state().swapchainExtent;
 		auto& mainRenderTarget = rRHI->get_state().mainRenderTarget;
 
@@ -198,10 +198,6 @@ namespace tur::vulkan
 			 .dstAccessMask = vk::AccessFlagBits2::eTransferRead}
 		);
 
-		Texture swapchainTexture;
-		swapchainTexture.image = swapchainImages.at(currentImage);
-		swapchainTexture.layout = vk::ImageLayout::eUndefined;
-
 		utils::transition_texture_layout(
 			*rRHI, swapchainTexture,
 			{.newLayout = vk::ImageLayout::eTransferDstOptimal,
@@ -214,8 +210,8 @@ namespace tur::vulkan
 		);
 
 		copy_image(
-			colorTexture.image, swapchainImages.at(currentImage),
-			{colorTexture.extent.width, colorTexture.extent.height}, swapchainExtent
+			colorTexture.image, swapchainTexture.image, {colorTexture.extent.width, colorTexture.extent.height},
+			swapchainExtent
 		);
 
 		utils::transition_texture_layout(

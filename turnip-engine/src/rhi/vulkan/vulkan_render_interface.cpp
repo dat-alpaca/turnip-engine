@@ -41,7 +41,7 @@ namespace tur::vulkan
 		}
 
 		// Frame Data:
-		mFrameDataHolder.initialize(mState.logicalDevice, mState.commandPool, mState.swapChainImages.size());
+		mFrameDataHolder.initialize(mState.logicalDevice, mState.commandPool, mState.swapchainTextures.size());
 
 		// Main Render Target:
 		create_main_render_target();
@@ -125,11 +125,12 @@ namespace tur::vulkan
 
 		mFrameDataHolder.advance();
 		auto& frameData = mFrameDataHolder.get_current_frame_data();
+		TUR_LOG_DEBUG("FRAME: {}", mFrameDataHolder.mData.mCurrentIndex);
 
 		try
 		{
-			auto result = device.waitForFences(frameData.recordingFence, true, RecordingFenceTimeout);
-			device.resetFences(frameData.recordingFence);
+			auto result = device.waitForFences({frameData.recordingFence}, true, RecordingFenceTimeout);
+			device.resetFences({frameData.recordingFence});
 		}
 		catch (vk::SystemError& err)
 		{
@@ -152,12 +153,8 @@ namespace tur::vulkan
 				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 			}
 
-			else if (imageResult.result == vk::Result::eSuccess)
-			{
-			}
-
 			else
-				TUR_LOG_WARN("Acquire returned error");
+				TUR_LOG_WARN("Acquire returned error. Code: {}", imageResult.value);
 		}
 
 		vk::CommandBufferBeginInfo beginInfo = {};
@@ -353,7 +350,7 @@ namespace tur::vulkan::utils
 			initialize_swapchain(state, requirements);
 		}
 
-		rhi.mFrameDataHolder.initialize(state.logicalDevice, state.commandPool, state.swapChainImages.size());
+		rhi.mFrameDataHolder.initialize(state.logicalDevice, state.commandPool, state.swapchainTextures.size());
 		rhi.create_main_render_target();
 	}
 

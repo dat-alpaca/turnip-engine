@@ -38,10 +38,10 @@ namespace tur
 				mCommandBuffer.bind_vertex_buffer(vbo, 0);
 				TUR_LOG_WARN("VBO()");
 
-				mCommandBuffer.bind_pipeline(pipeline);
+				// mCommandBuffer.bind_pipeline(pipeline);
 				TUR_LOG_WARN("PIPE()");
 
-				mCommandBuffer.draw(3, 1, 0, 0);
+				// mCommandBuffer.draw(3, 1, 0, 0);
 				TUR_LOG_WARN("DRAW()");
 
 				mCommandBuffer.end();
@@ -124,6 +124,16 @@ namespace tur
 				DynamicState::SCISSOR
 			});
 
+			constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
+			({
+				{
+					// .binding = 0,
+					// .amount = 1,
+					// .type = DescriptorType::UNIFORM_BUFFER,
+					// .stage = PipelineStage::VERTEX_STAGE
+				}
+			});
+			
 			constexpr auto Viewports = std::to_array<Viewport>({Viewport{}});
 			constexpr auto Scissors = std::to_array<Extent2D>({Extent2D{}});
 
@@ -148,16 +158,10 @@ namespace tur
 				.viewports = Viewports,
 				.scissors = Scissors,
 				.dynamicStates = DynamicStates,
-				/*.descriptorSetLayout =
+				.descriptorSetLayout =
 				{
-					.entries = std::to_array<const DescriptorSetLayoutEntry>({
-					{
-						.binding = 0,
-						.amount = 1,
-						.type = DescriptorType::UNIFORM_BUFFER,
-						.stage = PipelineStage::VERTEX_STAGE
-					}
-				})},*/
+					// .entries = LayoutEntries 
+				},
 
 				.vertexShader = vertexShader,
 				.fragmentShader = fragmentShader,

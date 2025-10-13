@@ -35,8 +35,7 @@ namespace tur::vulkan
 		vk::SwapchainKHR swapchain;
 		vk::SurfaceFormatKHR swapchainFormat;
 		vk::Extent2D swapchainExtent;
-		std::vector<vk::Image> swapChainImages;
-		std::vector<vk::ImageView> swapChainImageViews;
+		std::vector<Texture> swapchainTextures;
 
 		// Command Pool:
 		vk::CommandPool commandPool;

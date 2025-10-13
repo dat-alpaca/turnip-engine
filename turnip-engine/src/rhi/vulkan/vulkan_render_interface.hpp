@@ -88,8 +88,8 @@ namespace tur::vulkan
 		vk::CommandBuffer mImmCommandBuffer;
 
 	private:
-		static inline constexpr u32 RecordingFenceTimeout = 1'000'000'000;
-		static inline constexpr u32 ImageAvailableTimeout = 1'000'000'000;
+		static inline constexpr u32 RecordingFenceTimeout = UINT32_MAX;
+		static inline constexpr u32 ImageAvailableTimeout = UINT32_MAX;
 	};
 }
 

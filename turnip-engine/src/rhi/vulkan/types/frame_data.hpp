@@ -22,14 +22,14 @@ namespace tur::vulkan
 			mData.resize(totalAllocatedFrames);
 
 			// Command buffers:
-			for (auto& frame : mData.get_data())
+			for (auto& frame : mData)
 				frame.commandBuffer = allocate_single_primary_command_buffer(device, commandPool);
 
 			// Synchonization primitives:
-			for (auto& frame : mData.get_data())
+			for (auto& frame : mData)
 				frame.recordingFence = allocate_signaled_fence(device);
 
-			for (auto& frame : mData.get_data())
+			for (auto& frame : mData)
 			{
 				frame.imageAvailableSemaphore = allocate_semaphore(device);
 				frame.renderFinishedSemaphore = allocate_semaphore(device);
@@ -40,9 +40,14 @@ namespace tur::vulkan
 		{
 			for (const auto& frame : mData)
 			{
-				device.destroySemaphore(frame.imageAvailableSemaphore);
-				device.destroySemaphore(frame.renderFinishedSemaphore);
-				device.destroyFence(frame.recordingFence);
+				if (frame.imageAvailableSemaphore)
+					device.destroySemaphore(frame.imageAvailableSemaphore);
+
+				if (frame.renderFinishedSemaphore)
+					device.destroySemaphore(frame.renderFinishedSemaphore);
+
+				if (frame.recordingFence)
+					device.destroyFence(frame.recordingFence);
 			}
 
 			mData.clear();
@@ -58,7 +63,7 @@ namespace tur::vulkan
 		inline void set_image_buffer_index(u32 index) { mImageBufferIndex = index; }
 		inline u32 get_image_buffer_index() { return mImageBufferIndex; }
 
-	private:
+	public: // TODO
 		static_ring_buffer<FrameData> mData;
 		u32 mImageBufferIndex = 0;
 	};
