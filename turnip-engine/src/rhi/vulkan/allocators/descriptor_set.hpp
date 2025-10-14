@@ -2,6 +2,8 @@
 #include "graphics/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
+
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
@@ -27,15 +29,6 @@ namespace tur::vulkan
 		if (descriptorSetLayoutInfo.bindingCount)
 			descriptorSetLayoutInfo.pBindings = descriptorBindings.data();
 
-		try
-		{
-			return device.createDescriptorSetLayout(descriptorSetLayoutInfo);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create descriptor set layout. {}", err.what());
-		}
-
-		return nullptr;
+		return check_vk_object(device.createDescriptorSetLayout(descriptorSetLayoutInfo), "DescriptorSetLayout");
 	}
 }

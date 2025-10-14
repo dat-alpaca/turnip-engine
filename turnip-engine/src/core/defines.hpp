@@ -31,6 +31,9 @@
 
 #define UNUSED
 
+#define STRINGIFY(string) #string
+#define REMOVE_PREFIX(string, amount) std::string_view(STRINGIFY(string)).substr(amount)
+
 namespace tur
 {
 	using u8 = std::uint8_t;

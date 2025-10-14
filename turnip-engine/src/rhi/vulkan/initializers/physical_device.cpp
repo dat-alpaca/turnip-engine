@@ -3,6 +3,7 @@
 #include "rhi/vulkan/types/queue_family.hpp"
 #include "rhi/vulkan/utils/extension_utils.hpp"
 #include "rhi/vulkan/utils/layer_utils.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/utils/swapchain_features.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
 
@@ -10,7 +11,7 @@ namespace tur::vulkan
 {
 	void initialize_physical_device(VulkanState& state, const PhysicalDeviceRequirements& requirements)
 	{
-		auto physicalDevices = state.instance.enumeratePhysicalDevices();
+		auto physicalDevices = check_vk_object(state.instance.enumeratePhysicalDevices(), "PhysicalDevices");
 		if (physicalDevices.empty())
 			TUR_LOG_CRITICAL("No valid vulkan physical devices found.");
 
@@ -46,7 +47,9 @@ namespace tur::vulkan
 				}
 
 				// Extension Support:
-				auto extensionSupport = validate_extensions(device.enumerateDeviceExtensionProperties(), extensions);
+				auto extensionSupport = validate_extensions(
+					check_vk_object(device.enumerateDeviceExtensionProperties(), "DeviceExtensionProps"), extensions
+				);
 				if (!extensionSupport.success)
 				{
 					TUR_LOG_INFO("{} does not support the following extensions: ", deviceName);

@@ -1,6 +1,7 @@
 #include "logical_device.hpp"
 
 #include "rhi/vulkan/types/queue_family.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
 
 namespace tur::vulkan
@@ -71,14 +72,7 @@ namespace tur::vulkan
 			&deviceFeatures, &vulkan12Features
 		);
 
-		try
-		{
-			state.logicalDevice = state.physicalDevice.createDevice(deviceInfo);
-		}
-		catch (const std::exception& err)
-		{
-			TUR_LOG_ERROR("Failed to create logical device: {}", err.what());
-		}
+		state.logicalDevice = check_vk_result(state.physicalDevice.createDevice(deviceInfo));
 
 		// Queue Creation:
 		// TODO: improve this mess

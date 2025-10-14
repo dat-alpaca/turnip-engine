@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/types/queue_operations.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
@@ -22,9 +23,6 @@ namespace tur::vulkan
 			if (queueFamily.queueFlags & vk::QueueFlagBits::eGraphics)
 				support |= QueueOperation::GRAPHICS;
 
-			if (device.getSurfaceSupportKHR(queueIndex, surface))
-				support |= QueueOperation::PRESENT;
-
 			if (queueFamily.queueFlags & vk::QueueFlagBits::eCompute)
 				support |= QueueOperation::COMPUTE;
 
@@ -33,6 +31,9 @@ namespace tur::vulkan
 
 			if (queueFamily.queueFlags & vk::QueueFlagBits::eSparseBinding)
 				support |= QueueOperation::SPARSE_BINDING;
+
+			if (check_vk_object(device.getSurfaceSupportKHR(queueIndex, surface), "SurfaceSupportKHR"))
+				support |= QueueOperation::PRESENT;
 
 			++queueIndex;
 		}
@@ -55,7 +56,7 @@ namespace tur::vulkan
 				support |= QueueOperation::TRANSFER;
 			}
 
-			if (device.getSurfaceSupportKHR(queueIndex, surface))
+			if (check_vk_object(device.getSurfaceSupportKHR(queueIndex, surface), "SurfaceSupport"))
 				support |= QueueOperation::PRESENT;
 
 			if (queueFamily.queueFlags & vk::QueueFlagBits::eCompute)

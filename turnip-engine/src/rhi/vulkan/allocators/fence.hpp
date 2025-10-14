@@ -1,4 +1,5 @@
 #pragma once
+#include "rhi/vulkan/utils/logger.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
@@ -7,6 +8,7 @@ namespace tur::vulkan
 	{
 		vk::FenceCreateInfo createInfo = {};
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
-		return device.createFence(createInfo);
+
+		return check_vk_object(device.createFence(createInfo), "Fence");
 	}
 }

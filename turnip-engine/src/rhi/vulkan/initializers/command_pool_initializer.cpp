@@ -1,4 +1,5 @@
 #include "command_pool_initializer.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 
 namespace tur::vulkan
 {
@@ -15,14 +16,7 @@ namespace tur::vulkan
 			poolCreateInfo.queueFamilyIndex = transferQueueOpt.value().familyIndex;
 		}
 
-		try
-		{
-			state.commandPool = state.logicalDevice.createCommandPool(poolCreateInfo);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create frame command pool. {}", err.what());
-		}
+		state.commandPool = check_vk_object(state.logicalDevice.createCommandPool(poolCreateInfo), "CommandPool");
 	}
 
 	vk::CommandPool initialize_command_pool(const QueueList& queueList, vk::Device device)
@@ -38,13 +32,6 @@ namespace tur::vulkan
 			poolCreateInfo.queueFamilyIndex = transferQueueOpt.value().familyIndex;
 		}
 
-		try
-		{
-			return device.createCommandPool(poolCreateInfo);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create frame command pool. {}", err.what());
-		}
+		return check_vk_object(device.createCommandPool(poolCreateInfo), "CommandPool");
 	}
 }

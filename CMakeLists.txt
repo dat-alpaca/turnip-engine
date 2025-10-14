@@ -54,6 +54,7 @@ elseif(${TUR_USE_VULKAN})
     add_subdirectory(extern/vma)
 
     add_compile_definitions(TUR_GRAPHICS_VK)
+    add_compile_definitions(VULKAN_HPP_NO_EXCEPTIONS)
 endif()
 
 # Projects

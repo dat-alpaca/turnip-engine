@@ -391,14 +391,7 @@ namespace tur::vulkan
 			allocate_descriptor_set_layout(rhi->get_state().logicalDevice, descriptor.descriptorSetLayout);
 		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&pipeline.setLayout);
 
-		try
-		{
-			pipeline.layout = device.createPipelineLayout(pipelineLayout);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create pipeline layout. {}", err.what());
-		}
+		pipeline.layout = check_vk_result(device.createPipelineLayout(pipelineLayout));
 
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):
 		// TODO: add rendering info to descriptor parameters
@@ -431,31 +424,21 @@ namespace tur::vulkan
 			pipelineInfo.pNext = &renderingInfo;
 		}
 
-		try
+		auto result = device.createGraphicsPipeline(nullptr, pipelineInfo);
+		switch (result.result)
 		{
-			auto result = device.createGraphicsPipeline(nullptr, pipelineInfo);
-			switch (result.result)
-			{
-				case vk::Result::eSuccess:
-					break;
+			case vk::Result::eSuccess:
+				break;
 
-				case vk::Result::ePipelineCompileRequiredEXT:
-					TUR_LOG_CRITICAL(
-						"VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT_EXT on PipelineCreateInfo"
-					);
-					break;
+			case vk::Result::ePipelineCompileRequiredEXT:
+				TUR_LOG_CRITICAL("VK_PIPELINE_CREATE_FAIL_ON_PIPELINE_COMPILE_REQUIRED_BIT_EXT on PipelineCreateInfo");
+				break;
 
-				default:
-					TUR_LOG_CRITICAL("Pipeline creation gone wild");
-			}
-
-			pipeline.pipeline = result.value;
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create graphics pipeline. {}", err.what());
+			default:
+				TUR_LOG_CRITICAL("Failed to create graphics pipeline.");
 		}
 
+		pipeline.pipeline = result.value;
 		return pipeline;
 	}
 }

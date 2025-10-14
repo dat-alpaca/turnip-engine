@@ -2,6 +2,8 @@
 #include "rhi/vulkan/allocators/allocators.hpp"
 #include "rhi/vulkan/initializers/initializers.hpp"
 
+// TODO: substitute vk::result checks
+
 namespace tur::vulkan
 {
 	void RenderInterfaceVulkan::initialize(const ConfigData& configData, Window& window)
@@ -49,7 +51,9 @@ namespace tur::vulkan
 	void RenderInterfaceVulkan::shutdown()
 	{
 		auto& device = mState.logicalDevice;
-		device.waitIdle();
+		vk::Result result = device.waitIdle();
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to wait for device idle");
 
 		destroy_swapchain(mState);
 
@@ -137,31 +141,29 @@ namespace tur::vulkan
 		mFrameDataHolder.advance();
 		auto& frameData = mFrameDataHolder.get_current_frame_data();
 
-		try
-		{
-			auto result = device.waitForFences({frameData.recordingFence}, true, RecordingFenceTimeout);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to wait for fences. {}", err.what());
-		}
+		vk::Result result = device.waitForFences({frameData.recordingFence}, true, RecordingFenceTimeout);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to wait for fences.");
 
 		mDeletionQueue.flush();
 
 		// Acquiring swapchain:
 		{
-			auto imageResult =
-				device.acquireNextImageKHR(swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore);
-			mFrameDataHolder.set_image_buffer_index(imageResult.value);
+			u32 imageIndex = 0;
+			VkResult result = vkAcquireNextImageKHR(
+				device, swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore, nullptr, &imageIndex
+			);
+			mFrameDataHolder.set_image_buffer_index(imageIndex);
 
-			if (imageResult.result == vk::Result::eErrorOutOfDateKHR
-				|| imageResult.result == vk::Result::eSuboptimalKHR)
+			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 				utils::recreate_swapchain(*this);
 
-			else if (imageResult.result != vk::Result::eSuccess)
+			else if (result == VK_SUCCESS || result == VK_NOT_READY || result == VK_TIMEOUT)
 			{
-				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 			}
+
+			else
+				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 		}
 
 		// Begin:
@@ -175,14 +177,9 @@ namespace tur::vulkan
 
 		frameData.commandBuffer.reset();
 
-		try
-		{
-			frameData.commandBuffer.begin(beginInfo);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", err.what());
-		}
+		result = frameData.commandBuffer.begin(beginInfo);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
 	}
 	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue)
 	{
@@ -208,14 +205,9 @@ namespace tur::vulkan
 			submitInfo.pCommandBuffers = &frameData.commandBuffer;
 		}
 
-		try
-		{
-			queue.submit(submitInfo, frameData.recordingFence);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_ERROR("Failed to submit commands to the graphics queue. {}", err.what());
-		}
+		vk::Result result = queue.submit(submitInfo, frameData.recordingFence);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_ERROR("Failed to submit commands to the graphics queue.");
 	}
 	void RenderInterfaceVulkan::present(queue_handle presentQueue)
 	{
@@ -228,6 +220,7 @@ namespace tur::vulkan
 		vk::Semaphore waitSemaphores[] = {frameData.renderFinishedSemaphore};
 
 		u32 imageIndices[] = {frameHolder.get_image_buffer_index()};
+
 		vk::PresentInfoKHR presentInfo = {};
 		{
 			presentInfo.waitSemaphoreCount = 1;
@@ -237,39 +230,22 @@ namespace tur::vulkan
 			presentInfo.pImageIndices = imageIndices;
 		}
 
-		vk::Result presentResult = {};
-		try
+		VkResult result = vkQueuePresentKHR(queue, reinterpret_cast<const VkPresentInfoKHR*>(&presentInfo));
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || mWindowResized)
 		{
-			presentResult = queue.presentKHR(presentInfo);
-		}
-		catch (vk::OutOfDateKHRError& outOfDate)
-		{
+			mWindowResized = false;
 			utils::recreate_swapchain(*this);
 		}
-		catch (vk::SystemError& err)
-		{
-			if (presentResult == vk::Result::eErrorOutOfDateKHR || presentResult == vk::Result::eSuboptimalKHR
-				|| mWindowResized)
-			{
-				mWindowResized = false;
-				utils::recreate_swapchain(*this);
-			}
-			else if (presentResult != vk::Result::eSuccess)
-				TUR_LOG_CRITICAL("Failed to recreate swapchain image. {}", err.what());
-		}
+		else if (result != VK_SUCCESS)
+			TUR_LOG_CRITICAL("Failed to recreate swapchain image. {}", static_cast<i32>(result));
 	}
 	void RenderInterfaceVulkan::end_frame()
 	{
 		auto& currentCommandBuffer = mFrameDataHolder.get_current_frame_data().commandBuffer;
 
-		try
-		{
-			currentCommandBuffer.end();
-		}
-		catch (vk::SystemError err)
-		{
-			throw std::runtime_error("Failed to end() recording to vulkan command buffer.");
-		}
+		vk::Result result = currentCommandBuffer.end();
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to end() recording to vulkan command buffer.")
 	}
 }
 
@@ -287,9 +263,15 @@ namespace tur::vulkan::utils
 		vk::CommandBufferBeginInfo beginInfo = {};
 		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 
-		commandBuffer.begin(beginInfo);
+		vk::Result result = commandBuffer.begin(beginInfo);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_WARN("Failed to begin() immediate command buffer.");
+
 		command(commandBuffer);
-		commandBuffer.end();
+
+		result = commandBuffer.end();
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_WARN("Failed to end() immediate command buffer.");
 
 		vk::CommandBufferSubmitInfo submitCommandInfo = {};
 		{
@@ -315,27 +297,13 @@ namespace tur::vulkan::utils
 
 		auto& queue = queueOpt.value().queue;
 
-		try
-		{
-			queue.submit2(submitInfo, fence);
-		}
-		catch (vk::DeviceLostError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to submit immediate command: {}", err.what());
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to submit immediate command: {}", err.what());
-		}
+		result = queue.submit2(submitInfo, fence);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to submit immediate command.");
 
-		try
-		{
-			auto _ = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to wait for queue: {}", err.what());
-		}
+		result = state.logicalDevice.waitForFences(fence, true, rhi.RecordingFenceTimeout);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to wait for queue.");
 	}
 
 	void recreate_swapchain(RenderInterfaceVulkan& rhi)
@@ -350,7 +318,10 @@ namespace tur::vulkan::utils
 			window->wait_events();
 		}
 
-		state.logicalDevice.waitIdle();
+		vk::Result result = state.logicalDevice.waitIdle();
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to wait device idle");
+
 		destroy_swapchain(state);
 
 		SwapchainRequirements requirements;
@@ -406,15 +377,7 @@ namespace tur::vulkan::utils
 
 		vk::DependencyInfo dependencyInfo = vk::DependencyInfo().setImageMemoryBarriers(imageBarrier);
 
-		try
-		{
-			commandBuffer.pipelineBarrier2(dependencyInfo);
-		}
-		catch (vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to issue transition image layout command. {}", err.what());
-		}
-
+		commandBuffer.pipelineBarrier2(dependencyInfo);
 		texture.layout = description.newLayout;
 	}
 }

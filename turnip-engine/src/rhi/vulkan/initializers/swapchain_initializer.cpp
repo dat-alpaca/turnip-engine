@@ -110,14 +110,7 @@ namespace tur::vulkan
 		else
 			createInfo.imageSharingMode = vk::SharingMode::eExclusive;
 
-		try
-		{
-			state.swapchain = state.logicalDevice.createSwapchainKHR(createInfo);
-		}
-		catch (const vk::SystemError& err)
-		{
-			TUR_LOG_CRITICAL("Failed to create swapchain: {}", err.what());
-		}
+		state.swapchain = check_vk_object(state.logicalDevice.createSwapchainKHR(createInfo), "Swapchain");
 
 		// Swapchain information:
 		state.swapchainExtent = extent;
@@ -125,7 +118,9 @@ namespace tur::vulkan
 
 		// Retrieve Images:
 		{
-			const auto& images = state.logicalDevice.getSwapchainImagesKHR(state.swapchain);
+			const auto& images =
+				check_vk_object(state.logicalDevice.getSwapchainImagesKHR(state.swapchain), "SwapchainImages");
+
 			state.swapchainTextures.resize(images.size());
 
 			for (u64 i = 0; i < images.size(); ++i)
@@ -165,7 +160,8 @@ namespace tur::vulkan
 					imageCreateInfo.pNext = &usageCreateInfo;
 				}
 
-				state.swapchainTextures[i].imageView = state.logicalDevice.createImageView(imageCreateInfo);
+				state.swapchainTextures[i].imageView =
+					check_vk_object(state.logicalDevice.createImageView(imageCreateInfo), "SwapchainImageView");
 			}
 		}
 	}

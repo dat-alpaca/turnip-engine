@@ -18,7 +18,7 @@
     "vulkanConfig": {
         "instanceRequirements": {
             "enableDrawing": true,
-            "enableValidationLayers": true,
+            "enableValidationLayers": false,
             "extensions": [],
             "layers": []
         },

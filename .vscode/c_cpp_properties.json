@@ -9,7 +9,8 @@
                 "TUR_GRAPHICS_VK",
                 "GLFW_INCLUDE_NONE",
                 "TUR_WINDOWING_GLFW",
-                "_DEBUG"
+                "_DEBUG",
+                "VULKAN_HPP_NO_EXCEPTIONS"
             ],
             "compilerPath": "/usr/bin/gcc",
             "intelliSenseMode": "linux-gcc-x64",

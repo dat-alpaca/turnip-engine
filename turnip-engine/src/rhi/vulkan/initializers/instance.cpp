@@ -4,6 +4,7 @@
 #include "platform/platform.hpp"
 #include "rhi/vulkan/utils/extension_utils.hpp"
 #include "rhi/vulkan/utils/layer_utils.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
 
 namespace tur::vulkan
@@ -135,7 +136,8 @@ namespace tur::vulkan
 			extensions.push_back(DebugUtilsExtensionName);
 		}
 
-		std::vector<vk::ExtensionProperties> supportedExtensions = vk::enumerateInstanceExtensionProperties();
+		std::vector<vk::ExtensionProperties> supportedExtensions =
+			check_vk_object(vk::enumerateInstanceExtensionProperties(), "InstanceExtensionProps");
 		if (state.requiresDrawing)
 		{
 			extensions.push_back(SurfaceExtensionName);
@@ -146,7 +148,8 @@ namespace tur::vulkan
 				extensions.push_back(extensionName);
 		}
 
-		auto validationResults = validate_layers(vk::enumerateInstanceLayerProperties(), layers);
+		auto validationResults =
+			validate_layers(check_vk_object(vk::enumerateInstanceLayerProperties(), "InstanceLayerProps"), layers);
 		if (!validationResults.success)
 		{
 			TUR_LOG_ERROR("[Vulkan]: Unsupported instance layers:");
@@ -172,15 +175,7 @@ namespace tur::vulkan
 			static_cast<uint32_t>(extensions.size()), extensions.data()
 		);
 
-		try
-		{
-			state.instance = vk::createInstance(createInfo);
-		}
-		catch (const vk::SystemError& err)
-		{
-			TUR_LOG_ERROR("Failed to create vulkan instance: {}", err.what());
-			return;
-		}
+		state.instance = check_vk_result(vk::createInstance(createInfo));
 
 		// Messenger Creation:
 		if (!state.validationEnabled)
@@ -192,7 +187,10 @@ namespace tur::vulkan
 		);
 
 		vk::DispatchLoaderDynamic DLDI(state.instance, vkGetInstanceProcAddr);
-		state.debugMessenger = state.instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, DLDI);
+		state.debugMessenger = check_vk_object(
+			state.instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, DLDI), "DebugMessenger"
+		);
+
 		state.DLDI = DLDI;
 	}
 

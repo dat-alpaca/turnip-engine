@@ -13,15 +13,15 @@ namespace tur::vulkan
 	inline SwapchainFeatures fetch_swapchain_features(vk::PhysicalDevice device, VkSurfaceKHR surface)
 	{
 		SwapchainFeatures capabilities;
-		capabilities.surfaceCapabilities = device.getSurfaceCapabilitiesKHR(surface);
+		capabilities.surfaceCapabilities =
+			check_vk_object(device.getSurfaceCapabilitiesKHR(surface), "SurfaceFeatures");
 
-		auto surfaceFormats = device.getSurfaceFormatsKHR(surface);
-
+		auto surfaceFormats = check_vk_object(device.getSurfaceFormatsKHR(surface), "SurfaceFormats");
 		capabilities.availableSurfaceFormats.reserve(surfaceFormats.size());
 		for (const auto& surfaceFormat : surfaceFormats)
 			capabilities.availableSurfaceFormats.push_back(surfaceFormat);
 
-		auto presentModes = device.getSurfacePresentModesKHR(surface);
+		auto presentModes = check_vk_object(device.getSurfacePresentModesKHR(surface), "SurfacePresentModes");
 		capabilities.presentModes.reserve(presentModes.size());
 		for (const auto& presentMode : presentModes)
 			capabilities.presentModes.push_back(presentMode);

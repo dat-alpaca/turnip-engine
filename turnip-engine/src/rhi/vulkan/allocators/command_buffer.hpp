@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
@@ -13,13 +14,6 @@ namespace tur::vulkan
 			allocateInfo.level = vk::CommandBufferLevel::ePrimary;
 		}
 
-		try
-		{
-			return device.allocateCommandBuffers(allocateInfo).front();
-		}
-		catch (vk::SystemError err)
-		{
-			TUR_LOG_CRITICAL("Failed to allocate frame command buffer: {}", err.what());
-		}
+		return check_vk_object(device.allocateCommandBuffers(allocateInfo), "CommandBuffer").front();
 	}
 }

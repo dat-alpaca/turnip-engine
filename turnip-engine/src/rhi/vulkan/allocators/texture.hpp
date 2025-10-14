@@ -2,6 +2,7 @@
 #include "rhi/vulkan/objects/buffer.hpp"
 #include "rhi/vulkan/objects/texture.hpp"
 
+#include "rhi/vulkan/utils/logger.hpp"
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 
@@ -103,7 +104,7 @@ namespace tur::vulkan
 			imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
 		}
 
-		texture.imageView = device.createImageView(imageViewCreateInfo);
+		texture.imageView = check_vk_object(device.createImageView(imageViewCreateInfo), "ImageView");
 
 		// Sampler:
 		vk::SamplerCreateInfo samplerInfo = {};
@@ -130,7 +131,7 @@ namespace tur::vulkan
 			samplerInfo.unnormalizedCoordinates = false;
 		}
 
-		texture.sampler = device.createSampler(samplerInfo);
+		texture.sampler = check_vk_object(device.createSampler(samplerInfo), "Sampler");
 
 		return texture;
 	}
