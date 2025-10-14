@@ -133,7 +133,7 @@ namespace tur::vulkan
 		mState.mainRenderTarget = mResources.get_render_targets().get(mState.mainRenderTargetHandle);
 	}
 
-	void RenderInterfaceVulkan::begin_frame()
+	bool RenderInterfaceVulkan::begin_frame()
 	{
 		auto& device = mState.logicalDevice;
 		auto& swapchain = mState.swapchain;
@@ -156,7 +156,10 @@ namespace tur::vulkan
 			mFrameDataHolder.set_image_buffer_index(imageIndex);
 
 			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
+			{
 				utils::recreate_swapchain(*this);
+				return false;
+			}
 
 			else if (result == VK_SUCCESS || result == VK_NOT_READY || result == VK_TIMEOUT)
 			{
@@ -180,6 +183,8 @@ namespace tur::vulkan
 		result = frameData.commandBuffer.begin(beginInfo);
 		if (result != vk::Result::eSuccess)
 			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
+
+		return true;
 	}
 	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue)
 	{

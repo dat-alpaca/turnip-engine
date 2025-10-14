@@ -24,7 +24,9 @@ namespace tur
 		{
 			auto& rhi = *rRHI;
 
-			rhi.begin_frame();
+			if (!rhi.begin_frame())
+				return;
+
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
 
 			mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});

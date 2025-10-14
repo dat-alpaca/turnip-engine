@@ -18,7 +18,7 @@ namespace tur
 	
 	requires(T t, queue_handle queue)
 	{
-		{ t.begin_frame() };
+		{ t.begin_frame() }			-> std::same_as<bool>;
 		{ t.submit(queue) };
 		{ t.present(queue) };
 		{ t.end_frame() };

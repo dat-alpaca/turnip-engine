@@ -53,7 +53,7 @@ namespace tur::vulkan
 		void on_event(Event& event);
 
 	public:
-		void begin_frame();
+		bool begin_frame();
 		void submit(queue_handle graphicsQueue);
 		void present(queue_handle presentQueue);
 		void end_frame();

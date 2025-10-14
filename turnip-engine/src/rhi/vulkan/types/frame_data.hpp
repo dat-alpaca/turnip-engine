@@ -50,6 +50,7 @@ namespace tur::vulkan
 					device.destroyFence(frame.recordingFence);
 			}
 
+			mImageBufferIndex = 0;
 			mData.clear();
 		}
 
@@ -63,7 +64,7 @@ namespace tur::vulkan
 		inline void set_image_buffer_index(u32 index) { mImageBufferIndex = index; }
 		inline u32 get_image_buffer_index() { return mImageBufferIndex; }
 
-	public: // TODO
+	private:
 		static_ring_buffer<FrameData> mData;
 		u32 mImageBufferIndex = 0;
 	};
