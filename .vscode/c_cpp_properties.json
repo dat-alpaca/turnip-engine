@@ -14,7 +14,10 @@
             ],
             "compilerPath": "/usr/bin/gcc",
             "intelliSenseMode": "linux-gcc-x64",
-            "cppStandard": "c++23"
+            "cppStandard": "c++23",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            }
         }
     ],
     "version": 4
