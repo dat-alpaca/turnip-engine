@@ -38,18 +38,11 @@ namespace tur
 
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
 
-			static float angle = 0.0f;
-			angle += 0.1f;
-
 			UBO data;
 			{
 				data.model = glm::mat4(1.0f);
-				data.model = glm::rotate(data.model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
-				data.model = glm::scale(data.model, glm::vec3(0.4f, 0.4f, 1.f));
-
 				data.view = glm::mat4(1.0f);
 				data.projection = glm::mat4(1.0f);
-
 				resources.update_buffer(ubo, &data, {.size = sizeof(UBO)});
 			}
 
