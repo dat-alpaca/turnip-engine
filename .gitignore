@@ -52,3 +52,6 @@ bld/
 
 # Dlls:
 *.dll
+
+# Spir-V:
+*.spv
