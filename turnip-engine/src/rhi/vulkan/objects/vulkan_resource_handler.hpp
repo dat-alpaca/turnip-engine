@@ -1,6 +1,7 @@
 #pragma once
 #include "core/assets/texture_asset.hpp"
 
+#include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/resource_handler.hpp"
 #include "graphics/objects/texture.hpp"
@@ -35,6 +36,10 @@ namespace tur::vulkan
 		void destroy_render_target(render_target_handle renderTargetHandle);
 
 	public:
+		descriptor_set_layout_handle create_descriptor_set_layout(const DescriptorSetLayout& descriptorSetLayout);
+		void destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle);
+
+	public:
 		pipeline_handle create_graphics_pipeline(const PipelineDescriptor& descriptor);
 		void destroy_graphics_pipeline(pipeline_handle pipelineHandle);
 
@@ -56,6 +61,7 @@ namespace tur::vulkan
 
 	public:
 		free_list<vk::ShaderModule>& get_shaders() { return mShaders; }
+		free_list<DescriptorSet>& get_set_layouts() { return mSetLayouts; }
 		free_list<Buffer>& get_buffers() { return mBuffers; }
 		free_list<Pipeline>& get_pipelines() { return mPipelines; }
 		free_list<Texture>& get_textures() { return mTextures; }
@@ -67,6 +73,7 @@ namespace tur::vulkan
 
 	private:
 		free_list<vk::ShaderModule> mShaders;
+		free_list<DescriptorSet> mSetLayouts;
 		free_list<Buffer> mBuffers;
 		free_list<Pipeline> mPipelines;
 		free_list<Texture> mTextures;

@@ -24,3 +24,13 @@ namespace tur::vulkan
 		return {};
 	}
 }
+
+namespace tur::vulkan
+{
+	struct DescriptorSet
+	{
+		DescriptorSetLayout layoutDescriptor;
+		vk::DescriptorSetLayout layout;
+		vk::DescriptorPool pool;
+	};
+}

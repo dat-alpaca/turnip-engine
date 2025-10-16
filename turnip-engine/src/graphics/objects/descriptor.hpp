@@ -18,6 +18,7 @@ namespace tur
 
 namespace tur
 {
+	using descriptor_set_layout_handle = handle_type;
 	using descriptor_set_handle = handle_type;
 
 	struct DescriptorSetLayoutEntry

@@ -24,6 +24,9 @@ namespace tur::vulkan
 
 		for (const auto& pipelineHandle : mPipelines.available_indices())
 			destroy_graphics_pipeline(pipelineHandle);
+
+		for (const auto& setLayoutHandle : mSetLayouts.available_indices())
+			destroy_descriptor_set_layout(setLayoutHandle);
 	}
 
 	shader_handle ResourceHandler::create_shader(const ShaderDescriptor& descriptor)
@@ -61,6 +64,22 @@ namespace tur::vulkan
 
 		if (renderTarget.depthAttachment.textureHandle != invalid_handle)
 			destroy_texture(renderTarget.depthAttachment.textureHandle);
+	}
+
+	descriptor_set_layout_handle
+	ResourceHandler::create_descriptor_set_layout(const DescriptorSetLayout& descriptorSetLayout)
+	{
+		auto& device = rRHI->get_state().logicalDevice;
+		DescriptorSet descriptorSet{
+			.layoutDescriptor = descriptorSetLayout,
+			.layout = allocate_set_layout(device, descriptorSetLayout),
+			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)};
+
+		return mSetLayouts.add(descriptorSet);
+	}
+	void ResourceHandler::destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle)
+	{
+		rRHI->get_deletion_queue().submit_descriptor_set_layout(descriptorSetLayoutHandle);
 	}
 
 	pipeline_handle ResourceHandler::create_graphics_pipeline(const PipelineDescriptor& descriptor)

@@ -24,6 +24,10 @@ namespace tur::vulkan
 	{
 		mPipelineHandles.push_back(pipelineHandle);
 	}
+	void DeletionQueue::submit_descriptor_set_layout(descriptor_set_layout_handle setLayoutHandle)
+	{
+		mSetLayoutHandles.push_back(setLayoutHandle);
+	}
 
 	void DeletionQueue::flush()
 	{
@@ -75,8 +79,19 @@ namespace tur::vulkan
 			Pipeline& pipeline = pipelines.get(pipelineHandle);
 			device.destroyPipelineLayout(pipeline.layout);
 			device.destroyPipeline(pipeline.pipeline);
-			device.destroyDescriptorSetLayout(pipeline.setLayout);
 		}
 		mPipelineHandles.clear();
+
+		// Set Layouts:
+		auto& setLayouts = rRHI->get_resource_handler().get_set_layouts();
+		for (auto& setLayout : mSetLayoutHandles)
+		{
+			if (setLayout == invalid_handle)
+				continue;
+
+			device.destroyDescriptorSetLayout(setLayouts.get(setLayout).layout);
+			device.destroyDescriptorPool(setLayouts.get(setLayout).pool);
+		}
+		mSetLayoutHandles.clear();
 	}
 }

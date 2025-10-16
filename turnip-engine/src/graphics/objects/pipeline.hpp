@@ -144,12 +144,12 @@ namespace tur
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
 
+		descriptor_set_layout_handle setLayout;
+
 		// Viewport & Scissor:
 		std::span<const Viewport> viewports = {};
 		std::span<const Extent2D> scissors = {};
 		std::span<const DynamicState> dynamicStates = {};
-
-		DescriptorSetLayout descriptorSetLayout;
 
 		shader_handle vertexShader = invalid_handle;
 		shader_handle tesselationControlShader = invalid_handle;

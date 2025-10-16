@@ -339,7 +339,7 @@ namespace tur::vulkan
 // Pipeline Layout:
 namespace tur::vulkan
 {
-	static vk::PipelineLayoutCreateInfo create_pipeline_layout(vk::DescriptorSetLayout* setLayout)
+	static vk::PipelineLayoutCreateInfo create_pipeline_layout(const vk::DescriptorSetLayout* setLayout)
 	{
 		vk::PipelineLayoutCreateInfo pipelineLayoutCreateInfo = {};
 		{
@@ -358,6 +358,7 @@ namespace tur::vulkan
 {
 	Pipeline allocate_graphics_pipeline(RenderInterfaceVulkan* rhi, const PipelineDescriptor& descriptor)
 	{
+		auto setLayout = rhi->get_resource_handler().get_set_layouts().get(descriptor.setLayout);
 		auto& device = rhi->get_state().logicalDevice;
 		auto& swapchainFormat = rhi->get_state().swapchainFormat;
 
@@ -387,10 +388,7 @@ namespace tur::vulkan
 
 		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects();
 
-		pipeline.setLayout =
-			allocate_descriptor_set_layout(rhi->get_state().logicalDevice, descriptor.descriptorSetLayout);
-		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&pipeline.setLayout);
-
+		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout);
 		pipeline.layout = check_vk_result(device.createPipelineLayout(pipelineLayout));
 
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):

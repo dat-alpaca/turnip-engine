@@ -3,6 +3,7 @@
 
 #include "assets/texture_asset.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/shader.hpp"
@@ -30,6 +31,12 @@ namespace tur
 	{
         { t.create_render_target(desc) }							-> std::same_as<render_target_handle>;
 		{ t.destroy_shader(handle) };
+	} && 
+
+	requires(T t, const DescriptorSetLayout& desc, descriptor_set_layout_handle handle)
+	{
+        { t.create_descriptor_set_layout(desc) }					-> std::same_as<descriptor_set_layout_handle>;
+		{ t.destroy_descriptor_set_layout(handle) };
 	} && 
 	
 	requires(T t, const PipelineDescriptor& desc, pipeline_handle handle)

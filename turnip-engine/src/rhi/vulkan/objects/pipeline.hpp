@@ -176,6 +176,5 @@ namespace tur::vulkan
 		PipelineType type;
 		vk::Pipeline pipeline;
 		vk::PipelineLayout layout;
-		vk::DescriptorSetLayout setLayout;
 	};
 }

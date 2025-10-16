@@ -11,6 +11,13 @@ namespace tur
 			glm::vec3 position;
 		};
 
+		struct UBO
+		{
+			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 projection;
+		};
+
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi)
 		{
@@ -23,11 +30,17 @@ namespace tur
 		void render()
 		{
 			auto& rhi = *rRHI;
+			auto& resources = rhi.get_resource_handler();
 
 			if (!rhi.begin_frame())
 				return;
 
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
+
+			UBO data;
+			{
+				resources.update_buffer(ubo, &data, {.size = sizeof(UBO)});
+			}
 
 			mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});
 			mCommandBuffer.set_scissor(Extent2D{0, 0, 640, 480});
@@ -55,6 +68,7 @@ namespace tur
 			presentQueue = rRHI->get_queue(QueueOperation::PRESENT);
 
 			initialize_buffers();
+			initialize_descriptors();
 			initialize_pipeline();
 		}
 
@@ -74,6 +88,28 @@ namespace tur
 
 				vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 3});
 			}
+
+			{
+				BufferDescriptor descriptor = {.type = BufferType::UNIFORM_BUFFER, .usage = BufferUsage::COHERENT};
+				ubo = resources.create_empty_buffer(descriptor, sizeof(UBO));
+			}
+		}
+
+		void initialize_descriptors()
+		{
+			// clang-format off
+			constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
+			({
+				{
+					.binding = 0,
+				  	.amount = 1,
+				  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+				  	.stage = PipelineStage::FRAGMENT_STAGE
+				}
+			});
+			// clang-format on
+
+			setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
 		}
 
 		void initialize_pipeline()
@@ -110,16 +146,6 @@ namespace tur
 				DynamicState::VIEWPORT,
 				DynamicState::SCISSOR
 			});
-
-			constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
-			({
-				{
-					// .binding = 0,
-					// .amount = 1,
-					// .type = DescriptorType::UNIFORM_BUFFER,
-					// .stage = PipelineStage::VERTEX_STAGE
-				}
-			});
 			
 			constexpr auto Viewports = std::to_array<Viewport>({Viewport{}});
 			constexpr auto Scissors = std::to_array<Extent2D>({Extent2D{}});
@@ -131,7 +157,6 @@ namespace tur
 					.vertexBindings = VertexBindings,
 					.attributes = Attributes
 				},
-
 				.inputAssemblyStage = 
 				{
 					.topology = PrimitiveTopology::TRIANGLES,
@@ -142,13 +167,10 @@ namespace tur
 					.frontFace = FrontFace::COUNTER_CLOCKWISE, 
 					.cullMode = CullMode::FRONT,
 				},
+				.setLayout = setLayout,
 				.viewports = Viewports,
 				.scissors = Scissors,
 				.dynamicStates = DynamicStates,
-				.descriptorSetLayout =
-				{
-					// .entries = LayoutEntries 
-				},
 
 				.vertexShader = vertexShader,
 				.fragmentShader = fragmentShader,
@@ -163,7 +185,8 @@ namespace tur
 		CommandBuffer mCommandBuffer;
 
 	private:
-		buffer_handle vbo;
+		descriptor_set_layout_handle setLayout;
+		buffer_handle vbo, ubo;
 		pipeline_handle pipeline;
 		queue_handle graphicsQueue, presentQueue;
 	};
