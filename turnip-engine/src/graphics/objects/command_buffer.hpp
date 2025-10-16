@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 
@@ -45,11 +46,17 @@ namespace tur
 	{
         { t.bind_pipeline(pipelineHandle) };
 	} &&
-
-	requires(T t, u32 number)
+	requires(T t, descriptor_set_handle setHandle)
 	{
-        { t.draw(number, number, number, number) };
+        { t.bind_descriptor_set(setHandle) };
+	} &&
+
+	requires(T t, u32 vertexCount, u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
+	{
+        { t.draw(vertexCount, instanceCount, firstVertex, firstInstance) };
+        { t.draw_indexed(indexCount, instanceCount, firstVertex, firstInstance) };
 	};
+
 	// clang-format on
 
 	template <typename T, typename CommandBufferType>

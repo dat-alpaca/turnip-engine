@@ -67,19 +67,61 @@ namespace tur::vulkan
 	}
 
 	descriptor_set_layout_handle
-	ResourceHandler::create_descriptor_set_layout(const DescriptorSetLayout& descriptorSetLayout)
+	ResourceHandler::create_descriptor_set_layout(const DescriptorSetLayoutDescriptor& descriptorSetLayout)
 	{
+		// TODO: flexible number of max descriptor sets
+
 		auto& device = rRHI->get_state().logicalDevice;
-		DescriptorSet descriptorSet{
+		DescriptorSetLayout setLayout{
 			.layoutDescriptor = descriptorSetLayout,
 			.layout = allocate_set_layout(device, descriptorSetLayout),
 			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)};
 
-		return mSetLayouts.add(descriptorSet);
+		return mSetLayouts.add(setLayout);
 	}
 	void ResourceHandler::destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle)
 	{
 		rRHI->get_deletion_queue().submit_descriptor_set_layout(descriptorSetLayoutHandle);
+	}
+
+	descriptor_set_handle ResourceHandler::create_descriptor_set(descriptor_set_layout_handle layoutHandle)
+	{
+		DescriptorSetLayout setLayout = mSetLayouts.get(layoutHandle);
+		vk::DescriptorSet descriptorSet =
+			allocate_set_single_layout(rRHI->get_state().logicalDevice, setLayout.pool, setLayout.layout);
+
+		DescriptorSet set;
+		{
+			set.set = descriptorSet;
+			set.layoutHandle = layoutHandle;
+		}
+		return mDescriptorSets.add(set);
+	}
+
+	void ResourceHandler::write_uniform_buffer_to_set(
+		descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
+	)
+	{
+		const Buffer& buffer = mBuffers.get(bufferHandle);
+
+		vk::DescriptorBufferInfo bufferInfo = {};
+		{
+			bufferInfo.buffer = buffer.buffer;
+			bufferInfo.offset = range.offset;
+			bufferInfo.range = range.size;
+		}
+
+		vk::WriteDescriptorSet descriptorWrite = {};
+		{
+			descriptorWrite.dstSet = mDescriptorSets.get(setHandle).set;
+			descriptorWrite.dstBinding = binding;
+			descriptorWrite.dstArrayElement = 0; // TODO: allow modification
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.descriptorType = vk::DescriptorType::eUniformBuffer;
+			descriptorWrite.pBufferInfo = &bufferInfo;
+		}
+
+		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
 	}
 
 	pipeline_handle ResourceHandler::create_graphics_pipeline(const PipelineDescriptor& descriptor)

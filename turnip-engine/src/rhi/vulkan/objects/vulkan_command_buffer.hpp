@@ -31,24 +31,12 @@ namespace tur::vulkan
 	public:
 		void bind_vertex_buffer(buffer_handle bufferHandle, u32 binding);
 		void bind_index_buffer(buffer_handle bufferHandle, BufferIndexType type);
-
 		void bind_pipeline(pipeline_handle pipelineHandle);
+		void bind_descriptor_set(descriptor_set_handle setHandle);
 
 	public:
 		void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
-
-		/*
-				protected:
-						void bind_descriptor_set(descriptor_set_handle );
-
-				protected:
-					void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
-					void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
-
-				private:
-					void transition_image(vk::Image targetImage, vk::ImageLayout currentLayout, vk::ImageLayout
-		   newLayout); void copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D
-		   targetSize); */
+		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 
 	private:
 		void copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize);
@@ -59,6 +47,7 @@ namespace tur::vulkan
 		vk::CommandBuffer mCommandBuffer;
 
 	private:
+		pipeline_handle mBoundPipeline = invalid_handle;
 		render_target_handle mUsedTarget;
 		ClearColor mClearColor;
 	};

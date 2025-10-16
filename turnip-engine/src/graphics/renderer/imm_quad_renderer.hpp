@@ -1,6 +1,7 @@
 #pragma once
 #include "rhi/rhi.hpp"
 #include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 namespace tur
 {
@@ -37,8 +38,18 @@ namespace tur
 
 			mCommandBuffer.reset(rhi.get_current_command_buffer());
 
+			static float angle = 0.0f;
+			angle += 0.1f;
+
 			UBO data;
 			{
+				data.model = glm::mat4(1.0f);
+				data.model = glm::rotate(data.model, angle, glm::vec3(0.0f, 0.0f, 1.0f));
+				data.model = glm::scale(data.model, glm::vec3(0.4f, 0.4f, 1.f));
+
+				data.view = glm::mat4(1.0f);
+				data.projection = glm::mat4(1.0f);
+
 				resources.update_buffer(ubo, &data, {.size = sizeof(UBO)});
 			}
 
@@ -49,6 +60,7 @@ namespace tur
 
 				mCommandBuffer.bind_vertex_buffer(vbo, 0);
 				mCommandBuffer.bind_pipeline(pipeline);
+				mCommandBuffer.bind_descriptor_set(set);
 
 				mCommandBuffer.draw(3, 1, 0, 0);
 				mCommandBuffer.end();
@@ -90,26 +102,34 @@ namespace tur
 			}
 
 			{
-				BufferDescriptor descriptor = {.type = BufferType::UNIFORM_BUFFER, .usage = BufferUsage::COHERENT};
+				BufferDescriptor descriptor = {
+					.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST, .usage = BufferUsage::COHERENT};
 				ubo = resources.create_empty_buffer(descriptor, sizeof(UBO));
 			}
 		}
 
 		void initialize_descriptors()
 		{
+			auto& resources = rRHI->get_resource_handler();
+
+			/* Descriptor Set */
 			// clang-format off
 			constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
 			({
 				{
 					.binding = 0,
 				  	.amount = 1,
-				  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
-				  	.stage = PipelineStage::FRAGMENT_STAGE
+				  	.type = DescriptorType::UNIFORM_BUFFER,
+				  	.stage = PipelineStage::VERTEX_STAGE
 				}
 			});
 			// clang-format on
 
 			setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
+
+			/* Descriptors */
+			set = resources.create_descriptor_set(setLayout);
+			resources.write_uniform_buffer_to_set(set, ubo, {.size = sizeof(UBO)}, 0);
 		}
 
 		void initialize_pipeline()
@@ -186,6 +206,8 @@ namespace tur
 
 	private:
 		descriptor_set_layout_handle setLayout;
+		descriptor_set_handle set;
+
 		buffer_handle vbo, ubo;
 		pipeline_handle pipeline;
 		queue_handle graphicsQueue, presentQueue;

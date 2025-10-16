@@ -27,10 +27,16 @@ namespace tur::vulkan
 
 namespace tur::vulkan
 {
-	struct DescriptorSet
+	struct DescriptorSetLayout
 	{
-		DescriptorSetLayout layoutDescriptor;
+		DescriptorSetLayoutDescriptor layoutDescriptor;
 		vk::DescriptorSetLayout layout;
 		vk::DescriptorPool pool;
+	};
+
+	struct DescriptorSet
+	{
+		vk::DescriptorSet set;
+		descriptor_set_layout_handle layoutHandle;
 	};
 }

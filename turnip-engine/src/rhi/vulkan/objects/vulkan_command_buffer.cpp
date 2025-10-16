@@ -83,6 +83,8 @@ namespace tur::vulkan
 	}
 	void CommandBufferVulkan::end()
 	{
+		mBoundPipeline = invalid_handle;
+
 		mCommandBuffer.endRendering();
 
 		if (mUsedTarget != invalid_handle)
@@ -129,11 +131,26 @@ namespace tur::vulkan
 	{
 		const Pipeline& pipeline = rRHI->get_resource_handler().get_pipelines().get(pipelineHandle);
 		mCommandBuffer.bindPipeline(get_pipeline_type(pipeline.type), pipeline.pipeline);
+
+		mBoundPipeline = pipelineHandle;
+	}
+	void CommandBufferVulkan::bind_descriptor_set(descriptor_set_handle setHandle)
+	{
+		auto& resources = rRHI->get_resource_handler();
+		const DescriptorSet& set = resources.get_descriptor_sets().get(setHandle);
+		const Pipeline& pipeline = resources.get_pipelines().get(mBoundPipeline);
+
+		mCommandBuffer.bindDescriptorSets(get_pipeline_type(pipeline.type), pipeline.layout, 0, {set.set}, {});
 	}
 
 	void CommandBufferVulkan::draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		mCommandBuffer.draw(vertexCount, instanceCount, firstVertex, firstInstance);
+	}
+	void CommandBufferVulkan::draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
+	{
+		// TODO: allow first index
+		mCommandBuffer.drawIndexed(indexCount, instanceCount, 0, firstVertex, firstInstance);
 	}
 }
 

@@ -388,7 +388,7 @@ namespace tur::vulkan
 
 		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects();
 
-		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout);
+		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout.layout);
 		pipeline.layout = check_vk_result(device.createPipelineLayout(pipelineLayout));
 
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):

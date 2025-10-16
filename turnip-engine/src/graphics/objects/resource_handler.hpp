@@ -33,12 +33,20 @@ namespace tur
 		{ t.destroy_shader(handle) };
 	} && 
 
-	requires(T t, const DescriptorSetLayout& desc, descriptor_set_layout_handle handle)
+	requires(T t, const DescriptorSetLayoutDescriptor& desc, descriptor_set_layout_handle handle)
 	{
         { t.create_descriptor_set_layout(desc) }					-> std::same_as<descriptor_set_layout_handle>;
 		{ t.destroy_descriptor_set_layout(handle) };
+	} &&
+	requires(T t, descriptor_set_layout_handle layoutHandle)
+	{
+        { t.create_descriptor_set(layoutHandle) }					-> std::same_as<descriptor_set_handle>;
 	} && 
-	
+	requires(T t, descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding)
+	{
+		{ t.write_uniform_buffer_to_set(setHandle, bufferHandle, range, binding) };
+	} &&
+
 	requires(T t, const PipelineDescriptor& desc, pipeline_handle handle)
 	{ 
 		{ t.create_graphics_pipeline(desc) }						-> std::same_as<pipeline_handle>;

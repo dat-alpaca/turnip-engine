@@ -29,7 +29,7 @@ namespace tur
 		PipelineStage stage;
 	};
 
-	struct DescriptorSetLayout
+	struct DescriptorSetLayoutDescriptor
 	{
 		std::span<const DescriptorSetLayoutEntry> entries;
 	};

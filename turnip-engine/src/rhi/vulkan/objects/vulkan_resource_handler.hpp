@@ -10,6 +10,7 @@
 
 #include "data-structures/free_list.hpp"
 #include "rhi/vulkan/allocators/allocators.hpp"
+#include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 
@@ -36,8 +37,14 @@ namespace tur::vulkan
 		void destroy_render_target(render_target_handle renderTargetHandle);
 
 	public:
-		descriptor_set_layout_handle create_descriptor_set_layout(const DescriptorSetLayout& descriptorSetLayout);
+		descriptor_set_layout_handle
+		create_descriptor_set_layout(const DescriptorSetLayoutDescriptor& descriptorSetLayout);
 		void destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle);
+
+		descriptor_set_handle create_descriptor_set(descriptor_set_layout_handle layoutHandle);
+		void write_uniform_buffer_to_set(
+			descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
+		); // TODO: write_resource_to_set()
 
 	public:
 		pipeline_handle create_graphics_pipeline(const PipelineDescriptor& descriptor);
@@ -61,11 +68,12 @@ namespace tur::vulkan
 
 	public:
 		free_list<vk::ShaderModule>& get_shaders() { return mShaders; }
-		free_list<DescriptorSet>& get_set_layouts() { return mSetLayouts; }
 		free_list<Buffer>& get_buffers() { return mBuffers; }
 		free_list<Pipeline>& get_pipelines() { return mPipelines; }
 		free_list<Texture>& get_textures() { return mTextures; }
 		free_list<RenderTarget>& get_render_targets() { return mRenderTargets; }
+		free_list<DescriptorSetLayout>& get_set_layouts() { return mSetLayouts; }
+		free_list<DescriptorSet>& get_descriptor_sets() { return mDescriptorSets; }
 
 	private:
 		NON_OWNING RenderInterfaceVulkan* rRHI = nullptr;
@@ -73,11 +81,12 @@ namespace tur::vulkan
 
 	private:
 		free_list<vk::ShaderModule> mShaders;
-		free_list<DescriptorSet> mSetLayouts;
 		free_list<Buffer> mBuffers;
 		free_list<Pipeline> mPipelines;
 		free_list<Texture> mTextures;
 		free_list<RenderTarget> mRenderTargets;
+		free_list<DescriptorSetLayout> mSetLayouts;
+		free_list<DescriptorSet> mDescriptorSets;
 	};
 }
 

@@ -10,7 +10,7 @@
 namespace tur::vulkan
 {
 	inline vk::DescriptorPool
-	allocate_descriptor_pool(vk::Device device, const DescriptorSetLayout& layout, u32 maxSets)
+	allocate_descriptor_pool(vk::Device device, const DescriptorSetLayoutDescriptor& layout, u32 maxSets)
 	{
 		std::vector<vk::DescriptorPoolSize> poolSizes;
 		for (const auto& entry : layout.entries)
@@ -31,7 +31,7 @@ namespace tur::vulkan
 		return check_vk_object(device.createDescriptorPool(poolInfo), "DescriptorPool");
 	}
 
-	inline vk::DescriptorSetLayout allocate_set_layout(vk::Device device, const DescriptorSetLayout& layout)
+	inline vk::DescriptorSetLayout allocate_set_layout(vk::Device device, const DescriptorSetLayoutDescriptor& layout)
 	{
 		std::vector<vk::DescriptorSetLayoutBinding> bindings;
 		for (const auto& entry : layout.entries)
@@ -44,6 +44,7 @@ namespace tur::vulkan
 				binding.stageFlags = get_pipeline_stages(entry.stage);
 				binding.pImmutableSamplers = nullptr;
 			}
+			bindings.push_back(binding);
 		}
 
 		vk::DescriptorSetLayoutCreateInfo createInfo = {};
@@ -53,5 +54,18 @@ namespace tur::vulkan
 		}
 
 		return check_vk_object(device.createDescriptorSetLayout(createInfo), "DescriptorSetLayout");
+	}
+
+	inline vk::DescriptorSet
+	allocate_set_single_layout(vk::Device device, vk::DescriptorPool pool, vk::DescriptorSetLayout layout)
+	{
+		vk::DescriptorSetAllocateInfo allocateInfo = {};
+		{
+			allocateInfo.descriptorPool = pool;
+			allocateInfo.descriptorSetCount = 1;
+			allocateInfo.pSetLayouts = &layout;
+		}
+
+		return check_vk_object(device.allocateDescriptorSets(allocateInfo), "DescriptorSet").front();
 	}
 }

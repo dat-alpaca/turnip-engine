@@ -8,7 +8,8 @@
 
 namespace tur::vulkan
 {
-	inline vk::DescriptorSetLayout allocate_descriptor_set_layout(vk::Device device, const DescriptorSetLayout& layout)
+	inline vk::DescriptorSetLayout
+	allocate_descriptor_set_layout(vk::Device device, const DescriptorSetLayoutDescriptor& layout)
 	{
 		std::vector<vk::DescriptorSetLayoutBinding> descriptorBindings;
 		for (const auto& [binding, amount, type, stages] : layout.entries)
