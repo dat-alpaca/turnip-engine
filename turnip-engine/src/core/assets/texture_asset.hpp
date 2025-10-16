@@ -13,7 +13,6 @@ namespace tur
 
 		u32 width = 0;
 		u32 height = 0;
-		u32 depth = 0;
 		u32 channels = 0;
 
 		TextureDataFormat dataFormat = TextureDataFormat::RGBA;

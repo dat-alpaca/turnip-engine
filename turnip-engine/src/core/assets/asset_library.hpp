@@ -19,6 +19,7 @@ namespace tur
 	public:
 		asset_handle load_texture(const std::filesystem::path& filepath);
 		void unload_texture(asset_handle handle);
+		TextureAsset get_texture(asset_handle handle);
 
 	private:
 		asset_handle update_texture_data(const std::filesystem::path& filepath, asset_handle target);

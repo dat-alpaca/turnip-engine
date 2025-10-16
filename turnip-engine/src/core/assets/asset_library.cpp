@@ -35,6 +35,10 @@ namespace tur
 		AssetUnloadedEvent unloadedEvent(handle);
 		mEventCallback(unloadedEvent);
 	}
+	TextureAsset AssetLibrary::get_texture(asset_handle handle)
+	{
+		return mTextures.get(handle);
+	}
 
 	asset_handle AssetLibrary::update_texture_data(const std::filesystem::path& filepath, asset_handle target)
 	{
@@ -56,7 +60,7 @@ namespace tur
 		std::vector<byte> buffer(data, data + size);
 		stbi_image_free(data);
 
-		TextureAsset asset = mTextures.get(target);
+		TextureAsset& asset = mTextures.get(target);
 		{
 			asset.data = buffer;
 			asset.metadata.filepath = filepath;
