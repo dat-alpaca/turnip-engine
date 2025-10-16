@@ -10,8 +10,6 @@
 
 namespace tur
 {
-	// TODO: number -> parameter names
-
 	// clang-format off
 	template <typename T, typename CommandBufferType>
 	concept IsCommandBuffer = requires(T t, CommandBufferType commandBuffer)
@@ -41,7 +39,6 @@ namespace tur
         { t.bind_vertex_buffer(buffer, binding) };
         { t.bind_index_buffer(buffer, indexType) };
 	} &&
-
 	requires(T t, pipeline_handle pipelineHandle)
 	{
         { t.bind_pipeline(pipelineHandle) };

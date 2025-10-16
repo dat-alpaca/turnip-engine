@@ -41,10 +41,12 @@ namespace tur::vulkan
 		create_descriptor_set_layout(const DescriptorSetLayoutDescriptor& descriptorSetLayout);
 		void destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle);
 
+		// TODO: write_resource_to_set()
 		descriptor_set_handle create_descriptor_set(descriptor_set_layout_handle layoutHandle);
 		void write_uniform_buffer_to_set(
 			descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
-		); // TODO: write_resource_to_set()
+		);
+		void write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding);
 
 	public:
 		pipeline_handle create_graphics_pipeline(const PipelineDescriptor& descriptor);

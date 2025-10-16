@@ -10,6 +10,7 @@ namespace tur
 		struct Vertex
 		{
 			glm::vec3 position;
+			glm::vec2 uvs;
 		};
 
 		struct UBO
@@ -51,11 +52,12 @@ namespace tur
 			{
 				mCommandBuffer.begin();
 
+				mCommandBuffer.bind_index_buffer(ebo, BufferIndexType::UNSIGNED_INT);
 				mCommandBuffer.bind_vertex_buffer(vbo, 0);
 				mCommandBuffer.bind_pipeline(pipeline);
 				mCommandBuffer.bind_descriptor_set(set);
 
-				mCommandBuffer.draw(3, 1, 0, 0);
+				mCommandBuffer.draw_indexed(6, 1, 0, 0);
 				mCommandBuffer.end();
 			}
 
@@ -85,13 +87,26 @@ namespace tur
 				BufferDescriptor descriptor = {
 					.type = BufferType::VERTEX_BUFFER,
 				};
-				std::array<Vertex, 3> vertices = {
-					Vertex{glm::vec3{-0.5f, -0.5f, 0.0f}}, Vertex{glm::vec3{0.5f, -0.5f, 0.0f}},
-					Vertex{glm::vec3{0.5f, 0.5f, 0.0f}},
-					// Vertex{glm::vec3{-0.5f, 0.5f, 0.0f}},
-				};
 
-				vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 3});
+				// clang-format off
+				std::array<Vertex, 4> vertices = 
+				{
+					Vertex{glm::vec3{ -0.5f, -0.5f, 0.0f },	glm::vec2{ 0.0f, 0.0f }},
+					Vertex{glm::vec3{  0.5f, -0.5f, 0.0f }, glm::vec2{ 1.0f, 0.0f }},
+					Vertex{glm::vec3{  0.5f,  0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f }},
+					Vertex{glm::vec3{ -0.5f,  0.5f, 0.0f }, glm::vec2{ 0.0f, 1.0f }},
+				};
+				// clang-format on
+
+				vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 4});
+			}
+
+			{
+				BufferDescriptor descriptor = {
+					.type = BufferType::INDEX_BUFFER,
+				};
+				unsigned int indices[6] = {0, 1, 2, 2, 3, 0};
+				ebo = resources.create_buffer(descriptor, indices, {.size = sizeof(indices)});
 			}
 
 			{
@@ -152,6 +167,12 @@ namespace tur
 					.location = 0,
 					.offset = offsetof(Vertex, position),
 					.format = AttributeFormat::R32G32B32_SFLOAT
+				},
+				{
+					.binding = 0,
+					.location = 1,
+					.offset = offsetof(Vertex, uvs),
+					.format = AttributeFormat::R32G32_SFLOAT
 				}
 			});
 
@@ -201,7 +222,7 @@ namespace tur
 		descriptor_set_layout_handle setLayout;
 		descriptor_set_handle set;
 
-		buffer_handle vbo, ubo;
+		buffer_handle vbo, ubo, ebo;
 		pipeline_handle pipeline;
 		queue_handle graphicsQueue, presentQueue;
 	};

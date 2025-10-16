@@ -123,6 +123,35 @@ namespace tur::vulkan
 
 		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
 	}
+	void
+	ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
+	{
+		const auto& texture = mTextures.get(textureHandle);
+		TUR_ASSERT(
+			texture.layout == vk::ImageLayout::eShaderReadOnlyOptimal,
+			"Invalid texture layout passed to descriptor set."
+		);
+
+		vk::DescriptorImageInfo imageInfo = {};
+		{
+			imageInfo.imageLayout = vk::ImageLayout::eShaderReadOnlyOptimal;
+			imageInfo.imageView = texture.imageView;
+			imageInfo.sampler = texture.sampler;
+		}
+
+		vk::WriteDescriptorSet descriptorWrite = {};
+		{
+			descriptorWrite.dstSet = mDescriptorSets.get(setHandle).set;
+			descriptorWrite.dstBinding = binding;
+			descriptorWrite.dstArrayElement = 0;
+			descriptorWrite.descriptorType = vk::DescriptorType::eCombinedImageSampler;
+			descriptorWrite.descriptorCount = 1;
+
+			descriptorWrite.pImageInfo = &imageInfo;
+		}
+
+		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+	}
 
 	pipeline_handle ResourceHandler::create_graphics_pipeline(const PipelineDescriptor& descriptor)
 	{
