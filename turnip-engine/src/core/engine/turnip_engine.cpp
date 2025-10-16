@@ -80,6 +80,10 @@ namespace tur
 
 		// Worker Pool:
 		mWorkerPool.initialize(configData.workerConfig);
+
+		// Asset Library:
+		mAssetLibrary.initialize(&mWorkerPool);
+		mAssetLibrary.set_event_callback([&](Event& event) { engine::on_event(event, *this); });
 	}
 
 	void TurnipEngine::start()

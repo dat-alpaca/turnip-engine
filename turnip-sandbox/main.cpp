@@ -16,6 +16,9 @@ public:
 		engine->get_scene_holder().create_scene(true);
 		mCurrentScene = engine->get_scene_holder().get_current_scene();
 
+		// Textures:
+		engine->get_asset_library().load_texture("res/textures/face.png");
+
 		// Scene population:
 		mEntity = mCurrentScene->add_entity("test");
 		mScript = mEntity.add_component<ScriptComponent>(mEntity, "res/player.lua");

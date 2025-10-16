@@ -6,16 +6,16 @@ namespace tur
 {
 	using asset_handle = handle_type;
 
-	enum class AssetType
-	{
-		NONE = 0,
-		TEXTURE
-	};
-
 	struct AssetMetadata
 	{
 		std::filesystem::path filepath;
 		UUID uuid;
+	};
+
+	enum class AssetType
+	{
+		NONE = 0,
+		TEXTURE
 	};
 
 	static inline constexpr const char* get_asset_type_name(AssetType type)

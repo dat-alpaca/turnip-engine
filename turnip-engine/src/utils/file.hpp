@@ -15,13 +15,13 @@ namespace tur
 		std::ifstream file(filepath);
 		if (!std::filesystem::exists(filepath))
 		{
-			TUR_LOG_ERROR("Filepath does not exist: {}", filepath.string().c_str());
+			TUR_LOG_CRITICAL("Filepath does not exist: {}", filepath.string().c_str());
 			return "";
 		}
 
 		if (!file.is_open())
 		{
-			TUR_LOG_ERROR("Failed to load file: {}", filepath.string().c_str());
+			TUR_LOG_CRITICAL("Failed to load file: {}", filepath.string().c_str());
 			return "";
 		}
 
@@ -35,13 +35,13 @@ namespace tur
 	{
 		if (!std::filesystem::exists(filepath))
 		{
-			TUR_LOG_ERROR("Filepath does not exist: {}", filepath.string().c_str());
+			TUR_LOG_CRITICAL("Filepath does not exist: {}", filepath.string().c_str());
 			return {};
 		}
 
 		std::ifstream file(filepath, std::ios::binary | std::ios::ate);
 		if (!file.is_open())
-			TUR_LOG_ERROR("Failed to load file: {}", filepath.string().c_str());
+			TUR_LOG_CRITICAL("Failed to load file: {}", filepath.string().c_str());
 
 		u64 fileSize = static_cast<u64>(file.tellg());
 		std::vector<u8> data(fileSize);
@@ -54,8 +54,9 @@ namespace tur
 		return data;
 	}
 
-	inline std::string save_file_dialog(const std::string& title, const std::string& defaultPath = "",
-										const std::vector<std::string>& filters = {})
+	inline std::string save_file_dialog(
+		const std::string& title, const std::string& defaultPath = "", const std::vector<std::string>& filters = {}
+	)
 	{
 		return pfd::save_file(title, defaultPath, filters).result();
 	}

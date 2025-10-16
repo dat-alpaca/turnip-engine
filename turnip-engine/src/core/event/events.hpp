@@ -19,4 +19,7 @@
 #include "mouse_events/mouse_released_event.hpp"
 #include "mouse_events/mouse_scroll_event.hpp"
 
+#include "asset_events/asset_loaded_event.hpp"
+#include "asset_events/asset_unloaded_event.hpp"
+
 #include "scene_events/scene_switched_event.hpp"

@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/asset_library.hpp"
 #include "platform/platform.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/scene_holder.hpp"
@@ -28,6 +29,7 @@ namespace tur
 		SceneHolder& get_scene_holder() { return mSceneHolder; }
 		ViewSystem& get_view_system() { return mViewSystem; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
+		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	private:
 		RenderInterface mRenderInterface;
@@ -35,6 +37,7 @@ namespace tur
 		ViewSystem mViewSystem;
 		WorkerPool mWorkerPool;
 		tur_unique<Window> mWindow;
+		AssetLibrary mAssetLibrary;
 
 		bool mShutdownRequested = false;
 	};
