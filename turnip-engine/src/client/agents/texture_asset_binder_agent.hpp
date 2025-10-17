@@ -2,12 +2,11 @@
 #include "assets/texture_asset_binder.hpp"
 #include "event/events.hpp"
 #include "event_consumer.hpp"
+#include "event_emitter.hpp"
 
 namespace tur
 {
-	// TODO: add set_event_handle
-	// TODO: signal TextureUploaded event
-	class TextureAssetBinderConsumer : public IEventConsumer
+	class TextureAssetBinderAgent : public IEventConsumer, public IEventEmitter
 	{
 	public:
 		void initialize(NON_OWNING TextureAssetBinder* binder) { rBinder = binder; }
@@ -19,7 +18,11 @@ namespace tur
 			subscriber.subscribe<AssetLoadedEvent>(
 				[&](const AssetLoadedEvent& event) -> bool
 				{
-					rBinder->upload_texture(event.assetHandle);
+					auto textureHandle = rBinder->upload_texture(event.assetHandle);
+
+					TextureUploadedEvent uploadEvent(textureHandle);
+					callback(uploadEvent);
+
 					return false;
 				}
 			);

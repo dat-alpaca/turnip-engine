@@ -29,6 +29,8 @@ namespace tur
 		ASSET_LOADED,
 		ASSET_UNLOADED,
 
+		TEXTURE_UPLOADED,
+
 		AMOUNT
 	};
 

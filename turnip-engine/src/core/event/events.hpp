@@ -23,3 +23,5 @@
 #include "asset_events/asset_unloaded_event.hpp"
 
 #include "scene_events/scene_switched_event.hpp"
+
+#include "graphics_events/texture_uploaded_event.hpp"
