@@ -1,6 +1,6 @@
 #pragma once
 #include "assets/asset_library.hpp"
-#include "graphics/asset_texture_mapper.hpp"
+#include "assets/texture_asset_binder.hpp"
 #include "platform/platform.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/scene_holder.hpp"
@@ -33,7 +33,7 @@ namespace tur
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	public:
-		AssetTextureMapper& get_asset_texture_mapper() { return mAssetTextureMapper; }
+		TextureAssetBinder& get_texture_asset_binder() { return mTextureAssetBinder; }
 
 	private:
 		RenderInterface mRenderInterface;
@@ -41,10 +41,10 @@ namespace tur
 		ViewSystem mViewSystem;
 		WorkerPool mWorkerPool;
 		tur_unique<Window> mWindow;
-		AssetLibrary mAssetLibrary;
 
 	private:
-		AssetTextureMapper mAssetTextureMapper;
+		AssetLibrary mAssetLibrary;
+		TextureAssetBinder mTextureAssetBinder;
 
 	private:
 		bool mShutdownRequested = false;

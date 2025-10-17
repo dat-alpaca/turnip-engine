@@ -3,9 +3,10 @@
 
 namespace tur
 {
-	void AssetLibrary::initialize(WorkerPool* workerPool)
+	void AssetLibrary::initialize(WorkerPool* workerPool, TextureAssetBinder* binder)
 	{
 		rWorkerPool = workerPool;
+		rBinder = binder;
 	}
 	void AssetLibrary::set_event_callback(EventCallback&& eventCallback)
 	{
@@ -26,6 +27,24 @@ namespace tur
 		);
 
 		return allocationHandle;
+	}
+	void AssetLibrary::load_texture_imm(const std::filesystem::path& filepath, texture_handle& target)
+	{
+		asset_handle allocationHandle = mTextures.add({});
+
+		rWorkerPool->submit<asset_handle>(
+			[this, filepath, allocationHandle]() { return update_texture_data(filepath, allocationHandle); },
+			[this, &target](asset_handle assetHandle)
+			{
+				if (assetHandle == invalid_handle)
+				{
+					TUR_LOG_ERROR("load_texture_imm returned an invalid asset handle on update_texture_data");
+					return;
+				}
+				rBinder->upload_texture(assetHandle);
+				target = rBinder->upload_texture(assetHandle);
+			}
+		);
 	}
 	void AssetLibrary::unload_texture(asset_handle handle)
 	{

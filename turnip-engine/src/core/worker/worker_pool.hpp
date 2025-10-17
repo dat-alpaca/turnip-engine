@@ -38,7 +38,8 @@ namespace tur
 					{
 						ReturnType returnValue = task();
 						mCallbacks.push_back([callback, returnValue]() { callback(returnValue); });
-					});
+					}
+				);
 			}
 
 			mConditionalVar.notify_one();

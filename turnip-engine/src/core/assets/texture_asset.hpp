@@ -18,4 +18,10 @@ namespace tur
 		TextureDataFormat dataFormat = TextureDataFormat::RGBA;
 		bool floatTexture = false;
 	};
+
+	struct TextureLoadResult
+	{
+		asset_handle assetHandle;
+		texture_handle textureHandle;
+	};
 }

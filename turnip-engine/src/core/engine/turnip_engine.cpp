@@ -37,9 +37,6 @@ namespace tur::engine
 		// Systems:
 		engine.get_render_interface().on_event(event);
 
-		// Binders:
-		engine.get_asset_texture_mapper().on_event(event);
-
 		for (const auto& view : engine.get_view_system().get_views())
 			view->on_event(event);
 	}
@@ -86,11 +83,11 @@ namespace tur
 		mWorkerPool.initialize(configData.workerConfig);
 
 		// Asset Library:
-		mAssetLibrary.initialize(&mWorkerPool);
+		mAssetLibrary.initialize(&mWorkerPool, &mTextureAssetBinder);
 		mAssetLibrary.set_event_callback([&](Event& event) { engine::on_event(event, *this); });
 
 		// Binders:
-		mAssetTextureMapper.initialize(&mRenderInterface, &mAssetLibrary);
+		mTextureAssetBinder.initialize(&mRenderInterface, &mAssetLibrary);
 	}
 
 	void TurnipEngine::start()
