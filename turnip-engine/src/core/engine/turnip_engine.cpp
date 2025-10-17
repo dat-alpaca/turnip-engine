@@ -76,8 +76,8 @@ namespace tur
 		mSceneHolder.set_event_callback([&](Event& event) { engine::on_event(event, *this); });
 
 		// Script:
-		ScriptSystem::initialize_core();
-		ScriptSystem::initialize_input(*mWindow);
+		ScriptManager::initialize_core();
+		ScriptManager::initialize_input(*mWindow);
 
 		// Worker Pool:
 		mWorkerPool.initialize(configData.workerConfig);

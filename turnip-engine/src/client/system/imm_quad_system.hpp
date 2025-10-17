@@ -1,5 +1,4 @@
 #pragma once
-#include "imm_quad_renderer.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"

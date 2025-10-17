@@ -166,7 +166,7 @@ static inline void setup_script_input(sol::state& lua, tur::Window& window)
 
 namespace tur
 {
-	void ScriptSystem::initialize_input(Window& window)
+	void ScriptManager::initialize_input(Window& window)
 	{
 		setup_script_input(sLua, window);
 	}

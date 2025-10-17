@@ -11,7 +11,7 @@
 
 namespace tur
 {
-	class ScriptSystem
+	class ScriptManager
 	{
 	public:
 		static void initialize_entity_environment(Entity entity, sol::environment environment);

@@ -38,11 +38,13 @@ namespace
 			lua.new_usertype<glm::vec3>("vec3", "x", &glm::vec3::x, "y", &glm::vec3::y, "z", &glm::vec3::z);
 
 			// vec4:
-			lua.new_usertype<glm::vec4>("vec4", "x", &glm::vec4::x, "y", &glm::vec4::y, "z", &glm::vec4::z, "w",
-										&glm::vec4::w);
+			lua.new_usertype<glm::vec4>(
+				"vec4", "x", &glm::vec4::x, "y", &glm::vec4::y, "z", &glm::vec4::z, "w", &glm::vec4::w
+			);
 		}
-		lua.new_usertype<Transform>("Transform", "position", &Transform::position, "rotation", &Transform::rotation,
-									"scale", &Transform::scale);
+		lua.new_usertype<Transform>(
+			"Transform", "position", &Transform::position, "rotation", &Transform::rotation, "scale", &Transform::scale
+		);
 
 		lua.new_usertype<TransformComponent>("TransformComponent", "transform", &TransformComponent::transform);
 	}
@@ -51,8 +53,9 @@ namespace
 // Methods:
 namespace tur
 {
-	inline sol::object script_find_component(const sol::state& luaState, Scene* scene, entt::entity entity,
-											 const std::string& componentName)
+	inline sol::object script_find_component(
+		const sol::state& luaState, Scene* scene, entt::entity entity, const std::string& componentName
+	)
 	{
 		const auto& registry = scene->get_registry();
 		const auto& lua = luaState;
@@ -74,7 +77,7 @@ namespace tur
 
 namespace tur
 {
-	void ScriptSystem::initialize_core()
+	void ScriptManager::initialize_core()
 	{
 		sLua.open_libraries(sol::lib::base, sol::lib::math, sol::lib::package, sol::lib::table);
 
@@ -82,7 +85,7 @@ namespace tur
 		setup_script_core_components(sLua);
 	}
 
-	void ScriptSystem::initialize_entity_environment(Entity entity, sol::environment environment)
+	void ScriptManager::initialize_entity_environment(Entity entity, sol::environment environment)
 	{
 		environment["find_component"] = [&, entity](const std::string& componentName)
 		{ return script_find_component(sLua, entity.get_scene(), entity.get_handle(), componentName); };

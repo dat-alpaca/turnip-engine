@@ -5,9 +5,9 @@ namespace tur
 {
 	ScriptComponent::ScriptComponent(Entity entity, const std::filesystem::path& filepath)
 	{
-		script.environment = ScriptSystem::create_env();
+		script.environment = ScriptManager::create_env();
 		script.filepath = filepath;
-		ScriptSystem::initialize_entity_environment(entity, script.environment);
-		script.start(ScriptSystem::get_state());
+		ScriptManager::initialize_entity_environment(entity, script.environment);
+		script.start(ScriptManager::get_state());
 	}
 }

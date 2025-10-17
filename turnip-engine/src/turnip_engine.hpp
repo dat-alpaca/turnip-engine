@@ -4,7 +4,6 @@
 #include "core/engine/turnip_engine.hpp"
 
 #include "graphics/renderer/imm_quad_renderer.hpp"
-#include "graphics/renderer/imm_quad_system.hpp"
 
 #include "core/event/event.hpp"
 #include "core/event/event_type.hpp"
@@ -21,5 +20,8 @@
 
 #include "core/view/view.hpp"
 #include "core/windowing/windowing.hpp"
+
+#include "client/system/imm_quad_system.hpp"
+#include "client/system/script_system.hpp"
 
 #include "common.hpp"

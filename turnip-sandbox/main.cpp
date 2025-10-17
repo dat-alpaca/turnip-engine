@@ -5,7 +5,7 @@ using namespace tur;
 class MainView : public View
 {
 public:
-	void on_engine_startup() override {}
+	void on_engine_startup() override { TUR_LOG_DEBUG("Engine Startup"); }
 	void on_engine_shutdown() override { TUR_LOG_DEBUG("Engine Shutdown"); }
 
 	void on_view_added() override
@@ -21,8 +21,9 @@ public:
 			mCamera.set_orthogonal(0.0f, 640.0f, 0.0f, 480.f);
 		}
 
-		// Renderer:
-		mQuadRenderer.initialize(&engine->get_render_interface(), mCurrentScene, &mCamera);
+		// Renderer Systems:
+		auto& rhi = engine->get_render_interface();
+		mQuadSystem.initialize(&rhi, mCurrentScene, &mCamera);
 
 		// Scene population:
 		{
@@ -44,39 +45,31 @@ public:
 			mEntity.add_component<TransformComponent>(transformComponent);
 		}
 
-		// Running script (on_wake):
-		mScript.script.call("on_wake");
+		// ScriptSystem:
+		mScriptSystem.initialize(mCurrentScene);
+		mScriptSystem.wake();
 	}
 
-	void on_view_removed() override { TUR_LOG_DEBUG("MainView Removed"); }
-
-	void on_render() override { mQuadRenderer.render(); }
+	void on_render() override { mQuadSystem.render(); }
 	void on_render_gui() override {}
 
 	void on_update() override
 	{
 		mCamera.update_view();
-		mQuadRenderer.update();
-
-		mScript.script.environment["on_update"]();
-
-		for (auto& view : engine->get_view_system().get_views())
-		{
-			for (auto [entity, script] : mCurrentScene->get_registry().view<ScriptComponent>().each())
-			{
-				script.script.call("on_update");
-			}
-		}
+		mQuadSystem.update();
+		mScriptSystem.update();
 	}
 	void on_event(tur::Event& event) override {}
 
 private:
-	ScriptComponent mScript;
 	Scene* mCurrentScene;
+	ImmQuadSystem mQuadSystem;
+
+	ScriptSystem mScriptSystem;
+	ScriptComponent mScript;
 	Entity mEntity;
 
 	Camera mCamera;
-	ImmQuadSystem mQuadRenderer;
 };
 
 int main()

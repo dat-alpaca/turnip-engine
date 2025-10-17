@@ -15,7 +15,7 @@ namespace tur
 		{
 			auto function = environment[functionName];
 			if (!function.valid() || function.get_type() != sol::type::function)
-				TUR_LOG_CRITICAL("Failed to call function: {}", functionName);
+				TUR_LOG_ERROR("Failed to call function: {}", functionName);
 
 			function();
 		}
