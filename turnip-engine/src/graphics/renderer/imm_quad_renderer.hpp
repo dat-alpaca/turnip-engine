@@ -1,5 +1,7 @@
 #pragma once
+#include "graphics/camera.hpp"
 #include "rhi/rhi.hpp"
+#include "utils/transform.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -7,6 +9,9 @@ namespace tur
 {
 	class ImmQuadRenderer
 	{
+	public:
+		using quad_handle = handle_type;
+
 		struct Vertex
 		{
 			glm::vec3 position;
@@ -20,210 +25,46 @@ namespace tur
 			glm::mat4 projection;
 		};
 
+		struct Quad
+		{
+			Transform transform;
+
+			descriptor_set_handle setHandle = invalid_handle;
+			texture_handle textureHandle = invalid_handle;
+			buffer_handle uboHandle = invalid_handle;
+		};
+
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi)
-		{
-			rRHI = rhi;
-			initialize_resources();
+		void initialize(NON_OWNING RenderInterface* rhi);
+		void set_camera(NON_OWNING Camera* camera);
+		void render();
 
-			mCommandBuffer.clear(ClearColor{.color = Color(30, 40, 50, 255)}, ClearFlags::COLOR);
-		}
-
-		void render()
-		{
-			auto& rhi = *rRHI;
-			auto& resources = rhi.get_resource_handler();
-
-			if (!rhi.begin_frame())
-				return;
-
-			mCommandBuffer.reset(rhi.get_current_command_buffer());
-
-			UBO data;
-			{
-				data.model = glm::mat4(1.0f);
-				data.view = glm::mat4(1.0f);
-				data.projection = glm::mat4(1.0f);
-				resources.update_buffer(ubo, &data, {.size = sizeof(UBO)});
-			}
-
-			mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});
-			mCommandBuffer.set_scissor(Extent2D{0, 0, 640, 480});
-			{
-				mCommandBuffer.begin();
-
-				mCommandBuffer.bind_index_buffer(ebo, BufferIndexType::UNSIGNED_INT);
-				mCommandBuffer.bind_vertex_buffer(vbo, 0);
-				mCommandBuffer.bind_pipeline(pipeline);
-				mCommandBuffer.bind_descriptor_set(set);
-
-				mCommandBuffer.draw_indexed(6, 1, 0, 0);
-				mCommandBuffer.end();
-			}
-
-			rhi.end_frame();
-			rhi.submit(graphicsQueue);
-			rhi.present(presentQueue);
-		}
+	public:
+		quad_handle add_quad(const Transform& transform, texture_handle textureHandle);
+		Quad& get_quad(quad_handle handle);
+		void clear();
 
 	private:
-		void initialize_resources()
-		{
-			mCommandBuffer = rRHI->create_command_buffer();
+		void initialize_resources();
+		void initialize_buffers();
+		void initialize_descriptors();
+		void initialize_pipeline();
 
-			graphicsQueue = rRHI->get_queue(QueueOperation::GRAPHICS);
-			presentQueue = rRHI->get_queue(QueueOperation::PRESENT);
-
-			initialize_buffers();
-			initialize_descriptors();
-			initialize_pipeline();
-		}
-
-		void initialize_buffers()
-		{
-			auto& resources = rRHI->get_resource_handler();
-
-			{
-				BufferDescriptor descriptor = {
-					.type = BufferType::VERTEX_BUFFER,
-				};
-
-				// clang-format off
-				std::array<Vertex, 4> vertices = 
-				{
-					Vertex{glm::vec3{ -0.5f, -0.5f, 0.0f },	glm::vec2{ 0.0f, 0.0f }},
-					Vertex{glm::vec3{  0.5f, -0.5f, 0.0f }, glm::vec2{ 1.0f, 0.0f }},
-					Vertex{glm::vec3{  0.5f,  0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f }},
-					Vertex{glm::vec3{ -0.5f,  0.5f, 0.0f }, glm::vec2{ 0.0f, 1.0f }},
-				};
-				// clang-format on
-
-				vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 4});
-			}
-
-			{
-				BufferDescriptor descriptor = {
-					.type = BufferType::INDEX_BUFFER,
-				};
-				unsigned int indices[6] = {0, 1, 2, 2, 3, 0};
-				ebo = resources.create_buffer(descriptor, indices, {.size = sizeof(indices)});
-			}
-
-			{
-				BufferDescriptor descriptor = {
-					.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST, .usage = BufferUsage::COHERENT};
-				ubo = resources.create_empty_buffer(descriptor, sizeof(UBO));
-			}
-		}
-
-		void initialize_descriptors()
-		{
-			auto& resources = rRHI->get_resource_handler();
-
-			/* Descriptor Set */
-			// clang-format off
-			constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
-			({
-				{
-					.binding = 0,
-				  	.amount = 1,
-				  	.type = DescriptorType::UNIFORM_BUFFER,
-				  	.stage = PipelineStage::VERTEX_STAGE
-				}
-			});
-			// clang-format on
-
-			setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
-
-			/* Descriptors */
-			set = resources.create_descriptor_set(setLayout);
-			resources.write_uniform_buffer_to_set(set, ubo, {.size = sizeof(UBO)}, 0);
-		}
-
-		void initialize_pipeline()
-		{
-			// clang-format off
-			auto& resources = rRHI->get_resource_handler();
-
-			// Shaders:
-			shader_handle vertexShader =
-				resources.create_shader({"res/shaders/basic/basic_vert.spv", ShaderType::VERTEX});
-			shader_handle fragmentShader =
-				resources.create_shader({"res/shaders/basic/basic_frag.spv", ShaderType::FRAGMENT});
-
-			constexpr auto VertexBindings = std::to_array<BindingDescriptor>
-			({
-				{
-					.binding = 0, 
-					.stride = sizeof(Vertex), 
-					.inputRate = InputRate::VERTEX
-				}
-			});
-
-			constexpr auto Attributes = std::to_array<Attribute>
-			({
-				{
-					.binding = 0,
-					.location = 0,
-					.offset = offsetof(Vertex, position),
-					.format = AttributeFormat::R32G32B32_SFLOAT
-				},
-				{
-					.binding = 0,
-					.location = 1,
-					.offset = offsetof(Vertex, uvs),
-					.format = AttributeFormat::R32G32_SFLOAT
-				}
-			});
-
-			constexpr auto DynamicStates = std::to_array<DynamicState>({
-				DynamicState::VIEWPORT,
-				DynamicState::SCISSOR
-			});
-			
-			constexpr auto Viewports = std::to_array<Viewport>({Viewport{}});
-			constexpr auto Scissors = std::to_array<Extent2D>({Extent2D{}});
-
-			// Pipeline:
-			PipelineDescriptor pipelineDescriptor = {
-				.vertexInputStage = 
-				{
-					.vertexBindings = VertexBindings,
-					.attributes = Attributes
-				},
-				.inputAssemblyStage = 
-				{
-					.topology = PrimitiveTopology::TRIANGLES,
-					.primitiveRestartEnable = false
-				},
-				.rasterizerStage = 
-				{
-					.frontFace = FrontFace::COUNTER_CLOCKWISE, 
-					.cullMode = CullMode::FRONT,
-				},
-				.setLayout = setLayout,
-				.viewports = Viewports,
-				.scissors = Scissors,
-				.dynamicStates = DynamicStates,
-
-				.vertexShader = vertexShader,
-				.fragmentShader = fragmentShader,
-			};
-
-			pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
-			// clang-format on
-		}
+	private:
+		void populate_quads();
 
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
+		NON_OWNING Camera* rCamera = nullptr;
 		CommandBuffer mCommandBuffer;
 
 	private:
-		descriptor_set_layout_handle setLayout;
-		descriptor_set_handle set;
+		std::vector<Quad> mQuads;
 
-		buffer_handle vbo, ubo, ebo;
-		pipeline_handle pipeline;
+		descriptor_set_layout_handle setLayout;
 		queue_handle graphicsQueue, presentQueue;
+		buffer_handle vbo, ebo;
+		texture_handle defaultTextureHandle;
+		pipeline_handle pipeline;
 	};
 }

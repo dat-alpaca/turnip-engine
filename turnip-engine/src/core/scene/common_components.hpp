@@ -9,7 +9,10 @@ namespace tur
 	{
 	public:
 		UUIDComponent() = default;
-		UUIDComponent(UUID uuid) : uuid(uuid) {}
+		UUIDComponent(UUID uuid)
+			: uuid(uuid)
+		{
+		}
 		UUIDComponent(const UUIDComponent&) = default;
 
 	public:
@@ -21,7 +24,10 @@ namespace tur
 	public:
 		NameComponent() = default;
 		NameComponent(const NameComponent&) = default;
-		NameComponent(const std::string& name) : name(name) {}
+		NameComponent(const std::string& name)
+			: name(name)
+		{
+		}
 
 	public:
 		std::string name;

@@ -24,9 +24,16 @@ function on_update()
         return
     end
 
+    local transform_c = find_component("transform")
+
     local rightPressed = Input.get_mouse_pressed(MouseButton.MOUSE_RIGHT)
     if rightPressed then
         Log.info("Mouse pressed at location: " .. mouse_pos.x .. ", " .. mouse_pos.y)
+
+        if transform_c ~= nil then
+            transform_c.transform.position.x = mouse_pos.x
+            transform_c.transform.position.y = mouse_pos.y
+        end
     end
 
     local enterPressed = Input.get_key_pressed(Key.ENTER)

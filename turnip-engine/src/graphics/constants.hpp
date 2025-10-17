@@ -13,5 +13,7 @@ namespace tur
 		constexpr static inline u32 Width = 2;
 		constexpr static inline u32 Height = 2;
 		constexpr static inline u32 Channels = 4;
+
+		constexpr static inline TextureFormat Format = TextureFormat::RGBA8_UNORM;
 	};
 }

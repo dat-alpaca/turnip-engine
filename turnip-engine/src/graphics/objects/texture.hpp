@@ -29,6 +29,12 @@ namespace tur
 		TRILINEAR
 	};
 
+	enum class TextureTiling
+	{
+		OPTIMAL,
+		RAW
+	};
+
 	// Represents a texture on the GPU
 	enum class TextureFormat
 	{
@@ -61,7 +67,6 @@ namespace tur
 		BGR_INTEGER,
 		BGRA_INTEGER,
 	};
-
 	constexpr static inline const char* get_texture_data_format_name(TextureDataFormat dataFormat)
 	{
 		switch (dataFormat)
@@ -126,5 +131,7 @@ namespace tur
 		WrapMode wrapR = WrapMode::CLAMP_TO_BORDER;
 		FilterMode minFilter = FilterMode::NEAREST;
 		FilterMode magFilter = FilterMode::NEAREST;
+
+		TextureTiling tiling = TextureTiling::OPTIMAL;
 	};
 }

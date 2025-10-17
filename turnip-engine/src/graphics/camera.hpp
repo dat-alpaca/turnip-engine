@@ -7,7 +7,7 @@ namespace tur
 	class Camera
 	{
 	public:
-		void set_orthogonal(float left, float right, float bottom, float top, float zNear, float zFar)
+		void set_orthogonal(float left, float right, float bottom, float top, float zNear = -1.f, float zFar = 1.f)
 		{
 			mProjection = glm::ortho(left, right, bottom, top, zNear, zFar);
 		}

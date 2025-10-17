@@ -36,6 +36,7 @@ namespace tur
 
 					texture_handle textureHandle = resources.create_texture(descriptor, textureAsset);
 					mTextureMap[event.assetHandle] = textureHandle;
+					return false;
 				}
 			);
 		}

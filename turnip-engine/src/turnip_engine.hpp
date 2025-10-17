@@ -4,6 +4,7 @@
 #include "core/engine/turnip_engine.hpp"
 
 #include "graphics/renderer/imm_quad_renderer.hpp"
+#include "graphics/renderer/imm_quad_system.hpp"
 
 #include "core/event/event.hpp"
 #include "core/event/event_type.hpp"

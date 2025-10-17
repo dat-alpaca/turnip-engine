@@ -57,8 +57,10 @@ namespace tur::vulkan
 					TUR_LOG_CRITICAL("Texture samples must be a power of 2 and less than 64.");
 			}
 
-			// TODO: support linear tiling for CPU data.
-			imageCreateInfo.tiling = vk::ImageTiling::eOptimal;
+			if (descriptor.tiling == TextureTiling::OPTIMAL)
+				imageCreateInfo.tiling = vk::ImageTiling::eOptimal;
+			else
+				imageCreateInfo.tiling = vk::ImageTiling::eLinear;
 
 			// TODO: descriptor for usage flags.
 			vk::ImageUsageFlags usageFlags;

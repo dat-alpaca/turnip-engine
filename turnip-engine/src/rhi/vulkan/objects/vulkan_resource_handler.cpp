@@ -178,6 +178,8 @@ namespace tur::vulkan
 
 	buffer_handle ResourceHandler::create_buffer(const BufferDescriptor& descriptor, const void* data, Range range)
 	{
+		TUR_LOG_INFO("CREATE_BUFFER");
+
 		TUR_ASSERT(data, "Invalid data pointer");
 		TUR_ASSERT(range.size > 0, "Invalid range size");
 		TUR_ASSERT(range.offset >= 0, "Invalid offset size");
@@ -238,6 +240,7 @@ namespace tur::vulkan
 	}
 	buffer_handle ResourceHandler::create_empty_buffer(const BufferDescriptor& descriptor, u32 size)
 	{
+		TUR_LOG_INFO("CREATE_BUFFER_EMPTY");
 		return mBuffers.add(allocate_buffer(rRHI->get_state().vmaAllocator, descriptor, size));
 	}
 	void ResourceHandler::update_buffer(buffer_handle bufferHandle, const void* data, Range range)
