@@ -1,5 +1,7 @@
 require "base"
 
+transform_c = nil
+
 function on_wake()
     local name_c = find_component("name")
     if name_c ~= nil then
@@ -11,7 +13,7 @@ function on_wake()
         Log.info("UUID: " .. tostring(uuid_c.uuid))
     end
 
-    local transform_c = find_component("transform")
+    transform_c = find_component("transform")
     if transform_c ~= nil then
         local position = transform_c.transform.position
         Log.info("(" .. position.x .. ", " .. position.y .. ", " .. position.z .. ")")
@@ -23,8 +25,6 @@ function on_update()
     if mouse_pos == nil then
         return
     end
-
-    local transform_c = find_component("transform")
 
     local rightPressed = Input.get_mouse_pressed(MouseButton.MOUSE_RIGHT)
     if rightPressed then
@@ -39,5 +39,7 @@ function on_update()
     local enterPressed = Input.get_key_pressed(Key.ENTER)
     if enterPressed then
         Log.info("Key ENTER pressed")
+
+        transform_c.transform.rotation.z = transform_c.transform.rotation.z + 0.9
     end
 end
