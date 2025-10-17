@@ -14,6 +14,14 @@ namespace tur
 	{
 		rCamera = camera;
 	}
+	void ImmQuadRenderer::set_viewport(const Viewport& viewport)
+	{
+		mViewport = viewport;
+	}
+	void ImmQuadRenderer::set_scissor(const Extent2D& scissor)
+	{
+		mScissor = scissor;
+	}
 
 	void ImmQuadRenderer::render()
 	{
@@ -45,8 +53,8 @@ namespace tur
 
 		mCommandBuffer.reset(rhi.get_current_command_buffer());
 
-		mCommandBuffer.set_viewport(Viewport{0, 0, 640, 480});
-		mCommandBuffer.set_scissor(Extent2D{0, 0, 640, 480});
+		mCommandBuffer.set_viewport(mViewport);
+		mCommandBuffer.set_scissor(mScissor);
 		{
 			mCommandBuffer.begin();
 

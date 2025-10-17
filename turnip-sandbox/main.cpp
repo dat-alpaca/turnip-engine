@@ -18,7 +18,6 @@ public:
 		{
 			mCamera.set_position(glm::vec3(0.0f));
 			mCamera.set_target(glm::vec3(0.0f, 0.0f, -1.0f));
-			mCamera.set_orthogonal(0.0f, 640.0f, 0.0f, 480.f);
 		}
 
 		// Renderer Systems:
@@ -59,7 +58,21 @@ public:
 		mQuadSystem.update();
 		mScriptSystem.update();
 	}
-	void on_event(tur::Event& event) override {}
+	void on_event(tur::Event& event) override
+	{
+		mQuadSystem.on_event(event);
+
+		Subscriber subscriber(event);
+		subscriber.subscribe<WindowResizeEvent>(
+			[&](const WindowResizeEvent& resizeEvent) -> bool
+			{
+				mCamera.set_orthogonal(
+					0.0f, static_cast<f32>(resizeEvent.width), 0.0f, static_cast<f32>(resizeEvent.height)
+				);
+				return false;
+			}
+		);
+	}
 
 private:
 	Scene* mCurrentScene;

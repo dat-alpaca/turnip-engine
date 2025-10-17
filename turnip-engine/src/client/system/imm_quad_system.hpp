@@ -17,6 +17,20 @@ namespace tur
 
 		void render() { mQuadRenderer.render(); }
 
+		void on_event(Event& event)
+		{
+			Subscriber subscriber(event);
+			subscriber.subscribe<WindowResizeEvent>(
+				[&](const WindowResizeEvent& resizeEvent) -> bool
+				{
+					mQuadRenderer.set_viewport({0.f, 0.f, (f32)resizeEvent.width, (f32)resizeEvent.height});
+					mQuadRenderer.set_scissor({0, 0, resizeEvent.width, resizeEvent.height});
+
+					return false;
+				}
+			);
+		}
+
 		void update()
 		{
 			auto view = rScene->get_registry().view<TransformComponent, Sprite2DComponent>();

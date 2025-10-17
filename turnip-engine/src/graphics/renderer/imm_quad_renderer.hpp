@@ -38,6 +38,8 @@ namespace tur
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi);
 		void set_camera(NON_OWNING Camera* camera);
+		void set_viewport(const Viewport& viewport);
+		void set_scissor(const Extent2D& scissor);
 		void render();
 
 	public:
@@ -61,7 +63,10 @@ namespace tur
 
 	private:
 		std::vector<Quad> mQuads;
+		Viewport mViewport;
+		Extent2D mScissor;
 
+	private:
 		descriptor_set_layout_handle setLayout;
 		queue_handle graphicsQueue, presentQueue;
 		buffer_handle vbo, ebo;
