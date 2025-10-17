@@ -385,4 +385,52 @@ namespace tur::vulkan::utils
 		commandBuffer.pipelineBarrier2(dependencyInfo);
 		texture.layout = description.newLayout;
 	}
+
+	void transition_texture_layout_imm(
+		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
+	)
+	{
+		if (texture.layout == description.newLayout)
+		{
+			TUR_LOG_WARN("Attempted to transition to the same image layout.");
+			return;
+		}
+
+		vk::ImageAspectFlags aspectMask;
+		vk::ImageSubresourceRange subresourceRange;
+
+		vk::ImageMemoryBarrier2 imageBarrier = {};
+		{
+			imageBarrier.srcStageMask = description.srcStageMask;
+			imageBarrier.srcAccessMask = description.srcAccessMask;
+
+			imageBarrier.dstStageMask = description.dstStageMask;
+			imageBarrier.dstAccessMask = description.dstAccessMask;
+
+			imageBarrier.oldLayout = texture.layout;
+			imageBarrier.newLayout = description.newLayout;
+
+			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			else
+				aspectMask = vk::ImageAspectFlagBits::eColor;
+
+			subresourceRange.aspectMask = aspectMask;
+			subresourceRange.baseMipLevel = 0;
+			subresourceRange.levelCount = texture.descriptor.mipLevels;
+			subresourceRange.baseArrayLayer = 0;
+			subresourceRange.layerCount = 1; // TODO: change to texture.layers
+
+			imageBarrier.subresourceRange = subresourceRange;
+			imageBarrier.image = texture.image;
+		}
+
+		vk::DependencyInfo dependencyInfo = vk::DependencyInfo().setImageMemoryBarriers(imageBarrier);
+
+		utils::submit_immediate_command(
+			rhi, [&](vk::CommandBuffer commandBuffer) { commandBuffer.pipelineBarrier2(dependencyInfo); }
+		);
+
+		texture.layout = description.newLayout;
+	}
 }

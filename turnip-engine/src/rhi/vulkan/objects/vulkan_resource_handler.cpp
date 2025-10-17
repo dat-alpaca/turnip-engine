@@ -364,7 +364,9 @@ namespace tur::vulkan
 
 		else
 			// TODO: proper masks
-			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal});
+			utils::transition_texture_layout_imm(
+				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+			);
 
 		return handle;
 	}
@@ -389,12 +391,14 @@ namespace tur::vulkan
 		// TODO: prepare other image layouts
 		{
 			// TODO: proper masks
-			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eTransferDstOptimal});
+			utils::transition_texture_layout_imm(*rRHI, texture, {.newLayout = vk::ImageLayout::eTransferDstOptimal});
 
 			copy_buffer_to_texture(stagingBufferHandle, textureHandle, asset.width, asset.height);
 
 			// TODO: proper masks
-			utils::transition_texture_layout(*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal});
+			utils::transition_texture_layout_imm(
+				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+			);
 		}
 
 		destroy_buffer(stagingBufferHandle);

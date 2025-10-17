@@ -34,6 +34,10 @@ namespace tur::vulkan
 		void transition_texture_layout(
 			RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
 		);
+
+		void transition_texture_layout_imm(
+			RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
+		);
 	}
 
 	class RenderInterfaceVulkan
@@ -44,6 +48,10 @@ namespace tur::vulkan
 		friend void utils::recreate_swapchain(RenderInterfaceVulkan& rhi);
 
 		friend void utils::transition_texture_layout(
+			RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description
+		);
+
+		friend void utils::transition_texture_layout_imm(
 			RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description
 		);
 
