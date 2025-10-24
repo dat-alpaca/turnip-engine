@@ -51,7 +51,6 @@ If the SDK fails to include it automatically, you must provide an environment va
     | -DTUR_USE_VULKAN        | Uses the Vulkan backend                  | OFF     |
 
    \* _This option is a lie. Turnip doesn't support other platforms yet._
-    
 
 4. **Compile the project**
    Use the generated project files to build the project.
@@ -60,6 +59,15 @@ If the SDK fails to include it automatically, you must provide an environment va
    For Windows users, use the `Build All` option upon opening the Visual Studio solution project, or run `msbuild`.
    
    After that, you should have a working copy under `turnip-engine/build/turnip/`.
+
+
+## Configuration
+The engine requires a location file specified as its main constructor argument. A default file can be located under [`res/engine_config.json`](https://github.com/dat-alpaca/turnip-engine/blob/main/res/engine_config.json).
+
+> [!WARNING]
+> Changing the graphics API string (`windowingCapabilities/api`) will not change the actual graphics API used.
+As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments.
+Check the options listed [here](#installation) for more information. 
 
 # License
 
