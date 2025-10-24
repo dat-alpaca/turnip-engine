@@ -25,7 +25,7 @@ namespace tur
 	
 	requires(T t, const ClearColor& clearColor, ClearFlags flags)
 	{
-		{ t.clear(clearColor, flags) };
+		{ t.set_clear_color(clearColor, flags) };
 	} &&
 
 	requires(T t, const Viewport& viewport, const Extent2D& scissor)

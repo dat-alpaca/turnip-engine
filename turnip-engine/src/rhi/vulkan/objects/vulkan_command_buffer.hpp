@@ -24,9 +24,9 @@ namespace tur::vulkan
 		void end();
 
 	public:
-		void clear(const ClearColor& clearColor, ClearFlags flags);
 		void set_viewport(const Viewport& viewport);
 		void set_scissor(const Extent2D& scissor);
+		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
 
 	public:
 		void bind_vertex_buffer(buffer_handle bufferHandle, u32 binding);

@@ -1,35 +1,43 @@
 #include "gl_render_interface.hpp"
+#include "platform/platform.hpp"
 
 namespace tur::gl
 {
 	void RenderInterfaceGL::initialize(const ConfigData&, Window& window)
 	{
 		rWindow = &window;
+		glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE);
+		// TODO: check config
 	}
 	void RenderInterfaceGL::shutdown()
 	{
 		/* Blank */
 	}
+	void RenderInterfaceGL::on_event(Event& event)
+	{
+		/* Blank */
+	}
 
-	void RenderInterfaceGL::begin_frame()
+	bool RenderInterfaceGL::begin_frame()
+	{
+		/* Blank */
+		return true;
+	}
+	void RenderInterfaceGL::submit([[maybe_unused]] queue_handle)
 	{
 		/* Blank */
 	}
-	void RenderInterfaceGL::submit()
+	void RenderInterfaceGL::present([[maybe_unused]] queue_handle)
 	{
-		/* Blank */
-	}
-	void RenderInterfaceGL::present(UNUSED queue_handle)
-	{
-		GraphicsBinder::present();
+		platform::WindowingSystem::get_binder().present();
 	}
 	void RenderInterfaceGL::end_frame()
 	{
 		/* Blank */
 	}
 
-	CommandBufferGL RenderInterfaceGL::create_command_buffer()
+	CommandBuffer RenderInterfaceGL::create_command_buffer()
 	{
-		return CommandBufferGL();
+		return CommandBuffer(this);
 	}
 }

@@ -1,6 +1,7 @@
 #pragma once
 #include "common.hpp"
 #include "objects/opengl_command_buffer.hpp"
+#include "objects/opengl_resource_handler.hpp"
 
 #include "graphics/objects/queue.hpp"
 #include "graphics/render_interface.hpp"
@@ -15,23 +16,25 @@ namespace tur::gl
 	public:
 		void initialize(const ConfigData&, Window& window);
 		void shutdown();
+		void on_event(Event& event);
 
 	public:
-		void begin_frame();
-		void submit();
-		void present(UNUSED queue_handle);
+		bool begin_frame();
+		void submit([[maybe_unused]] queue_handle);
+		void present([[maybe_unused]] queue_handle);
 		void end_frame();
 
 	public:
-		CommandBufferGL create_command_buffer();
+		CommandBuffer create_command_buffer();
 		EmptyCommandBuffer get_current_command_buffer() { return {}; }
 
 	public:
-		auto get_resource_handler();
-		auto get_queue(QueueOperation operation);
+		queue_handle get_queue(QueueOperation operation) { return invalid_handle; }
+		inline ResourceHandler& get_resource_handler() { return mResources; }
 
 	private:
 		NON_OWNING Window* rWindow = nullptr;
+		ResourceHandler mResources;
 	};
 
 }

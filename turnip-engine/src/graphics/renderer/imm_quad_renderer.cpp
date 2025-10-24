@@ -7,8 +7,6 @@ namespace tur
 	{
 		rRHI = rhi;
 		initialize_resources();
-
-		mCommandBuffer.clear(ClearColor{.color = Color(30, 40, 50, 255)}, ClearFlags::COLOR);
 	}
 	void ImmQuadRenderer::set_camera(NON_OWNING Camera* camera)
 	{
@@ -21,6 +19,10 @@ namespace tur
 	void ImmQuadRenderer::set_scissor(const Extent2D& scissor)
 	{
 		mScissor = scissor;
+	}
+	void ImmQuadRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
+	{
+		mCommandBuffer.set_clear_color(color, flags);
 	}
 
 	void ImmQuadRenderer::render()
@@ -84,7 +86,8 @@ namespace tur
 		buffer_handle quadUBO;
 		{
 			BufferDescriptor descriptor = {
-				.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST, .usage = BufferUsage::COHERENT};
+				.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST,
+				.usage = BufferUsage::COHERENT | BufferUsage::PERSISTENT};
 			quadUBO = resources.create_empty_buffer(descriptor, sizeof(UBO));
 		}
 
@@ -207,11 +210,11 @@ namespace tur
 
 		// Shaders:
 		shader_handle vertexShader =
-			resources.create_shader({"res/shaders/basic/basic_vert.spv", ShaderType::VERTEX});
+			resources.create_shader({"res/shaders/basic/basic_gl.vert", ShaderType::VERTEX});
 		shader_handle fragmentShader =
-			resources.create_shader({"res/shaders/basic/basic_frag.spv", ShaderType::FRAGMENT});
+			resources.create_shader({"res/shaders/basic/basic_gl.frag", ShaderType::FRAGMENT});
 
-		constexpr auto VertexBindings = std::to_array<BindingDescriptor>
+		auto VertexBindings = std::vector<BindingDescriptor>
 		({
 			{
 				.binding = 0, 
@@ -220,7 +223,7 @@ namespace tur
 			},
 		});
 
-		constexpr auto Attributes = std::to_array<Attribute>
+		auto Attributes = std::vector<Attribute>
 		({
 			{
 				.binding = 0,

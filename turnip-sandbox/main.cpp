@@ -23,6 +23,7 @@ public:
 		// Renderer Systems:
 		auto& rhi = engine->get_render_interface();
 		mQuadSystem.initialize(&rhi, mCurrentScene, &mCamera);
+		mQuadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 
 		// Scene population:
 		{

@@ -48,8 +48,8 @@ namespace tur
 
 	struct VertexInputDescriptor
 	{
-		std::span<const BindingDescriptor> vertexBindings;
-		std::span<const Attribute> attributes;
+		std::vector<BindingDescriptor> vertexBindings;
+		std::vector<Attribute> attributes;
 	};
 }
 

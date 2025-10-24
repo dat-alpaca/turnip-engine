@@ -12,8 +12,8 @@ option(TUR_BUILD_SANDBOX "Builds the turnip sandbox program" ON)
 option(TUR_BUILD_ENGINE "Builds the turnip engine library" ON)
 
 option(TUR_USE_GLFW "Uses the GLFW windowing implementation" ON)
-option(TUR_USE_OPENGL "Uses the OpenGL backend" OFF)
-option(TUR_USE_VULKAN "Uses the Vulkan backend" ON)
+option(TUR_USE_OPENGL "Uses the OpenGL backend" ON)
+option(TUR_USE_VULKAN "Uses the Vulkan backend" OFF)
 
 # Core Dependencies:
 add_subdirectory(extern/lua)
@@ -46,7 +46,7 @@ if(${TUR_USE_OPENGL})
     find_package(OpenGL REQUIRED)
     add_subdirectory(extern/glad/cmake)
     glad_add_library(glad STATIC REPRODUCIBLE LOADER API gl:core=4.6)
-    target_include_directories(glad PUBLIC ${glad_SOURCE_DIR})
+    target_include_directories(glad PUBLIC ${CMAKE_CURRENT_BINARY_DIR}/gladsources/glad/include)
 
     add_compile_definitions(TUR_GRAPHICS_GL)
 elseif(${TUR_USE_VULKAN})

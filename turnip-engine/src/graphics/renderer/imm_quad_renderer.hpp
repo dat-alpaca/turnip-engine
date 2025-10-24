@@ -40,6 +40,7 @@ namespace tur
 		void set_camera(NON_OWNING Camera* camera);
 		void set_viewport(const Viewport& viewport);
 		void set_scissor(const Extent2D& scissor);
+		void set_clear_color(const ClearColor& color, ClearFlags flags);
 		void render();
 
 	public:
@@ -52,9 +53,6 @@ namespace tur
 		void initialize_buffers();
 		void initialize_descriptors();
 		void initialize_pipeline();
-
-	private:
-		void populate_quads();
 
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;

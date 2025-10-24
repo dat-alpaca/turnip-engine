@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/renderer/imm_quad_renderer.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -11,6 +12,7 @@ namespace tur
 		void initialize(RenderInterface* rhi, Scene* scene, Camera* camera)
 		{
 			mQuadRenderer.initialize(rhi);
+			mQuadRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mQuadRenderer.set_camera(camera);
 			rScene = scene;
 		}
@@ -47,6 +49,9 @@ namespace tur
 				quad.textureHandle = sprite.textureHandle;
 			}
 		}
+
+	public:
+		ImmQuadRenderer& renderer() { return mQuadRenderer; }
 
 	private:
 		NON_OWNING Scene* rScene = nullptr;
