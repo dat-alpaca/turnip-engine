@@ -1,45 +1,21 @@
 {
-    "applicationSpecification": {
+    "applicationSpecs": {
         "applicationName": "Default Application",
         "major": 1,
         "minor": 0,
         "patch": 0,
         "variant": 0
     },
-    "engineSpecification": {
+    "engineSpecs": {
         "major": 1,
         "minor": 0,
         "patch": 0,
         "variant": 0
     },
-    "graphicsSpecification": {
-        "api": "OPENGL",
-        "major": 4,
-        "minor": 5,
-        "patch": 0,
-        "variant": 0
-    },
-    "instancedQuadRendererInformation": {
-        "fragmentFilepath": "./res/shaders/instanced/iquad_gl.frag",
-        "maxInstanceCount": 1200,
-        "maxTextureCount": 2,
-        "textureHeight": 32,
-        "textureWidth": 32,
-        "vertexFilepath": "./res/shaders/instanced/iquad_gl.vert"
-    },
-    "quadRendererInformation": {
-        "fragmentFilepath": "./res/shaders/quad/quad_gl.frag",
-        "vertexFilepath": "./res/shaders/quad/quad_gl.vert"
-    },
     "scriptingInfo": {
-	"mainDomainPath": "bin/turnip-script.dll",
-        "monoAssembliesPath": "lib",
-        "domainName": "TurScript",
-        "monoSDKvariable": "MONO_SDK",
-        "monoConfigPath": "etc",
-        "monoVersion": "v4.0.30319"
+        "stubFilepath": "lib"
     },
-    "vulkanConfiguration": {
+    "vulkanConfig": {
         "instanceRequirements": {
             "enableDrawing": true,
             "enableValidationLayers": false,
@@ -47,6 +23,7 @@
             "layers": []
         },
         "logicalDeviceRequirements": {
+            "customQueueRequirements": false,
             "requiredQueueOperations": [
                 "graphics",
                 "present"
@@ -61,23 +38,33 @@
         }
     },
     "windowProperties": {
-        "startsMaximized": true,
         "dimensions": {
             "x": 640,
             "y": 480
         },
         "maxSize": {
-            "x": 4000,
-            "y": 4000
-        },
-        "minSize": {
             "x": 640,
             "y": 480
+        },
+        "minSize": {
+            "x": 0,
+            "y": 0
         },
         "position": {
             "x": "default",
             "y": "default"
         },
+        "startsMaximized": false,
         "title": "TurnipEngine v1.0"
+    },
+    "windowingCapabilities": {
+        "api": "vulkan",
+        "major": 4,
+        "minor": 6,
+        "patch": 0,
+        "variant": 0
+    },
+    "workerConfig": {
+        "threadAmount": 4
     }
 }

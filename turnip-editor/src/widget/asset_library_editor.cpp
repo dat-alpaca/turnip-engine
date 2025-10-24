@@ -1,7 +1,8 @@
-#include "pch.hpp"
 #include "asset_library_editor.hpp"
 
-void AssetLibraryEditor::initialize(NON_OWNING tur::AssetLibrary* assetLibrary, NON_OWNING RendererAssemblerSystem* assemblerSystem, NON_OWNING GUISystem* guiSystem)
+void AssetLibraryEditor::initialize(NON_OWNING tur::AssetLibrary* assetLibrary,
+									NON_OWNING RendererAssemblerSystem* assemblerSystem,
+									NON_OWNING GUISystem* guiSystem)
 {
 	isOpen = false;
 
@@ -20,8 +21,9 @@ void AssetLibraryEditor::on_render_gui()
 
 	// Left Panel:
 	{
-		ImGui::BeginChild("Asset List", ImVec2(windowSize.x * s_LeftPanelProportion, windowSize.y - 40), ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
-		
+		ImGui::BeginChild("Asset List", ImVec2(windowSize.x * s_LeftPanelProportion, windowSize.y - 40),
+						  ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
+
 		if (ImGui::BeginCombo("Asset Type", get_asset_type_name(m_CurrentFilterType)))
 		{
 			if (ImGui::Selectable("All"))
@@ -32,7 +34,7 @@ void AssetLibraryEditor::on_render_gui()
 
 			ImGui::EndCombo();
 		}
-		
+
 		if (m_CurrentFilterType == AssetType::NONE || m_CurrentFilterType == AssetType::TEXTURE)
 		{
 			for (auto& texture : assetLibrary->textures)
@@ -46,7 +48,7 @@ void AssetLibraryEditor::on_render_gui()
 				}
 			}
 		}
-		
+
 		ImGui::EndChild();
 	}
 
@@ -58,10 +60,11 @@ void AssetLibraryEditor::on_render_gui()
 
 		ImGui::BeginChild("Asset Information:", ImVec2(rightPanelWidth, windowSize.y - 40), true);
 		float rightPanelHeight = ImGui::GetContentRegionAvail().y;
-		
+
 		// Upper:
 		{
-			ImGui::BeginChild("Asset Display", ImVec2(rightPanelWidth, windowSize.y * s_UpperPanelPropotion), ImGuiWindowFlags_NoScrollbar | ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
+			ImGui::BeginChild("Asset Display", ImVec2(rightPanelWidth, windowSize.y * s_UpperPanelPropotion),
+							  ImGuiWindowFlags_NoScrollbar | ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 			ImVec2 assetDisplaySize = ImGui::GetContentRegionAvail();
 			constexpr float padding = 50.f;
 
@@ -85,21 +88,22 @@ void AssetLibraryEditor::on_render_gui()
 					usedWidth = assetDisplaySize.y * aspectRatio;
 					usedHeight = assetDisplaySize.y;
 				}
-				else 
+				else
 				{
 					float usedWidth = assetDisplaySize.x;
 					float usedHeight = assetDisplaySize.x / aspectRatio;
 				}
 
-				guiSystem->texture(m_CurrentHandle, { usedWidth, usedHeight });
+				guiSystem->texture(m_CurrentHandle, {usedWidth, usedHeight});
 			}
-			
+
 			ImGui::EndChild();
 		}
 
 		// Bottom:
 		{
-			ImGui::BeginChild("Asset Information", ImVec2(rightPanelWidth, windowSize.y * s_LowerPanelPropotion), ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
+			ImGui::BeginChild("Asset Information", ImVec2(rightPanelWidth, windowSize.y * s_LowerPanelPropotion),
+							  ImGuiChildFlags_ResizeX | ImGuiChildFlags_ResizeY);
 
 			ImGui::Text("Asset Information");
 			ImGui::Separator();
@@ -119,11 +123,13 @@ void AssetLibraryEditor::on_render_gui()
 					ImGui::Text("Depth: %lu", m_TextureAsset->depth);
 					ImGui::Text("Channels: %lux", m_TextureAsset->channels);
 
-					ImGui::Text("Offset: (%lu, %lu, %lu)", m_TextureAsset->xOffset, m_TextureAsset->yOffset, m_TextureAsset->zOffset);
+					ImGui::Text("Offset: (%lu, %lu, %lu)", m_TextureAsset->xOffset, m_TextureAsset->yOffset,
+								m_TextureAsset->zOffset);
 					ImGui::Text("Float Texture: %s", m_TextureAsset->floatTexture ? "Yes" : "No");
-				} break;
+				}
+				break;
 			}
-			
+
 			ImGui::EndChild();
 		}
 

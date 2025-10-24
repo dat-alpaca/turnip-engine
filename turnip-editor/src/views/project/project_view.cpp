@@ -1,4 +1,3 @@
-#include "pch.hpp"
 #include "project_view.hpp"
 #include "views/main/main_view.hpp"
 
@@ -41,14 +40,12 @@ void ProjectView::on_render_gui()
 
 		if (ImGui::Button("Open Project..."))
 		{
-			std::vector<std::string> filters = {
-				fmt::format("Project Files ({})", TUR_ENGINE_FILE_EXTENSION),
-				"*" + std::string(TUR_ENGINE_FILE_EXTENSION)
-			};
+			std::vector<std::string> filters = {fmt::format("Project Files ({})", TUR_ENGINE_FILE_EXTENSION),
+												"*" + std::string(TUR_ENGINE_FILE_EXTENSION)};
 
 			auto projectFilepaths = open_file_dialog("Open Project Folder", filters);
 
-			if(projectFilepaths.empty())
+			if (projectFilepaths.empty())
 				return ImGui::End();
 
 			auto projectWrap = read_project_file(projectFilepaths[0]);

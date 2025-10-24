@@ -1,149 +1,163 @@
 #pragma once
-#include <vector>
+#include <span>
 
 #include "common.hpp"
-#include "graphics/type/types.hpp"
-#include "graphics/objects/shader.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/texture.hpp"
+#include "graphics/types/pipeline_stage.hpp"
+#include "graphics/types/pipeline_type.hpp"
+
+#include "graphics/types/extent.hpp"
+#include "graphics/types/viewport.hpp"
+
+#include "graphics/objects/shader.hpp"
 
 namespace tur
 {
-    enum class FrontFace
-    {
-        COUNTER_CLOCKWISE,
-        CLOCKWISE
-    };
+	enum class InputRate
+	{
+		VERTEX,
+		INSTANCE
+	};
 
-    enum class CullMode : u32
-    {
-        NONE            = 1 << 0,
-        FRONT           = 1 << 1,
-        BACK            = 1 << 2,
-        FRONT_AND_BACK  = 1 << 3
-    };
+	enum class AttributeFormat
+	{
+		R32_SFLOAT,          // FLOAT
+		R64_SFLOAT,          // DOUBLE
+		R32G32_SFLOAT,       // VEC2
+		R32G32B32_SFLOAT,    // VEC3
+		R32G32B32A32_SFLOAT, // VEC4
+		R32G32_SINT,         // IVEC2
+		R32G32B32A32_UINT,   // UVEC4
+	};
 
-    inline u32 operator& (CullMode lhs, CullMode rhs)
-    {
-        return static_cast<u32>(lhs) & static_cast<u32>(rhs);
-    }
+	struct BindingDescriptor
+	{
+		u32 binding;
+		u32 stride;
+		InputRate inputRate = InputRate::VERTEX;
+	};
 
-    inline u32 operator| (CullMode lhs, CullMode rhs)
-    {
-        return static_cast<u32>(lhs) | static_cast<u32>(rhs);
-    }
+	struct Attribute
+	{
+		u32 binding;
+		u32 location;
+		u32 offset;
+		AttributeFormat format;
+	};
 
-    enum class PolygonMode
-    {
-        FILL,
-        LINE,
-        POINT,
-        FILL_RECTANGLE
-    };
-
-    enum class PrimitiveTopology
-    {
-        POINTS,
-
-        LINES,
-        LINE_STRIPS,
-
-        TRIANGLES,
-        TRIANGLE_STRIPS,
-        TRIANGLE_FANS,
-
-        LINES_WITH_ADJACENCY,
-        LINE_STRIPS_WITH_ADJACENCY,
-
-        TRIANGLES_WITH_ADJACENCY,
-        TRIANGLE_STRIPS_WITH_ADJACENCY,
-
-        PATCHES,
-    };
-
-    enum class InputRate
-    {
-        VERTEX,
-        INSTANCE
-    };
-
-    enum class AttributeFormat
-    {
-        R32_SFLOAT,             // FLOAT
-        R64_SFLOAT,             // DOUBLE
-        R32G32_SFLOAT,          // VEC2
-        R32G32B32_SFLOAT,       // VEC3
-        R32G32B32A32_SFLOAT,    // VEC4
-        R32G32_SINT,            // IVEC2
-        R32G32B32A32_UINT,      // UVEC4
-    };
+	struct VertexInputDescriptor
+	{
+		std::vector<BindingDescriptor> vertexBindings;
+		std::vector<Attribute> attributes;
+	};
 }
 
 namespace tur
 {
-    using pipeline_handle = handle_type;
+	enum class PrimitiveTopology
+	{
+		POINTS,
 
-    struct BindingDescription
-    {
-        u32 binding = 0;
-        u32 stride  = 0;
-        InputRate inputRate = InputRate::VERTEX;
-    };
+		LINES,
+		LINE_STRIPS,
 
-    struct Attribute
-    {
-        u32 binding  = 0;
-        u32 location = 0;
-        AttributeFormat format = AttributeFormat::R32_SFLOAT;
-        u32 offset = 0;
-        bool normalized = false;
-    };
+		TRIANGLES,
+		TRIANGLE_STRIPS,
+		TRIANGLE_FANS,
 
-    struct VertexInputDescriptor
-    {
-        std::vector<BindingDescription> bindings;
-        std::vector<Attribute> attributes;
-    };
+		LINES_WITH_ADJACENCY,
+		LINE_STRIPS_WITH_ADJACENCY,
 
-    struct InputAssemblyDescriptor
-    {
-        PrimitiveTopology topology = PrimitiveTopology::TRIANGLES;
-        bool primitiveRestartEnable = false;
-    };
+		TRIANGLES_WITH_ADJACENCY,
+		TRIANGLE_STRIPS_WITH_ADJACENCY,
 
-    struct RasterizerDescriptor
-    {
-        FrontFace frontFace = FrontFace::COUNTER_CLOCKWISE;
-        PolygonMode polygonMode = PolygonMode::FILL;
-        CullMode cullMode = CullMode::FRONT;
+		PATCHES,
+	};
 
-        float lineWidth = 1.0f;
+	struct InputAssemblyDescriptor
+	{
+		PrimitiveTopology topology = PrimitiveTopology::TRIANGLES;
+		bool primitiveRestartEnable = false;
+	};
+}
 
-        bool discardFragments = false;
-        bool enableDepthBias = false;
-        bool clampDepth = false;
-    };
+namespace tur
+{
+	enum class FrontFace
+	{
+		COUNTER_CLOCKWISE,
+		CLOCKWISE
+	};
 
-    struct PipelineDescriptor
-    {
-        VertexInputDescriptor vertexInputStage;
-        InputAssemblyDescriptor inputAssemblyStage;
-        RasterizerDescriptor rasterizerStage;
+	enum class CullMode : u32
+	{
+		NONE = 1 << 0,
+		FRONT = 1 << 1,
+		BACK = 1 << 2,
+		FRONT_AND_BACK = 1 << 3
+	};
+	inline u32 operator&(CullMode lhs, CullMode rhs)
+	{
+		return static_cast<u32>(lhs) & static_cast<u32>(rhs);
+	}
+	inline u32 operator|(CullMode lhs, CullMode rhs)
+	{
+		return static_cast<u32>(lhs) | static_cast<u32>(rhs);
+	}
 
-        std::vector<descriptor_handle> descriptorSetLayouts;
+	enum class PolygonMode
+	{
+		FILL,
+		LINE,
+		POINT,
+		FILL_RECTANGLE
+	};
 
-        shader_handle vertexShader = invalid_handle;
-        shader_handle tesselationControlShader = invalid_handle;
-        shader_handle tesselationEvaluationShader = invalid_handle;
-        shader_handle geometryShader = invalid_handle;
-        shader_handle fragmentShader = invalid_handle;
+	struct RasterizerDescriptor
+	{
+		FrontFace frontFace = FrontFace::COUNTER_CLOCKWISE;
+		CullMode cullMode = CullMode::FRONT;
+		PolygonMode polygonMode = PolygonMode::FILL;
 
-        // Viewport & Scissor:
-        std::vector<Viewport> viewports = {};
-        std::vector<Rect2D> scissors = {};
+		float lineWidth = 1.0f;
 
-        u32 viewportCount = 1;
-        u32 scissorCount = 1;
-        bool useDynamicViewport = true;
-        bool useDynamicScissor = true;
-    };
+		bool discardFragments = false;
+		bool enableDepthBias = false;
+		bool clampDepth = false;
+	};
+}
+
+namespace tur
+{
+	using pipeline_handle = handle_type;
+
+	enum class DynamicState
+	{
+		VIEWPORT,
+		SCISSOR
+	};
+
+	struct PipelineDescriptor
+	{
+		VertexInputDescriptor vertexInputStage;
+		InputAssemblyDescriptor inputAssemblyStage;
+		RasterizerDescriptor rasterizerStage;
+
+		descriptor_set_layout_handle setLayout;
+
+		// Viewport & Scissor:
+		std::span<const Viewport> viewports = {};
+		std::span<const Extent2D> scissors = {};
+		std::span<const DynamicState> dynamicStates = {};
+
+		shader_handle vertexShader = invalid_handle;
+		shader_handle tesselationControlShader = invalid_handle;
+		shader_handle tesselationEvaluationShader = invalid_handle;
+		shader_handle geometryShader = invalid_handle;
+		shader_handle fragmentShader = invalid_handle;
+
+		// Work image texture format:
+		TextureFormat targetFormat = TextureFormat::RGBA8_UNORM;
+	};
 }

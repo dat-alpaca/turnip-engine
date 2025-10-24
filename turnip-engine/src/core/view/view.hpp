@@ -2,8 +2,8 @@
 #include <vector>
 
 #include "common.hpp"
-#include "core/scene/scene.hpp"
 #include "core/event/event.hpp"
+#include "core/scene/scene.hpp"
 
 namespace tur
 {
@@ -16,38 +16,40 @@ namespace tur
 
 	public:
 		void set_engine(struct TurnipEngine* engine);
-		void set_handle(view_handle textureHandle);
-
-		EventCallback get_main_event_callback() const;
+		void set_handle(view_handle viewHandle);
 
 	public:
-		virtual void on_engine_startup() { };
-		virtual void on_engine_shutdown() { };
+		virtual void on_engine_startup(){};
+		virtual void on_engine_shutdown(){};
 
-		virtual void on_view_added() { };
-		virtual void on_view_removed() { };
+		virtual void on_view_added(){};
+		virtual void on_view_removed(){};
 
-		virtual void on_render() { };
-		virtual void on_render_gui() { };
+		virtual void on_render(){};
+		virtual void on_render_gui(){};
 
-		virtual void on_update() { };
+		virtual void on_update(){};
 
-		virtual void on_event(Event& event) { };
+		virtual void on_event(Event& event){};
 
 	protected:
 		NON_OWNING struct TurnipEngine* engine = nullptr;
 		view_handle viewHandle = invalid_handle;
-		Scene scene;
 	};
 }
 namespace tur
 {
-	struct ViewSystem
+	class ViewSystem
 	{
-		std::vector<tur_unique<View>> views;
+	public:
+		view_handle add(tur_unique<View> view);
+		void remove(view_handle handle);
+		tur_unique<View>& get(view_handle handle);
+
+	public:
+		std::vector<tur_unique<View>>& get_views() { return mViews; }
+
+	private:
+		std::vector<tur_unique<View>> mViews;
 	};
-	
-	view_handle view_system_add(ViewSystem* system, tur_unique<View> view);
-	void view_system_remove(ViewSystem* system, view_handle textureHandle);
-	tur_unique<View>& view_system_get(ViewSystem* system, view_handle textureHandle);
 }

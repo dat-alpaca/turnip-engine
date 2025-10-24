@@ -1,7 +1,7 @@
 #pragma once
-#include <nlohmann/json.hpp>
 #include <filesystem>
 #include <fstream>
+#include <nlohmann/json.hpp>
 #include <optional>
 
 namespace tur
@@ -14,7 +14,7 @@ namespace tur
 		return nlohmann::json::parse(file);
 	}
 
-	template<typename DataType>
+	template <typename DataType>
 	inline std::optional<DataType> json_parse_file(const std::filesystem::path& filepath)
 	{
 		nlohmann::json jsonObject;
@@ -47,10 +47,10 @@ namespace tur
 		return json_parse_file<nlohmann::json>(filepath);
 	}
 
-	template<typename DataType>
+	template <typename DataType>
 	inline void json_write_file(const std::filesystem::path& filepath, const DataType& dataType)
 	{
-		nlohmann::json json{ dataType };
+		nlohmann::json json{dataType};
 
 		std::ofstream jsonFile(filepath);
 		jsonFile << std::setfill(' ') << std::setw(4) << json[0];

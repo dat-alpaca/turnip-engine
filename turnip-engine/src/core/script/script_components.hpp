@@ -1,52 +1,20 @@
 #pragma once
-#include <string>
-#include <vector>
 #include <filesystem>
-#include <mono/jit/jit.h>
+#include <sol/sol.hpp>
+
+#include "common.hpp"
+#include "scene/entity.hpp"
+#include "script.hpp"
 
 namespace tur
 {
-	struct EntityScriptData
-	{
-		MonoObject* instance = nullptr;
-
-		MonoMethod* sceneStartMethod = nullptr;
-		MonoMethod* sceneEndMethod = nullptr;
-		MonoMethod* entityInstanceCreatedMethod = nullptr;
-		MonoMethod* entityInstanceDestroyedMethod = nullptr;
-		MonoMethod* updateMethod = nullptr;
-	};
-
-	struct InternalEntityScript
+	struct ScriptComponent
 	{
 	public:
-		InternalEntityScript() = default;
-		InternalEntityScript(const InternalEntityScript&) = default;
-		InternalEntityScript(const std::string& className, const std::filesystem::path& filepath) 
-			: className(className) 
-			, filepath(filepath)
-		{
-		}
+		ScriptComponent(Entity entity, const std::filesystem::path& filepath);
+		ScriptComponent() = default;
 
 	public:
-		std::string className;
-		std::filesystem::path filepath;
-		EntityScriptData scriptData;
-	};
-
-	struct EntityScriptsComponent
-	{
-	public:
-		EntityScriptsComponent() = default;
-		EntityScriptsComponent(const EntityScriptsComponent&) = default;
-
-	public:
-		void add(const InternalEntityScript& script)
-		{
-			scriptComponents.push_back(script);
-		}
-
-	public:
-		std::vector<InternalEntityScript> scriptComponents;
+		Script script;
 	};
 }

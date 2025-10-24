@@ -1,8 +1,16 @@
 #pragma once
+#include "utils/uuid/uuid.hpp"
+#include <filesystem>
 
 namespace tur
 {
 	using asset_handle = handle_type;
+
+	struct AssetMetadata
+	{
+		std::filesystem::path filepath;
+		UUID uuid;
+	};
 
 	enum class AssetType
 	{

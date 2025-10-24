@@ -1,5 +1,5 @@
 #pragma once
-#include "core/logger/logger.hpp"
+#include "core/logging/logging.hpp"
 
 namespace tur
 {
@@ -8,7 +8,7 @@ namespace tur
  		TUR_LOG_CRITICAL("[Assert]: '{}' failed. [{}]\nFile: {} [{}]", condition, message, file, line);
 	}
 
-#define TUR_ASSERT(condition, message)									\
+    #define TUR_ASSERT(condition, message)									\
 	{																		\
 		if(condition) { }													\
 		else																\
@@ -17,7 +17,7 @@ namespace tur
 		}																	\
 	}
 
-#define TUR_ASS(condition)																\
+    #define TUR_ASS(condition)															    \
 	{																						\
 		if(condition) { }																	\
 		else																				\

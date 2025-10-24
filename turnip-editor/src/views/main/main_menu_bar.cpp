@@ -1,7 +1,6 @@
-#include "pch.hpp"
-#include "main_view.hpp"
 #include "main_menu_bar.hpp"
 #include "event/events.hpp"
+#include "main_view.hpp"
 
 #include <core/scene/scene_serialization.hpp>
 
@@ -40,7 +39,7 @@ void MainMenuBar::on_render()
 
 		if (ImGui::BeginMenu("View"))
 		{
-			for (auto& [widget, name]: m_WidgetList)
+			for (auto& [widget, name] : m_WidgetList)
 			{
 				if (ImGui::MenuItem(name.c_str(), "", nullptr, &widget->isOpen))
 					widget->set_open(!widget->isOpen);
@@ -55,7 +54,7 @@ void MainMenuBar::on_render()
 
 void MainMenuBar::register_widget(Widget* widget, const std::string& name)
 {
-	m_WidgetList.push_back({ widget, name });
+	m_WidgetList.push_back({widget, name});
 }
 
 void MainMenuBar::on_file_new()
@@ -78,7 +77,7 @@ void MainMenuBar::on_file_new()
 }
 void MainMenuBar::on_file_open()
 {
-	auto projectFilepaths = open_file_dialog("Open Project Folder", { "Project Files (.json)" });
+	auto projectFilepaths = open_file_dialog("Open Project Folder", {"Project Files (.json)"});
 
 	if (projectFilepaths.empty())
 		return;

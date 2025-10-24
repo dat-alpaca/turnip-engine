@@ -1,28 +1,27 @@
 #pragma once
-#include "core/assets/asset_library.hpp"
-#include "core/worker/worker_pool.hpp"
-#include "core/engine/engine.hpp"
-#include "core/event/events.hpp"
-#include "core/view/view.hpp"
+#include "core/assert/assert.hpp"
+#include "core/config/config_data.hpp"
+#include "core/engine/turnip_engine.hpp"
 
+#include "graphics/renderer/imm_quad_renderer.hpp"
+
+#include "core/event/event.hpp"
+#include "core/event/event_type.hpp"
+
+#include "core/logging/logging.hpp"
+#include "core/memory/memory.hpp"
+
+#include "core/scene/components.hpp"
 #include "core/scene/entity.hpp"
 #include "core/scene/scene.hpp"
-#include "core/scene/components.hpp"
-#include "core/scene/scene_serialization.hpp"
 
-#include "core/project/project.hpp"
-
+#include "core/script/script_components.hpp"
 #include "core/script/script_system.hpp"
 
-#include "graphics/graphics.hpp"
-#include "graphics/gui_system.hpp"
-#include "graphics/renderer/quad/quad_renderer.hpp"
-#include "graphics/renderer/quad/quad_renderer_system.hpp"
-#include "graphics/renderer/instanced/instanced_quad_renderer.hpp"
+#include "core/view/view.hpp"
+#include "core/windowing/windowing.hpp"
 
-#include "utils/string_utils.hpp"
-#include "utils/transform.hpp"
-#include "utils/file.hpp"
+#include "client/system/imm_quad_system.hpp"
+#include "client/system/script_system.hpp"
 
-#include "platform/platform.hpp"
 #include "common.hpp"

@@ -1,11 +1,11 @@
-#include "pch.hpp"
 #include "entity_inspector.hpp"
 
+#include "core/script/script_compiler.hpp"
 #include "event/events.hpp"
 #include "utils/gui_utils.hpp"
-#include "core/script/script_compiler.hpp"
 
-void EntityInspector::initialize(NON_OWNING tur::TurnipEngine* engine, NON_OWNING tur::Scene* scene, SceneData* sceneData)
+void EntityInspector::initialize(NON_OWNING tur::TurnipEngine* engine, NON_OWNING tur::Scene* scene,
+								 SceneData* sceneData)
 {
 	r_Engine = engine;
 	r_Scene = scene;
@@ -36,19 +36,23 @@ void EntityInspector::on_render_gui()
 void EntityInspector::on_event(Event& event)
 {
 	Subscriber subscriber(event);
-	subscriber.subscribe<SceneEditorResized>([&](SceneEditorResized& resizeEvent) -> bool {
-		m_EditorArea.width = (float)resizeEvent.width;
-		m_EditorArea.height = (float)resizeEvent.height;
+	subscriber.subscribe<SceneEditorResized>(
+		[&](SceneEditorResized& resizeEvent) -> bool
+		{
+			m_EditorArea.width = (float)resizeEvent.width;
+			m_EditorArea.height = (float)resizeEvent.height;
 
-		return false;
-	});
+			return false;
+		});
 
-	subscriber.subscribe<SceneEditorMoved>([&](SceneEditorMoved& moveEvent) -> bool {
-		m_EditorArea.x = (float)moveEvent.x;
-		m_EditorArea.y = (float)moveEvent.y;
+	subscriber.subscribe<SceneEditorMoved>(
+		[&](SceneEditorMoved& moveEvent) -> bool
+		{
+			m_EditorArea.x = (float)moveEvent.x;
+			m_EditorArea.y = (float)moveEvent.y;
 
-		return false;
-	});
+			return false;
+		});
 }
 
 void EntityInspector::render_components(Entity selectedEntity)
@@ -99,7 +103,7 @@ void EntityInspector::render_texture_component(Entity selectedEntity)
 
 	auto* graphicsDevice = &r_Engine->graphicsDevice;
 	auto* assetLibrary = &r_Engine->assetLibrary;
-	
+
 	auto entityID = selectedEntity.get_handle();
 	auto* scene = r_Scene;
 
@@ -109,55 +113,57 @@ void EntityInspector::render_texture_component(Entity selectedEntity)
 		{
 			if (ImGui::Button("Choose Texture..."))
 			{
-				auto filepaths = open_file_dialog("Open texture", { "All Images (*.png, *.jpg)", "*.png", "*.jpg" });
+				auto filepaths = open_file_dialog("Open texture", {"All Images (*.png, *.jpg)", "*.png", "*.jpg"});
 
 				if (filepaths.empty())
 					return;
 
 				auto& filepath = std::filesystem::path(filepaths[0]);
 
-				r_Engine->workerPool.submit<AssetInformation>([assetLibrary, filepath]() {
-					return load_texture_asset(assetLibrary, filepath);
-				}, [textureComponent, this, assetLibrary, selectedEntity](AssetInformation information) {
-					tur::UUID& textureUUID = assetLibrary->textures.get(information.assetHandle).uuid;
-					
-					SceneQuadTextureLoaded sceneQuadLoadEvent(selectedEntity.get_handle(), textureUUID);
-					callback(sceneQuadLoadEvent);
+				r_Engine->workerPool.submit<AssetInformation>(
+					[assetLibrary, filepath]() { return load_texture_asset(assetLibrary, filepath); },
+					[textureComponent, this, assetLibrary, selectedEntity](AssetInformation information)
+					{
+						tur::UUID& textureUUID = assetLibrary->textures.get(information.assetHandle).uuid;
 
-					if (!information.is_valid())
-						return;
+						SceneQuadTextureLoaded sceneQuadLoadEvent(selectedEntity.get_handle(), textureUUID);
+						callback(sceneQuadLoadEvent);
 
-					OnNewTextureLoad textureLoadEvent(information.assetHandle);
-					callback(textureLoadEvent);
-				});
+						if (!information.is_valid())
+							return;
+
+						OnNewTextureLoad textureLoadEvent(information.assetHandle);
+						callback(textureLoadEvent);
+					});
 			}
 			return;
 		}
 		else
 		{
-			if (r_Engine->guiSystem->texture_button(textureComponent->textureHandle, { 50.0f, 50.0f }))
+			if (r_Engine->guiSystem->texture_button(textureComponent->textureHandle, {50.0f, 50.0f}))
 			{
-				auto filepaths = open_file_dialog("Open texture", { "All Images (*.png, *.jpg)", "*.png", "*.jpg" });
+				auto filepaths = open_file_dialog("Open texture", {"All Images (*.png, *.jpg)", "*.png", "*.jpg"});
 
 				if (filepaths.empty())
 					return;
 
 				auto& filepath = std::filesystem::path(filepaths[0]);
 
-				r_Engine->workerPool.submit<AssetInformation>([assetLibrary, filepath]() {
-					return load_texture_asset(assetLibrary, filepath);
-				}, [textureComponent, this, assetLibrary, selectedEntity](AssetInformation information) {
-					tur::UUID& textureUUID = assetLibrary->textures.get(information.assetHandle).uuid;
+				r_Engine->workerPool.submit<AssetInformation>(
+					[assetLibrary, filepath]() { return load_texture_asset(assetLibrary, filepath); },
+					[textureComponent, this, assetLibrary, selectedEntity](AssetInformation information)
+					{
+						tur::UUID& textureUUID = assetLibrary->textures.get(information.assetHandle).uuid;
 
-					SceneQuadTextureLoaded sceneQuadLoadEvent(selectedEntity.get_handle(), textureUUID);
-					callback(sceneQuadLoadEvent);
+						SceneQuadTextureLoaded sceneQuadLoadEvent(selectedEntity.get_handle(), textureUUID);
+						callback(sceneQuadLoadEvent);
 
-					if (!information.is_valid())
-						return;
+						if (!information.is_valid())
+							return;
 
-					OnNewTextureLoad textureLoadEvent(information.assetHandle);
-					callback(textureLoadEvent);
-				});
+						OnNewTextureLoad textureLoadEvent(information.assetHandle);
+						callback(textureLoadEvent);
+					});
 			}
 
 			if (ImGui::Button("Remove texture"))
@@ -240,7 +246,7 @@ void EntityInspector::render_add_script_component(Entity selectedEntity)
 	{
 		using namespace std::filesystem;
 
-		auto scriptFilepath = path(save_file_dialog("New Script", "", { "Script files (.cs)", "*.cs" }));
+		auto scriptFilepath = path(save_file_dialog("New Script", "", {"Script files (.cs)", "*.cs"}));
 		if (scriptFilepath.empty())
 			return;
 

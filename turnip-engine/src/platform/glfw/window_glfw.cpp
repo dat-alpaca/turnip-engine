@@ -1,274 +1,278 @@
-#include "pch.hpp"
 #include "window_glfw.hpp"
+#include "core/event/events.hpp"
 #include "events_glfw.hpp"
 
-#include "core/event/events.hpp"
-#include "core/logger/logger.hpp"
-
-namespace tur
+namespace tur::platform
 {
-	static void GLFWErrorCallback(int errorCode, const char* description)
-	{
-		TUR_LOG_ERROR("[GLFW]: {} [{}]", description, errorCode);
-	}
-
-	static void set_window_events(Window* window)
+	static void set_window_events(GLFWwindow* glfwWindow)
 	{
 		// Status:
-		glfwSetWindowCloseCallback(window->window, [](GLFWwindow* window) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowCloseCallback(glfwWindow,
+								   [](GLFWwindow* window)
+								   {
+									   auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			WindowCloseEvent event;
-			data->eventCallback(event);
-		});
+									   WindowCloseEvent event;
+									   data->eventCallback(event);
+								   });
 
-		glfwSetWindowMaximizeCallback(window->window, [](GLFWwindow* window, int maximized) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowMaximizeCallback(glfwWindow,
+									  [](GLFWwindow* window, int maximized)
+									  {
+										  auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			WindowMaximizedEvent event(maximized);
-			data->eventCallback(event);
-		});
+										  WindowMaximizedEvent event(maximized);
+										  data->eventCallback(event);
+									  });
 
-		glfwSetWindowFocusCallback(window->window, [](GLFWwindow* window, int focus) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowFocusCallback(glfwWindow,
+								   [](GLFWwindow* window, int focus)
+								   {
+									   auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			WindowFocusEvent event(focus);
-			data->eventCallback(event);
-		});
+									   WindowFocusEvent event(focus);
+									   data->eventCallback(event);
+								   });
 
 		// Size:
-		glfwSetWindowSizeCallback(window->window, [](GLFWwindow* window, int width, int height) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowSizeCallback(glfwWindow,
+								  [](GLFWwindow* window, int width, int height)
+								  {
+									  auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			data->properties.dimensions = { width, height };
+									  data->properties.dimensions = {width, height};
 
-			WindowResizeEvent event(width, height);
-			data->eventCallback(event);
-		});
+									  WindowResizeEvent event(width, height);
+									  data->eventCallback(event);
+								  });
 
-		glfwSetFramebufferSizeCallback(window->window, [](GLFWwindow* window, int width, int height) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
-			data->framebufferResized = true;
+		glfwSetFramebufferSizeCallback(glfwWindow,
+									   [](GLFWwindow* window, int width, int height)
+									   {
+										   auto* data =
+											   static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			data->properties.dimensions = { width, height };
+										   data->properties.dimensions = {width, height};
 
-			WindowFramebufferEvent event(width, height);
-			data->eventCallback(event);
-		});
+										   WindowFramebufferEvent event(width, height);
+										   data->eventCallback(event);
+									   });
 
-		glfwSetWindowContentScaleCallback(window->window, [](GLFWwindow* window, float xScale, float yScale) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowContentScaleCallback(glfwWindow,
+										  [](GLFWwindow* window, float xScale, float yScale)
+										  {
+											  auto* data =
+												  static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			WindowContentScaleEvent event(xScale, yScale);
-			data->eventCallback(event);
-		});
+											  WindowContentScaleEvent event(xScale, yScale);
+											  data->eventCallback(event);
+										  });
 
 		// Position:
-		glfwSetWindowPosCallback(window->window, [](GLFWwindow* window, int xPos, int yPos) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetWindowPosCallback(glfwWindow,
+								 [](GLFWwindow* window, int xPos, int yPos)
+								 {
+									 auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			data->properties.position = { xPos, yPos };
+									 data->properties.position = {xPos, yPos};
 
-			WindowMovedEvent event(xPos, yPos);
-			data->eventCallback(event);
-		});
+									 WindowMovedEvent event(xPos, yPos);
+									 data->eventCallback(event);
+								 });
 
 		// Keyboard:
-		glfwSetKeyCallback(window->window, [](GLFWwindow* window, int key, int scancode, int action, int mods) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetKeyCallback(glfwWindow,
+						   [](GLFWwindow* window, int key, int scancode, int action, int mods)
+						   {
+							   auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			switch (action)
-			{
-				case GLFW_PRESS:
-				{
-					Key convertedKey = translate_key(key);
-					KeyboardMods convertedMods = translate_key_mods(mods);
+							   switch (action)
+							   {
+								   case GLFW_PRESS:
+								   {
+									   Key convertedKey = translate_key(key);
+									   KeyboardMods convertedMods = translate_key_mods(mods);
 
-					KeyPressedEvent event(convertedKey, convertedMods);
-					data->eventCallback(event);
-				} break;
+									   KeyPressedEvent event(convertedKey, convertedMods);
+									   data->eventCallback(event);
+								   }
+								   break;
 
-				case GLFW_RELEASE:
-				{
-					Key convertedKey = translate_key(key);
-					KeyboardMods convertedMods = translate_key_mods(mods);
+								   case GLFW_RELEASE:
+								   {
+									   Key convertedKey = translate_key(key);
+									   KeyboardMods convertedMods = translate_key_mods(mods);
 
-					KeyReleasedEvent event(convertedKey, convertedMods);
-					data->eventCallback(event);
-				} break;
+									   KeyReleasedEvent event(convertedKey, convertedMods);
+									   data->eventCallback(event);
+								   }
+								   break;
 
-				case GLFW_REPEAT:
-				{
-					Key convertedKey = translate_key(key);
-					KeyboardMods convertedMods = translate_key_mods(mods);
+								   case GLFW_REPEAT:
+								   {
+									   Key convertedKey = translate_key(key);
+									   KeyboardMods convertedMods = translate_key_mods(mods);
 
-					KeyRepeatEvent event(convertedKey, convertedMods);
-					data->eventCallback(event);
-				} break;
+									   KeyRepeatEvent event(convertedKey, convertedMods);
+									   data->eventCallback(event);
+								   }
+								   break;
 
-				default:
-				{
-					TUR_LOG_WARN("Invalid keyboard action passed to window callback: {}", action);
-				} break;
-			}
-		});
+								   default:
+								   {
+									   TUR_LOG_WARN("Invalid keyboard action passed to window callback: {}", action);
+								   }
+								   break;
+							   }
+						   });
 
 		// Mouse:
-		glfwSetCursorPosCallback(window->window, [](GLFWwindow* window, double x, double y) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetCursorPosCallback(glfwWindow,
+								 [](GLFWwindow* window, double x, double y)
+								 {
+									 auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			MouseMovedEvent event(x, y);
-			data->eventCallback(event);
-		});
+									 MouseMovedEvent event(x, y);
+									 data->eventCallback(event);
+								 });
 
-		glfwSetMouseButtonCallback(window->window, [](GLFWwindow* window, int button, int action, int mods) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetMouseButtonCallback(glfwWindow,
+								   [](GLFWwindow* window, int button, int action, int mods)
+								   {
+									   auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			switch (action)
-			{
-				case GLFW_PRESS:
-				{
-					MouseButton convertedButton = translate_mouse_button(button);
-					MousePressedEvent event(convertedButton);
-					data->eventCallback(event);
-				} break;
+									   switch (action)
+									   {
+										   case GLFW_PRESS:
+										   {
+											   MouseButton convertedButton = translate_mouse_button(button);
+											   MousePressedEvent event(convertedButton);
+											   data->eventCallback(event);
+										   }
+										   break;
 
-				case GLFW_RELEASE:
-				{
-					MouseButton convertedButton = translate_mouse_button(button);
-					MouseReleasedEvent event(convertedButton);
-					data->eventCallback(event);
-				} break;
+										   case GLFW_RELEASE:
+										   {
+											   MouseButton convertedButton = translate_mouse_button(button);
+											   MouseReleasedEvent event(convertedButton);
+											   data->eventCallback(event);
+										   }
+										   break;
 
-				default:
-				{
-					TUR_LOG_WARN("Invalid keyboard action passed to window callback: {}", action);
-				} break;
-			}
-		});
+										   default:
+										   {
+											   TUR_LOG_WARN("Invalid keyboard action passed to window callback: {}",
+															action);
+										   }
+										   break;
+									   }
+								   });
 
-		glfwSetScrollCallback(window->window, [](GLFWwindow* window, double xOffset, double yOffset) {
-			auto* data = static_cast<Window::Data*>(glfwGetWindowUserPointer(window));
+		glfwSetScrollCallback(glfwWindow,
+							  [](GLFWwindow* window, double xOffset, double yOffset)
+							  {
+								  auto* data = static_cast<WindowGLFW::Data*>(glfwGetWindowUserPointer(window));
 
-			MouseScrollEvent event(xOffset, yOffset);
-			data->eventCallback(event);
-		});
+								  MouseScrollEvent event(xOffset, yOffset);
+								  data->eventCallback(event);
+							  });
 	}
 }
 
-namespace tur
+namespace tur::platform
 {
-	void initialize_windowing_system()
+	void WindowGLFW::create(const WindowProperties& properties)
 	{
-		glfwSetErrorCallback(GLFWErrorCallback);
+		mWindow.reset(glfwCreateWindow(properties.dimensions.x, properties.dimensions.y, properties.title.c_str(),
+									   nullptr, nullptr));
 
-		if (!glfwInit())
-			TUR_LOG_CRITICAL("Failed to initialize the platform system.");
-	}
-	void shutdown_windowing_system()
-	{
-		glfwTerminate();
-	}
-
-	void initialize_window(Window* window, const WindowProperties& properties)
-	{
-		window->window = glfwCreateWindow(
-			properties.dimensions.x,
-			properties.dimensions.y,
-			properties.title.c_str(),
-			nullptr,
-			nullptr
-		);
-
-		window->data.properties = properties;
-
-		if (!window->window)
+		if (!mWindow)
 		{
 			TUR_LOG_CRITICAL("Failed to create a valid GLFW window. GLFW is probably uninitialized");
 			return;
 		}
 
-		glfwSetWindowUserPointer(window->window, &window->data);
+		set_properties(properties);
+		set_window_events(mWindow.get());
 
-		set_properties_window(window, properties);
-		set_window_events(window);
-		
-		if(properties.startsMaximized)
-			maximimize_window(window);
+		if (properties.startsMaximized)
+			maximize();
 	}
-	void set_callback_window(Window* window, EventCallback&& callback)
+	void WindowGLFW::destroy()
 	{
-		window->data.eventCallback = callback;
-	}
-	void poll_events(Window* window)
-	{
-		glfwPollEvents();
+		mWindow.reset();
 	}
 
-	void set_properties_window(Window* window, const WindowProperties& properties)
+	void WindowGLFW::set_event_callback(EventCallback&& callback)
 	{
-		auto* windowGlfw = window->window;
+		mData.eventCallback = callback;
+		glfwSetWindowUserPointer(mWindow.get(), &mData);
+	}
+	void WindowGLFW::set_properties(const WindowProperties& properties)
+	{
+		mData.properties = properties;
 
 		// Current Size:
-		glfwSetWindowSize(windowGlfw, (int)properties.dimensions.x, (int)properties.dimensions.y);
+		glfwSetWindowSize(mWindow.get(), (int)properties.dimensions.x, (int)properties.dimensions.y);
 
 		// Size Limits:
-		glfwSetWindowSizeLimits(
-			windowGlfw,
-			(int)properties.minSize.x,
-			(int)properties.minSize.y,
-			(int)properties.maxSize.x,
-			(int)properties.maxSize.y
-		);
+		glfwSetWindowSizeLimits(mWindow.get(), (int)properties.minSize.x, (int)properties.minSize.y,
+								(int)properties.maxSize.x, (int)properties.maxSize.y);
 
 		// Position:
 		if (properties.position != invalid_size)
-			glfwSetWindowPos(windowGlfw, properties.position.x, properties.position.y);
+			glfwSetWindowPos(mWindow.get(), properties.position.x, properties.position.y);
 
 		// Title:
-		glfwSetWindowTitle(windowGlfw, properties.title.c_str());
+		glfwSetWindowTitle(mWindow.get(), properties.title.c_str());
 	}
-	void set_window_title(Window* window, const std::string& title)
+	void WindowGLFW::poll_events()
 	{
-		glfwSetWindowTitle(window->window, title.c_str());
+		glfwPollEvents();
 	}
-
-	void shutdown_window(Window* window)
+	void WindowGLFW::wait_events()
 	{
-		glfwDestroyWindow(window->window);
-	}
-
-	bool is_open_window(Window* window)
-	{
-		return !glfwWindowShouldClose(window->window);
+		glfwWaitEvents();
 	}
 
-	void show_window(Window* window)
+	void WindowGLFW::maximize()
 	{
-		glfwShowWindow(window->window);
-	}
-	void hide_window(Window* window)
-	{
-		glfwHideWindow(window->window);
-	}
-	void maximimize_window(Window* window)
-	{
-		glfwMaximizeWindow(window->window);
+		glfwMaximizeWindow(mWindow.get());
 	}
 
-	glm::vec2 get_mouse_cursor_position_window(Window* window)
+	void WindowGLFW::show()
 	{
-		double xpos, ypos;
-		glfwGetCursorPos(window->window, &xpos, &ypos);
-
-		return glm::vec2(xpos, ypos);
+		glfwShowWindow(mWindow.get());
+	}
+	void WindowGLFW::hide()
+	{
+		glfwHideWindow(mWindow.get());
+	}
+	bool WindowGLFW::is_open() const
+	{
+		return !glfwWindowShouldClose(mWindow.get());
 	}
 
-	glm::uvec2 get_window_size(Window* window)
+	glm::vec2 WindowGLFW::get_dimensions()
 	{
-		int width = 0, height = 0;
-		glfwGetFramebufferSize(window->window, &width, &height);
+		int width, height;
+		glfwGetWindowSize(mWindow.get(), &width, &height);
+		return {width, height};
+	}
 
-		return { static_cast<u32>(width), static_cast<u32>(height) };
+	bool WindowGLFW::get_mouse_pressed(MouseButton mouseButton)
+	{
+		int state = glfwGetMouseButton(mWindow.get(), reverse_mouse_button(mouseButton));
+		return state == GLFW_PRESS;
+	}
+	bool WindowGLFW::get_key_pressed(Key key)
+	{
+		return glfwGetKey(mWindow.get(), reverse_key(key)) == GLFW_PRESS;
+	}
+	glm::vec2 WindowGLFW::get_mouse_position()
+	{
+		double xPos, yPos;
+		glfwGetCursorPos(mWindow.get(), &xPos, &yPos);
+		return glm::vec2(xPos, yPos);
 	}
 }

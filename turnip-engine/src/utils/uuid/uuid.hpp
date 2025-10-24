@@ -9,44 +9,31 @@ namespace tur
 	class UUID
 	{
 	public:
-		UUID()
-			: m_UUID(generate_random<u64>(std::numeric_limits<u64>::min(), std::numeric_limits<u64>::max() - 1))
-		{
+		UUID() : uuid(generate_random<u64>(std::numeric_limits<u64>::min(), std::numeric_limits<u64>::max() - 1)) {}
 
-		}
-
-		UUID(u64 uuid)
-			: m_UUID(uuid)
-		{
-		}
+		UUID(u64 uuid) : uuid(uuid) {}
 
 	public:
-		operator u64() const { return m_UUID; }
+		operator u64() const { return uuid; }
 
 	public:
-		bool is_valid() const { return m_UUID != std::numeric_limits<u64>::max(); }
+		bool is_valid() const { return uuid != std::numeric_limits<u64>::max(); }
 
 	public:
-		u64& data() { return m_UUID; }
-		u64 data() const { return m_UUID; }
-
-	private:
-		u64 m_UUID = std::numeric_limits<u64>::max();
+		u64 uuid = std::numeric_limits<u64>::max();
 	};
 
 	static inline UUID invalid_uuid = UUID(std::numeric_limits<u64>::max());
 }
 
-namespace std 
+namespace std
 {
-	template <typename T> struct hash;
+	template <typename T>
+	struct hash;
 
-	template<>
+	template <>
 	struct hash<tur::UUID>
 	{
-		size_t operator()(const tur::UUID& uuid) const
-		{
-			return uuid.data();
-		}
+		size_t operator()(const tur::UUID& uuid) const { return uuid.uuid; }
 	};
 }

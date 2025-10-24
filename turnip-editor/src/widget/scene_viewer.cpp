@@ -1,4 +1,3 @@
-#include "pch.hpp"
 #include "scene_viewer.hpp"
 #include "event/events.hpp"
 
@@ -61,7 +60,8 @@ void SceneViewer::render_scene_graph_node(Entity entity)
 
 		std::copy(entityName.name.begin(), entityName.name.end(), m_RenameBuffer);
 
-		if (ImGui::InputText("##Editing", m_RenameBuffer, IM_ARRAYSIZE(m_RenameBuffer), ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll))
+		if (ImGui::InputText("##Editing", m_RenameBuffer, IM_ARRAYSIZE(m_RenameBuffer),
+							 ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll))
 		{
 			entityName.name = std::string(m_RenameBuffer);
 			m_RenamingEntity = entt::null;
@@ -101,7 +101,8 @@ void SceneViewer::render_scene_viewer_popup(Entity entity)
 
 	if (ImGui::Button("Export as instance"))
 	{
-		auto instanceFilepath = path(save_file_dialog("Export instance file", entityExtension, { "Instance files (*.ins)", ".ins" }));
+		auto instanceFilepath =
+			path(save_file_dialog("Export instance file", entityExtension, {"Instance files (*.ins)", ".ins"}));
 		std::string instanceFilepathName = instanceFilepath.filename().string();
 
 		serialize_entity(instanceFilepath, r_Scene, entity);
