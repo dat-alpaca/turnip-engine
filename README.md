@@ -50,7 +50,7 @@ If the SDK fails to include it automatically, you must provide an environment va
     | -DTUR_USE_OPENGL        | Uses the OpenGL backend                  | ON      |
     | -DTUR_USE_VULKAN        | Uses the Vulkan backend                  | OFF     |
 
-   * _This option is a lie. Turnip doesn't support other platforms yet._
+   \* _This option is a lie. Turnip doesn't support other platforms yet._
     
 
 4. **Compile the project**
