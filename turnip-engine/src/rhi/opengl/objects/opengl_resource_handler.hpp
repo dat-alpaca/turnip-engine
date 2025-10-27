@@ -83,7 +83,6 @@ namespace tur::gl
 	private:
 		NON_OWNING RenderInterfaceGL* rRHI = nullptr;
 		ShaderLoader mShaderLoader;
-		vk::Device rDevice;
 
 	private:
 		free_list<Shader> mShaders;
