@@ -69,6 +69,13 @@ The engine requires a location file specified as its main constructor argument. 
 As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments.
 Check the options listed [here](#installation) for more information. 
 
+# Using
+Currently, there are no available examples nor documentation. The best you can do (which is highly discouraged) is to follow the `turnip-sandbox` project code source.
+The engine does not provide a single entry point to the user, so you must declare an instance of the engine, and a conscrete implementation of a `tur::View`. However, the View is designed
+to be as bare-bones as possible. It does not provide a renderer system nor scenes, albeit those are available to use.
+
+With all being said, I would highly advise against using the engine for the moment. I will provide code examples and (probably) a proper documentation in the future.
+
 # License
 
 This project is licensed under the [MPL-2.0 license](https://www.mozilla.org/en-US/MPL/2.0/) - see the [LICENSE](LICENSE) file for details. It is important to note that until [a certain commit](https://github.com/dat-alpaca/turnip-engine/commit/3e2776747c4ac76e5793da7dedc50eb300a1aa40), the project was licensed under the [MIT License](https://opensource.org/license/mit).
