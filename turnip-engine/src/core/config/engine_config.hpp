@@ -6,7 +6,7 @@ namespace tur
 {
 	struct EngineSpecification
 	{
-		u32 major = 1, minor = 0, patch = 0, variant = 0;
+		u32 major = TUR_ENGINE_VERSION_MAJOR, minor = TUR_ENGINE_VERSION_MINOR, patch = 0, variant = 0;
 
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineSpecification, major, minor, patch, variant);
 	};

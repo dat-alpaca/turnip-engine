@@ -8,7 +8,7 @@
     },
     "engineSpecs": {
         "major": 1,
-        "minor": 0,
+        "minor": 1,
         "patch": 0,
         "variant": 0
     },
@@ -55,12 +55,12 @@
             "y": "default"
         },
         "startsMaximized": false,
-        "title": "TurnipEngine v1.0"
+        "title": "TurnipEngine v1.1"
     },
     "windowingCapabilities": {
-        "api": "vulkan",
-        "major": 1,
-        "minor": 4,
+        "api": "UNKNOWN",
+        "major": 0,
+        "minor": 0,
         "patch": 0,
         "variant": 0
     },

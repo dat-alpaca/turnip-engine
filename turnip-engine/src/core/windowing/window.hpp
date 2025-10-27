@@ -3,6 +3,15 @@
 #include <glm/glm.hpp>
 #include <string>
 
+namespace
+{
+	static std::string default_window_title()
+	{
+		return "TurnipEngine v" + std::to_string(TUR_ENGINE_VERSION_MAJOR) + "."
+			   + std::to_string(TUR_ENGINE_VERSION_MINOR);
+	}
+}
+
 namespace tur
 {
 	struct WindowProperties
@@ -13,7 +22,7 @@ namespace tur
 		};
 
 	public:
-		std::string title = "TurnipEngine v1.0";
+		std::string title = default_window_title();
 		glm::uvec2 dimensions = glm::vec2(640, 480);
 		glm::uvec2 position = glm::vec2(Position::DEFAULT, Position::DEFAULT);
 		glm::uvec2 minSize = glm::vec2(0);

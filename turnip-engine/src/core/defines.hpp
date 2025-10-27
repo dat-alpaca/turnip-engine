@@ -7,6 +7,9 @@
 #define TUR_PROJECT_NAME "Turnip"
 #define TUR_ENGINE_NAME "TurnipEngine"
 
+#define TUR_ENGINE_VERSION_MAJOR 1
+#define TUR_ENGINE_VERSION_MINOR 1
+
 #if defined(_DEBUG) || !defined(NDEBUG)
 	#define TUR_DEBUG
 #else
