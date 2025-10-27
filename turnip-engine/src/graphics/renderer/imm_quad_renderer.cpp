@@ -3,9 +3,10 @@
 
 namespace tur
 {
-	void ImmQuadRenderer::initialize(NON_OWNING RenderInterface* rhi)
+	void ImmQuadRenderer::initialize(NON_OWNING RenderInterface* rhi, const ShaderInformation& info)
 	{
 		rRHI = rhi;
+		mInfo = info;
 		initialize_resources();
 	}
 	void ImmQuadRenderer::set_camera(NON_OWNING Camera* camera)
@@ -208,11 +209,26 @@ namespace tur
 		// clang-format off
 		auto& resources = rRHI->get_resource_handler();
 
+		// TODO: remove
 		// Shaders:
-		shader_handle vertexShader =
-			resources.create_shader({"res/shaders/basic/basic_gl.vert", ShaderType::VERTEX});
-		shader_handle fragmentShader =
-			resources.create_shader({"res/shaders/basic/basic_gl.frag", ShaderType::FRAGMENT});
+
+		shader_handle vertexShader;
+		shader_handle fragmentShader;
+		if(mInfo.isVKSetup)
+		{
+			vertexShader =
+				resources.create_shader({mInfo.vertexVK, ShaderType::VERTEX});
+			fragmentShader =
+				resources.create_shader({mInfo.fragVK, ShaderType::FRAGMENT});
+		}
+		else
+		{
+			vertexShader =
+				resources.create_shader({mInfo.vertexGL, ShaderType::VERTEX});
+			fragmentShader =
+				resources.create_shader({mInfo.fragGL, ShaderType::FRAGMENT});
+		}
+		
 
 		auto VertexBindings = std::vector<BindingDescriptor>
 		({

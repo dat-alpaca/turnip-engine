@@ -4,10 +4,10 @@
             "name": "Linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/build/turnip/gladsources/glad/include"
+                "${workspaceFolder}/build/turnip/gladsources/glad/include",
             ],
             "defines": [
-                "TUR_GRAPHICS_GL",
+                "TUR_GRAPHICS_VK",
                 "GLFW_INCLUDE_NONE",
                 "TUR_WINDOWING_GLFW",
                 "_DEBUG",

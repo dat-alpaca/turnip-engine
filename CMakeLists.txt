@@ -12,8 +12,8 @@ option(TUR_BUILD_SANDBOX "Builds the turnip sandbox program" ON)
 option(TUR_BUILD_ENGINE "Builds the turnip engine library" ON)
 
 option(TUR_USE_GLFW "Uses the GLFW windowing implementation" ON)
-option(TUR_USE_OPENGL "Uses the OpenGL backend" ON)
-option(TUR_USE_VULKAN "Uses the Vulkan backend" OFF)
+option(TUR_USE_OPENGL "Uses the OpenGL backend" OFF)
+option(TUR_USE_VULKAN "Uses the Vulkan backend" ON)
 
 # Core Dependencies:
 add_subdirectory(extern/lua)

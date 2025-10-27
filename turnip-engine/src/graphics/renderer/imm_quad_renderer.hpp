@@ -35,8 +35,23 @@ namespace tur
 			buffer_handle uboHandle = invalid_handle;
 		};
 
+		// TODO: remove and use spirv-tools
+		struct ShaderInformation
+		{
+			std::string vertexGL = "res/shaders/basic/basic_gl.vert";
+			std::string fragGL = "res/shaders/basic/basic_gl.frag";
+
+			std::string vertexVK = "res/shaders/basic/basic_vert.spv";
+			std::string fragVK = "res/shaders/basic/basic_frag.spv";
+#ifdef TUR_GRAPHICS_VK
+			bool isVKSetup = true;
+#else
+			bool isVKSetup = false
+#endif
+		};
+
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi);
+		void initialize(NON_OWNING RenderInterface* rhi, const ShaderInformation& info);
 		void set_camera(NON_OWNING Camera* camera);
 		void set_viewport(const Viewport& viewport);
 		void set_scissor(const Extent2D& scissor);
@@ -63,6 +78,9 @@ namespace tur
 		std::vector<Quad> mQuads;
 		Viewport mViewport;
 		Extent2D mScissor;
+
+		// TODO: remove
+		ShaderInformation mInfo;
 
 	private:
 		descriptor_set_layout_handle setLayout;

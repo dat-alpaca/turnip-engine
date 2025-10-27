@@ -181,17 +181,20 @@ namespace tur::vulkan
 		if (!state.validationEnabled)
 			return;
 
-		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = vk::DebugUtilsMessengerCreateInfoEXT(
-			vk::DebugUtilsMessengerCreateFlagsEXT(), DefaultDebugMessageSeverity, DefaultDebugMessageType,
-			default_debug_callback, nullptr
-		);
+		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
+		{
+			debugCreateInfo.flags = {};
+			debugCreateInfo.setMessageSeverity(DefaultDebugMessageSeverity);
+			debugCreateInfo.setMessageType(DefaultDebugMessageType);
+			debugCreateInfo.setPfnUserCallback(default_debug_callback);
+		};
 
-		vk::DispatchLoaderDynamic DLDI(state.instance, vkGetInstanceProcAddr);
+		/*vk::DispatchLoaderDynamic DLDI(state.instance, vkGetInstanceProcAddr);
+
+		vk::detail::DispatchLoaderDynamic vk::detail::defaultDispatchLoaderDynamic;
 		state.debugMessenger = check_vk_object(
 			state.instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, DLDI), "DebugMessenger"
-		);
-
-		state.DLDI = DLDI;
+		);*/
 	}
 
 	void destroy_instance_messenger(VulkanState& state)

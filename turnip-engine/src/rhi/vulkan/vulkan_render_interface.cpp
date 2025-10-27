@@ -170,7 +170,7 @@ namespace tur::vulkan
 		}
 
 		// Begin:
-		device.resetFences({frameData.recordingFence});
+		auto _ = device.resetFences({frameData.recordingFence});
 
 		vk::CommandBufferBeginInfo beginInfo = {};
 		{
@@ -178,7 +178,7 @@ namespace tur::vulkan
 			beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
 		}
 
-		frameData.commandBuffer.reset();
+		auto __ = frameData.commandBuffer.reset();
 
 		result = frameData.commandBuffer.begin(beginInfo);
 		if (result != vk::Result::eSuccess)
@@ -262,8 +262,8 @@ namespace tur::vulkan::utils
 		auto& fence = rhi.mImmFence;
 		auto& commandBuffer = rhi.mImmCommandBuffer;
 
-		state.logicalDevice.resetFences(fence);
-		commandBuffer.reset();
+		auto _ = state.logicalDevice.resetFences(fence);
+		auto __ = commandBuffer.reset();
 
 		vk::CommandBufferBeginInfo beginInfo = {};
 		beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;

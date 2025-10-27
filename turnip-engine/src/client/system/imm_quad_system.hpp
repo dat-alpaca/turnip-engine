@@ -11,7 +11,7 @@ namespace tur
 	public:
 		void initialize(RenderInterface* rhi, Scene* scene, Camera* camera)
 		{
-			mQuadRenderer.initialize(rhi);
+			mQuadRenderer.initialize(rhi, {});
 			mQuadRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mQuadRenderer.set_camera(camera);
 			rScene = scene;
