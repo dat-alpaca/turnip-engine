@@ -16,6 +16,7 @@
 #include "texture.hpp"
 
 #include "data-structures/free_list.hpp"
+#include "rhi/opengl/objects/opengl_shader_loader.hpp"
 
 #include <glad/gl.h>
 #include <span>
@@ -81,6 +82,7 @@ namespace tur::gl
 
 	private:
 		NON_OWNING RenderInterfaceGL* rRHI = nullptr;
+		ShaderLoader mShaderLoader;
 		vk::Device rDevice;
 
 	private:

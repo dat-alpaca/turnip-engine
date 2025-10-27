@@ -22,8 +22,7 @@
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
-                "CMAKE_COLOR_DIAGNOSTICS": "ON",
-                "CMAKE_COLOR_MAKEFILE": "ON"
+                "CMAKE_COLOR_DIAGNOSTICS": "ON"
             }
         }
     ]

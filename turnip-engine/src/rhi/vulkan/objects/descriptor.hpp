@@ -15,9 +15,6 @@ namespace tur::vulkan
 
 			case DescriptorType::UNIFORM_BUFFER:
 				return vk::DescriptorType::eUniformBuffer;
-
-			case DescriptorType::STORAGE_BUFFER:
-				return vk::DescriptorType::eStorageBuffer;
 		}
 
 		TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));

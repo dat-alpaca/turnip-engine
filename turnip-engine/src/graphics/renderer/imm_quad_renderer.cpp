@@ -210,9 +210,10 @@ namespace tur
 
 		// Shaders:
 		shader_handle vertexShader =
-			resources.create_shader({"res/shaders/basic/basic_gl.vert", ShaderType::VERTEX});
-		shader_handle fragmentShader =
-			resources.create_shader({"res/shaders/basic/basic_gl.frag", ShaderType::FRAGMENT});
+				resources.create_shader({"res/shaders/basic/basic_vert.spv", ShaderType::VERTEX});
+			shader_handle fragmentShader =
+				resources.create_shader({"res/shaders/basic/basic_frag.spv", ShaderType::FRAGMENT});
+		
 
 		auto VertexBindings = std::vector<BindingDescriptor>
 		({

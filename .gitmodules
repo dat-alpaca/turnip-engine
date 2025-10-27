@@ -38,3 +38,6 @@
 [submodule "extern/lua"]
 	path = extern/lua
 	url = https://github.com/marovira/lua
+[submodule "extern/SPIRV-Cross"]
+	path = extern/SPIRV-Cross
+	url = https://github.com/KhronosGroup/SPIRV-Cross

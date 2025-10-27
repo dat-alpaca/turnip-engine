@@ -93,12 +93,11 @@ namespace tur::vulkan
 		blit_onto_swapchain();
 	}
 
-	void CommandBufferVulkan::clear(const ClearColor& clearColor, ClearFlags flags)
+	void CommandBufferVulkan::set_clear_color(const ClearColor& clearColor, ClearFlags flags)
 	{
 		// TODO: use color flags
 		mClearColor = clearColor;
 	}
-
 	void CommandBufferVulkan::set_viewport(const Viewport& viewport)
 	{
 		mCommandBuffer.setViewport(

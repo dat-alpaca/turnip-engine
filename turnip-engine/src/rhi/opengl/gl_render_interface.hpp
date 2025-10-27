@@ -14,7 +14,7 @@ namespace tur::gl
 	class RenderInterfaceGL
 	{
 	public:
-		void initialize(const ConfigData&, Window& window);
+		void initialize(const ConfigData& configData, Window& window);
 		void shutdown();
 		void on_event(Event& event);
 
@@ -32,9 +32,13 @@ namespace tur::gl
 		queue_handle get_queue(QueueOperation operation) { return invalid_handle; }
 		inline ResourceHandler& get_resource_handler() { return mResources; }
 
+	public:
+		const ConfigData& get_config_data() const { return mConfigData; }
+
 	private:
 		NON_OWNING Window* rWindow = nullptr;
 		ResourceHandler mResources;
+		ConfigData mConfigData;
 	};
 
 }

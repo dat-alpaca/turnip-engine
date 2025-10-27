@@ -14,7 +14,6 @@ namespace tur::vulkan
 		u32 apiVersion;
 		vk::Instance instance;
 		vk::DebugUtilsMessengerEXT debugMessenger;
-		vk::DispatchLoaderDynamic DLDI;
 		bool requiresDrawing;
 		bool validationEnabled;
 
