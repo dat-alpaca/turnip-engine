@@ -1,5 +1,6 @@
 #include "opengl_resource_handler.hpp"
 #include "rhi/opengl/allocators/allocators.hpp"
+#include "rhi/opengl/gl_render_interface.hpp"
 #include <glad/gl.h>
 
 namespace tur::gl
@@ -17,7 +18,10 @@ namespace tur::gl
 
 	shader_handle ResourceHandler::create_shader(const ShaderDescriptor& descriptor)
 	{
-		return mShaders.add(allocate_shader(descriptor));
+		auto windowingCapabilities = rRHI->get_config_data().windowingCapabilities;
+		auto contents = mShaderLoader.compile(windowingCapabilities, descriptor.filepath);
+
+		return mShaders.add(allocate_shader(descriptor.type, contents));
 	}
 	void ResourceHandler::destroy_shader(shader_handle shaderHandle)
 	{

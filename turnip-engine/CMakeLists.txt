@@ -29,6 +29,7 @@ target_link_libraries(turnip-core PUBLIC
     lua::lua
     sol2::sol2
     pfd
+    spirv-cross-glsl
 )
 
 # Platform & Graphics specific:

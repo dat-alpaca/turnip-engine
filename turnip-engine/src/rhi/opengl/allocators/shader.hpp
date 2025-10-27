@@ -24,15 +24,14 @@ namespace
 
 namespace tur::gl
 {
-	inline Shader allocate_shader(const ShaderDescriptor& descriptor)
+	inline Shader allocate_shader(ShaderType shaderType, const std::string& shaderContents)
 	{
-		std::string contents = read_file(descriptor.filepath);
-		const char* cString = contents.c_str();
+		const char* cString = shaderContents.c_str();
 
-		u32 shaderID = glCreateShader(get_shader_type(descriptor.type));
+		u32 shaderID = glCreateShader(get_shader_type(shaderType));
 		glShaderSource(shaderID, 1, &cString, NULL);
 		glCompileShader(shaderID);
-		check_compile_error(shaderID, descriptor.type);
+		check_compile_error(shaderID, shaderType);
 
 		return Shader{.handle = shaderID};
 	}

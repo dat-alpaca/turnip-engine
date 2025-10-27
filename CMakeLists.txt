@@ -23,6 +23,7 @@ add_subdirectory(extern/json)
 add_subdirectory(extern/pfd)
 add_subdirectory(extern/sol2)
 add_subdirectory(extern/spdlog)
+add_subdirectory(extern/SPIRV-Cross)
 
 add_library(stb INTERFACE)
 target_include_directories(stb INTERFACE "${CMAKE_SOURCE_DIR}/extern/stb")

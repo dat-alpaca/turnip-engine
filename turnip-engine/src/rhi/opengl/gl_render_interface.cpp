@@ -3,11 +3,13 @@
 
 namespace tur::gl
 {
-	void RenderInterfaceGL::initialize(const ConfigData&, Window& window)
+	void RenderInterfaceGL::initialize(const ConfigData& configData, Window& window)
 	{
 		rWindow = &window;
+		mConfigData = configData;
+
+		mResources.initialize(this);
 		glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE);
-		// TODO: check config
 	}
 	void RenderInterfaceGL::shutdown()
 	{
