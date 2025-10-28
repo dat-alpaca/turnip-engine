@@ -7,7 +7,8 @@ namespace tur
 	class ScriptSystem
 	{
 	public:
-		void initialize(Scene* scene) { rScene = scene; }
+		void initialize(Scene* scene) { set_scene(scene); }
+		void set_scene(Scene* scene) { rScene = scene; }
 
 	public:
 		void wake()

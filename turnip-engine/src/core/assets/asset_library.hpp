@@ -15,7 +15,7 @@ namespace tur
 	{
 	public:
 		void initialize(WorkerPool* workerPool, TextureAssetBinder* binder);
-		void set_event_callback(EventCallback&& eventCallback);
+		void set_event_callback(EventCallback& eventCallback);
 
 	public:
 		asset_handle load_texture(const std::filesystem::path& filepath);

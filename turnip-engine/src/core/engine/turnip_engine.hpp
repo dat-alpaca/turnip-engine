@@ -3,7 +3,6 @@
 #include "assets/texture_asset_binder.hpp"
 #include "platform/platform.hpp"
 #include "rhi/rhi.hpp"
-#include "scene/scene_holder.hpp"
 #include "script/script_system.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
@@ -27,17 +26,16 @@ namespace tur
 
 	public:
 		RenderInterface& get_render_interface() { return mRenderInterface; }
-		SceneHolder& get_scene_holder() { return mSceneHolder; }
 		ViewSystem& get_view_system() { return mViewSystem; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	public:
 		TextureAssetBinder& get_texture_asset_binder() { return mTextureAssetBinder; }
+		const EventCallback& get_event_callback() const { return mMainEventCallback; }
 
 	private:
 		RenderInterface mRenderInterface;
-		SceneHolder mSceneHolder;
 		ViewSystem mViewSystem;
 		WorkerPool mWorkerPool;
 		tur_unique<Window> mWindow;
@@ -47,6 +45,7 @@ namespace tur
 		TextureAssetBinder mTextureAssetBinder;
 
 	private:
+		EventCallback mMainEventCallback;
 		bool mShutdownRequested = false;
 	};
 }

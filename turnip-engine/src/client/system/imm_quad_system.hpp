@@ -14,8 +14,9 @@ namespace tur
 			mQuadRenderer.initialize(rhi);
 			mQuadRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mQuadRenderer.set_camera(camera);
-			rScene = scene;
+			set_scene(scene);
 		}
+		void set_scene(Scene* scene) { rScene = scene; }
 
 		void render() { mQuadRenderer.render(); }
 

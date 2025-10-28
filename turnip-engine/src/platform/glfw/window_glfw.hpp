@@ -17,7 +17,7 @@ namespace tur::platform
 		void destroy();
 
 	public:
-		void set_event_callback(EventCallback&& callback);
+		void set_event_callback(EventCallback& callback);
 		void set_properties(const WindowProperties& properties);
 		void poll_events();
 		void wait_events();

@@ -8,7 +8,7 @@ namespace tur
 		rWorkerPool = workerPool;
 		rBinder = binder;
 	}
-	void AssetLibrary::set_event_callback(EventCallback&& eventCallback)
+	void AssetLibrary::set_event_callback(EventCallback& eventCallback)
 	{
 		mEventCallback = eventCallback;
 	}
@@ -41,7 +41,6 @@ namespace tur
 					TUR_LOG_ERROR("load_texture_imm returned an invalid asset handle on update_texture_data");
 					return;
 				}
-				rBinder->upload_texture(assetHandle);
 				target = rBinder->upload_texture(assetHandle);
 			}
 		);

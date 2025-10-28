@@ -17,11 +17,11 @@ namespace tur
 {
 	view_handle ViewSystem::add(tur_unique<View> view)
 	{
-		view->on_view_added();
 		mViews.push_back(std::move(view));
 
 		u32 viewHandle = static_cast<view_handle>(mViews.size() - 1);
 		mViews[viewHandle]->set_handle(viewHandle);
+		mViews[viewHandle]->on_view_added();
 
 		return viewHandle;
 	}
