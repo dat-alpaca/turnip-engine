@@ -7,6 +7,8 @@ namespace tur
 	{
 		rWorkerPool = workerPool;
 		rBinder = binder;
+
+		mAudioHandler.initialize();
 	}
 	void AssetLibrary::set_event_callback(EventCallback&& eventCallback)
 	{

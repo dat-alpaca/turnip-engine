@@ -9,6 +9,8 @@
 #include "texture_asset.hpp"
 #include "texture_asset_binder.hpp"
 
+#include "audio_asset_handler.hpp"
+
 namespace tur
 {
 	class AssetLibrary
@@ -33,5 +35,8 @@ namespace tur
 
 		free_list<TextureAsset> mTextures;
 		std::unordered_map<std::string, asset_handle> mAssetFilepathMap;
+
+	private:
+		AudioAssetHandler mAudioHandler;
 	};
 }

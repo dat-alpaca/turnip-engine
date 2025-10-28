@@ -15,7 +15,8 @@ namespace tur
 	enum class AssetType
 	{
 		NONE = 0,
-		TEXTURE
+		TEXTURE,
+		AUDIO
 	};
 
 	static inline constexpr const char* get_asset_type_name(AssetType type)
@@ -25,5 +26,8 @@ namespace tur
 
 		if (type == AssetType::TEXTURE)
 			return "Texture";
+
+		if (type == AssetType::AUDIO)
+			return "Audio";
 	}
 }
