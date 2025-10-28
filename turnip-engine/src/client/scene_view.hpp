@@ -28,6 +28,8 @@ namespace tur
 
 	public:
 		scene_handle add_scene(bool setAsCurrent = false) { return mSceneHolder.create_scene(setAsCurrent); }
+
+		// TODO: add scene removal
 		// void remove_scene(scene_handle sceneHandle) { mSceneHolder.remove_scene(sceneHandle); }
 		void switch_current_scene(scene_handle sceneHandle) { mSceneHolder.set_current_scene(sceneHandle); }
 
