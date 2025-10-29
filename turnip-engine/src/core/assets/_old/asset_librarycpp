@@ -7,10 +7,28 @@ namespace tur
 	{
 		rWorkerPool = workerPool;
 		rBinder = binder;
+
+		mAudioHandler.initialize();
 	}
 	void AssetLibrary::set_event_callback(EventCallback&& eventCallback)
 	{
 		mEventCallback = eventCallback;
+	}
+
+	asset_handle AssetLibrary::load_audio(const std::filesystem::path& filepath)
+	{
+		asset_handle allocationHandle = mTextures.add({});
+
+		rWorkerPool->submit<asset_handle>(
+			[this, filepath, allocationHandle]() { return update_audio_data(filepath, allocationHandle); },
+			[&](asset_handle assetHandle)
+			{
+				AssetLoadedEvent loadedEvent(assetHandle);
+				mEventCallback(loadedEvent);
+			}
+		);
+
+		return asset_handle();
 	}
 
 	asset_handle AssetLibrary::load_texture(const std::filesystem::path& filepath)
@@ -92,5 +110,10 @@ namespace tur
 
 		mAssetFilepathMap[filepath.string()] = target;
 		return target;
+	}
+
+	asset_handle AssetLibrary::update_audio_data(const std::filesystem::path& filepath, asset_handle target)
+	{
+		return asset_handle();
 	}
 }

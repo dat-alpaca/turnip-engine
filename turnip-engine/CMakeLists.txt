@@ -30,6 +30,7 @@ target_link_libraries(turnip-core PUBLIC
     sol2::sol2
     pfd
     spirv-cross-glsl
+    miniaudio
 )
 
 # Platform & Graphics specific:
