@@ -1,15 +1,16 @@
 #pragma once
-#include "asset.hpp"
+#include "assets/asset.hpp"
 #include "graphics/objects/texture.hpp"
-#include "utils/uuid/uuid.hpp"
-#include <filesystem>
 
-namespace tur
+namespace tur::asset
 {
-	struct TextureAsset
+	struct TextureAsset : public Asset
 	{
+	public:
+		TextureAsset() { metadata.type = AssetType::TEXTURE; }
+
+	public:
 		std::vector<byte> data;
-		AssetMetadata metadata;
 
 		u32 width = 0;
 		u32 height = 0;
@@ -17,11 +18,5 @@ namespace tur
 
 		TextureDataFormat dataFormat = TextureDataFormat::RGBA;
 		bool floatTexture = false;
-	};
-
-	struct TextureLoadResult
-	{
-		asset_handle assetHandle;
-		texture_handle textureHandle;
 	};
 }

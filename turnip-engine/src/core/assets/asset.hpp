@@ -2,15 +2,9 @@
 #include "utils/uuid/uuid.hpp"
 #include <filesystem>
 
-namespace tur
+namespace tur::asset
 {
 	using asset_handle = handle_type;
-
-	struct AssetMetadata
-	{
-		std::filesystem::path filepath;
-		UUID uuid;
-	};
 
 	enum class AssetType
 	{
@@ -18,7 +12,6 @@ namespace tur
 		TEXTURE,
 		AUDIO
 	};
-
 	static inline constexpr const char* get_asset_type_name(AssetType type)
 	{
 		if (type == AssetType::NONE)
@@ -30,4 +23,25 @@ namespace tur
 		if (type == AssetType::AUDIO)
 			return "Audio";
 	}
+
+	struct AssetMetadata
+	{
+		std::filesystem::path filepath;
+		UUID uuid;
+		AssetType type;
+	};
+
+	enum class AssetState
+	{
+		INVALID,
+		UNLOADED,
+		LOADING,
+		READY
+	};
+
+	struct Asset
+	{
+		AssetMetadata metadata;
+		AssetState state = AssetState::UNLOADED;
+	};
 }

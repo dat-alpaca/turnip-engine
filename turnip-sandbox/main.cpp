@@ -14,6 +14,11 @@ public:
 		engine->get_scene_holder().create_scene(true);
 		mCurrentScene = engine->get_scene_holder().get_current_scene();
 
+		// Load assets:
+		{
+			mFaceAsset = engine->get_asset_library().load_texture("res/face.png", {options});
+		}
+
 		// Camera:
 		{
 			mCamera.set_position(glm::vec3(0.0f));
