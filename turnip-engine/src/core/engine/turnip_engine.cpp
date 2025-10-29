@@ -65,15 +65,15 @@ namespace tur
 		}
 		ConfigData configData = configDataResult.value();
 
+		// Event Callback:
+		mMainEventCallback = [&](Event& event) { engine::on_event(event, *this); };
+
 		// Windowing:
 		mWindow = WindowingSystem::initialize(configData.windowingCapabilities, configData.windowProperties);
-		mWindow->set_event_callback([&](Event& event) { engine::on_event(event, *this); });
+		mWindow->set_event_callback(mMainEventCallback);
 
 		// Render Interface:
 		mRenderInterface.initialize(configData, *mWindow);
-
-		// Scene Management:
-		mSceneHolder.set_event_callback([&](Event& event) { engine::on_event(event, *this); });
 
 		// Script:
 		ScriptManager::initialize_core();
@@ -84,7 +84,7 @@ namespace tur
 
 		// Asset Library:
 		mAssetLibrary.initialize(&mWorkerPool, &mTextureAssetBinder);
-		mAssetLibrary.set_event_callback([&](Event& event) { engine::on_event(event, *this); });
+		mAssetLibrary.set_event_callback(mMainEventCallback);
 
 		// Binders:
 		mTextureAssetBinder.initialize(&mRenderInterface, &mAssetLibrary);

@@ -7,7 +7,8 @@ namespace tur::asset
 	class AssetLibrary
 	{
 	public:
-		void initialize(NON_OWNING WorkerPool* workerPool);
+		void initialize(WorkerPool* workerPool, TextureAssetBinder* binder);
+		void set_event_callback(EventCallback& eventCallback);
 
 	public:
 		void load_texture_async(const std::filesystem::path& filepath);

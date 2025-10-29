@@ -11,7 +11,7 @@ namespace tur
 	class SceneHolder
 	{
 	public:
-		void set_event_callback(EventCallback&& callback) { mEventCallback = std::move(callback); }
+		void set_event_callback(const EventCallback& callback) { mEventCallback = callback; }
 
 	public:
 		scene_handle create_scene(bool setAsCurrent = false)
@@ -25,6 +25,7 @@ namespace tur
 		}
 		void set_current_scene(Scene* scene)
 		{
+			TUR_ASSERT(scene, "Invalid scene provided");
 			mCurrentScene = scene;
 
 			ViewSwitchedEvent viewSwitchedEvent(mCurrentScene);

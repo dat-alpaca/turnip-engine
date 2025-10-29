@@ -21,6 +21,7 @@
 #include "core/view/view.hpp"
 #include "core/windowing/windowing.hpp"
 
+#include "client/scene_view.hpp"
 #include "client/system/imm_quad_system.hpp"
 #include "client/system/script_system.hpp"
 

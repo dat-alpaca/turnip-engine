@@ -32,11 +32,11 @@ namespace tur
 
 	// clang-format off
 	template <typename T>
-	concept IsWindow = requires(T t, EventCallback&& callback, const WindowProperties& properties)
+	concept IsWindow = requires(T t, EventCallback& callback, const WindowProperties& properties)
 	{
 		{ t.create(properties) }						-> std::same_as<void>;
 
-		{ t.set_event_callback(std::move(callback)) }   -> std::same_as<void>;
+		{ t.set_event_callback(callback) }   			-> std::same_as<void>;
 		{ t.set_properties(properties) }				-> std::same_as<void>;
 		{ t.poll_events() }								-> std::same_as<void>;
 		{ t.wait_events() }								-> std::same_as<void>;
