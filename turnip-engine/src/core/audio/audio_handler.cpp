@@ -5,7 +5,6 @@ namespace tur
 {
 	void AudioHandler::initialize(NON_OWNING AssetLibrary* library)
 	{
-		// TODO: check_error()
 		TUR_ASSERT(library, "Invalid AssetLibrary handle passed");
 		rAssetLibrary = library;
 

@@ -38,15 +38,17 @@ namespace tur
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
 
 		rWorkerPool->submit<texture_asset_opt>(
-			[filepath]() { return load_texture_task(filepath); },
-			[&, filepath, assetHandle, options](const texture_asset_opt& textureAsset)
+			[filepath, options]()
+			{
+				if (!options.floatTexture)
+					return load_texture_task(filepath);
+				else
+					return load_float_texture_task(filepath);
+			},
+			[&, filepath, assetHandle](const texture_asset_opt& textureAsset)
 			{
 				if (!textureAsset.has_value())
 					return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
-
-				// TODO: check if float texture and format.
-				options.floatTexture;
-				options.dataFormat;
 
 				TextureAsset& loadedTextureAsset = mTextureAssets.get(assetHandle);
 				loadedTextureAsset = textureAsset.value();

@@ -2,12 +2,12 @@
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 #include <vk_mem_alloc.h>
 
-// TODO: asserts
-
 namespace tur::vulkan
 {
 	void ResourceHandler::initialize(RenderInterfaceVulkan* rhi)
 	{
+		TUR_ASS(rhi);
+
 		rRHI = rhi;
 		rDevice = rhi->get_state().logicalDevice;
 	}
@@ -36,6 +36,8 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_shader(shader_handle shaderHandle)
 	{
+		TUR_ASSERT(shaderHandle != invalid_handle, "Invalid shader_handle");
+
 		vk::ShaderModule shaderModule = mShaders.get(shaderHandle);
 		rDevice.destroyShaderModule(shaderModule);
 		mShaders.remove(shaderHandle);
@@ -43,13 +45,13 @@ namespace tur::vulkan
 
 	render_target_handle ResourceHandler::create_render_target(const RenderTargetDescriptor& descriptor)
 	{
-		// create textures:
 		RenderTarget renderTarget;
 		renderTarget.colorAttachment.loadOp = descriptor.attachmentDescriptions[0].loadOp;
 		renderTarget.colorAttachment.storeOp = descriptor.attachmentDescriptions[0].storeOp;
 		renderTarget.colorAttachment.textureHandle =
 			create_empty_texture(descriptor.attachmentDescriptions[0].textureDescriptor);
 
+		// TODO: support depth and stencil
 		// renderTarget.depthAttachment.loadOp = descriptor.attachmentDescriptions[1].loadOp;
 		// renderTarget.depthAttachment.storeOp = descriptor.attachmentDescriptions[1].storeOp;
 
@@ -57,6 +59,7 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_render_target(render_target_handle renderTargetHandle)
 	{
+		TUR_ASSERT(renderTargetHandle != invalid_handle, "Invalid render_target_handle");
 		RenderTarget renderTarget = mRenderTargets.get(renderTargetHandle);
 
 		if (renderTarget.colorAttachment.textureHandle != invalid_handle)
@@ -81,11 +84,14 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_descriptor_set_layout(descriptor_set_layout_handle descriptorSetLayoutHandle)
 	{
+		TUR_ASSERT(descriptorSetLayoutHandle != invalid_handle, "Invalid descriptor_set_layout_handle");
 		rRHI->get_deletion_queue().submit_descriptor_set_layout(descriptorSetLayoutHandle);
 	}
 
 	descriptor_set_handle ResourceHandler::create_descriptor_set(descriptor_set_layout_handle layoutHandle)
 	{
+		TUR_ASSERT(layoutHandle != invalid_handle, "Invalid descriptor_set_layout_handle");
+
 		DescriptorSetLayout setLayout = mSetLayouts.get(layoutHandle);
 		vk::DescriptorSet descriptorSet =
 			allocate_set_single_layout(rRHI->get_state().logicalDevice, setLayout.pool, setLayout.layout);
@@ -102,6 +108,9 @@ namespace tur::vulkan
 		descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
 	)
 	{
+		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
+		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer_handle");
+
 		const Buffer& buffer = mBuffers.get(bufferHandle);
 
 		vk::DescriptorBufferInfo bufferInfo = {};
@@ -126,6 +135,9 @@ namespace tur::vulkan
 	void
 	ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
 	{
+		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
+		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
+
 		const auto& texture = mTextures.get(textureHandle);
 		TUR_ASSERT(
 			texture.layout == vk::ImageLayout::eShaderReadOnlyOptimal,
@@ -173,6 +185,7 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_graphics_pipeline(pipeline_handle pipelineHandle)
 	{
+		TUR_ASSERT(pipelineHandle != invalid_handle, "Invalid pipeline_handle");
 		rRHI->get_deletion_queue().submit_pipeline(pipelineHandle);
 	}
 
@@ -288,6 +301,8 @@ namespace tur::vulkan
 		buffer_handle source, buffer_handle destination, u32 size, u32 srcOffset, u32 dstOffset
 	)
 	{
+		TUR_ASSERT(source != invalid_handle, "Invalid buffer_handle");
+
 		utils::submit_immediate_command(
 			*rRHI,
 			[&](vk::CommandBuffer commandBuffer)
@@ -307,6 +322,9 @@ namespace tur::vulkan
 		buffer_handle source, texture_handle destination, u32 width, u32 height, u32 depth
 	)
 	{
+		TUR_ASSERT(source != invalid_handle, "Invalid buffer_handle");
+		TUR_ASSERT(destination != invalid_handle, "Invalid texture_handle");
+
 		const Buffer& buffer = mBuffers.get(source);
 		const Texture& texture = mTextures.get(destination);
 
@@ -345,6 +363,7 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_buffer(buffer_handle bufferHandle)
 	{
+		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer_handle");
 		rRHI->get_deletion_queue().submit_buffer(bufferHandle);
 	}
 
@@ -375,6 +394,8 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::update_texture(texture_handle textureHandle, const TextureAsset& asset)
 	{
+		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
+
 		Texture& texture = mTextures.get(textureHandle);
 		BufferDescriptor stagingDescriptor = {};
 		{
@@ -402,6 +423,7 @@ namespace tur::vulkan
 	}
 	void ResourceHandler::destroy_texture(texture_handle textureHandle)
 	{
+		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
 		rRHI->get_deletion_queue().submit_texture(textureHandle);
 	}
 }
