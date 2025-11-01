@@ -32,4 +32,15 @@ namespace tur
 
 		ma_sound_start(&soundAsset.sound);
 	}
+	void AudioHandler::set_volume(asset_handle assetHandle, float volume)
+	{
+		TUR_ASSERT(rAssetLibrary, "AudioHandler not initialized");
+		TUR_ASSERT(assetHandle != invalid_handle, "Invalid asset handle passed to play()");
+
+		auto& soundAsset = rAssetLibrary->get_audio_asset(assetHandle);
+		if (soundAsset.state != AssetState::READY)
+			return;
+
+		ma_sound_set_volume(&soundAsset.sound, volume);
+	}
 }

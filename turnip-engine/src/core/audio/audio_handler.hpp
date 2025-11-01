@@ -15,6 +15,7 @@ namespace tur
 		void shutdown();
 
 		void play(asset_handle assetHandle);
+		void set_volume(asset_handle assetHandle, float volume);
 
 	public:
 		ma_engine& get_engine() { return mEngine; }

@@ -1,0 +1,3 @@
+---@class AudioSourceComponent
+---@field play fun(self: AudioSourceComponent)
+---@field set_volume fun(self: AudioSourceComponent, v: number)

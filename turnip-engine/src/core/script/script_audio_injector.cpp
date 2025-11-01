@@ -12,5 +12,11 @@ namespace tur
 			asset_handle assetHandle = component->assetHandle;
 			srAudioHandler->play(assetHandle);
 		};
+
+		environment["AudioSourceComponent"]["set_volume"] = [&](AudioSourceComponent* component, float volume)
+		{
+			asset_handle assetHandle = component->assetHandle;
+			srAudioHandler->set_volume(assetHandle, volume);
+		};
 	}
 }

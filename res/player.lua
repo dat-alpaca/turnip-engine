@@ -1,19 +1,19 @@
-require "base"
+require "turnip"
+
+---@type AudioSourceComponent
+audio_c = nil
 
 transform_c = nil
-audio_c = nil
 
 function on_wake()
     transform_c = find_component("transform")
-    if transform_c ~= nil then
-        local position = transform_c.transform.position
-        Log.info("(" .. position.x .. ", " .. position.y .. ", " .. position.z .. ")")
-    end
 
     audio_c = find_component("audio_source")
     if audio_c == nil then
         Log.info("Failed to find audio source")
     end
+
+    audio_c:set_volume(10)
 end
 
 function on_update()
@@ -39,8 +39,6 @@ function on_update()
 
     local enterPressed = Input.get_key_pressed(Key.ENTER)
     if enterPressed then
-        Log.info("Key ENTER pressed")
-
         transform_c.transform.rotation.z = transform_c.transform.rotation.z + 0.9
     end
 end
