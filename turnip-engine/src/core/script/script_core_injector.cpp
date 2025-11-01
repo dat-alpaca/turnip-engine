@@ -85,6 +85,9 @@ namespace tur
 
 		script_script_core_logging(sLua);
 		setup_script_core_components(sLua);
+
+		sol::table turnip = sLua.create_table();
+		sLua["package"]["preload"] = turnip;
 	}
 
 	void ScriptManager::initialize(NON_OWNING AudioHandler* audioHandler)

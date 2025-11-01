@@ -11,7 +11,6 @@ public:
 
 		initialize_resources();
 		initialize_entities();
-
 		wake_scene();
 	}
 
@@ -29,17 +28,16 @@ private:
 		auto entity = get_current_scene().add_entity("bloky");
 		auto script = entity.add_component<ScriptComponent>(entity, "res/player.lua");
 
-		// Textures:
 		entity.add_component<Sprite2DComponent>(mFaceAsset);
-
-		// Audio:
 		entity.add_component<AudioSourceComponent>(mSoundAsset);
+
+		auto windowSize = engine->get_window_dimensions();
 
 		// Transform:
 		TransformComponent transformComponent;
 		{
-			transformComponent.transform.position = glm::vec3(0.f);
-			transformComponent.transform.scale = glm::vec3(100.0f, 100.f, 1.f);
+			transformComponent.transform.position = glm::vec3(windowSize.x / 2.f, windowSize.y / 2.f, 0.0f);
+			transformComponent.transform.scale = glm::vec3(100.f, 100.f, 1.f);
 		}
 		entity.add_component<TransformComponent>(transformComponent);
 	}

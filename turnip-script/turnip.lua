@@ -42,3 +42,5 @@ require "audio"
 ---@return PossibleComponent | nil
 ---Returns a component by name
 function find_component(name) end
+
+return {}

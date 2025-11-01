@@ -31,6 +31,9 @@ namespace tur
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	public:
+		glm::vec2 get_window_dimensions() const { return mWindow->get_dimensions(); }
+
+	public:
 		const EventCallback& get_event_callback() const { return mMainEventCallback; }
 
 	private:

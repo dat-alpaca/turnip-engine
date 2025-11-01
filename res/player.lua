@@ -1,5 +1,3 @@
-require "turnip"
-
 ---@type AudioSourceComponent
 audio_c = nil
 
@@ -7,13 +5,7 @@ transform_c = nil
 
 function on_wake()
     transform_c = find_component("transform")
-
     audio_c = find_component("audio_source")
-    if audio_c == nil then
-        Log.info("Failed to find audio source")
-    end
-
-    audio_c:set_volume(10)
 end
 
 function on_update()
