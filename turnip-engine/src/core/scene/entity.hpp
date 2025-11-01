@@ -12,7 +12,11 @@ namespace tur
 	public:
 		Entity() = default;
 
-		Entity(entt::entity entityHandle, Scene* sceneHandle) : mEntityHandle(entityHandle), rScene(sceneHandle) {}
+		Entity(entt::entity entityHandle, Scene* sceneHandle)
+			: mEntityHandle(entityHandle),
+			  rScene(sceneHandle)
+		{
+		}
 
 	public:
 		template <typename T, typename... Args>

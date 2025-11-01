@@ -22,7 +22,6 @@
 ---@field rotation vec3
 ---@field scale vec3
 
-
 -- * -- * -- * Component Types -- * -- * -- *
 ---@class UUIDComponent
 ---@field uuid UUID
@@ -33,6 +32,11 @@
 ---@class TransformComponent
 ---@field transform Transform
 
+-- * -- * -- * Audio -- * -- * -- *
+---@class AudioSourceComponent
+AudioSourceComponent = {}
+
+function AudioSourceComponent.play() end
 
 -- * -- * -- * Logging -- * -- * -- *
 ---@class Log
@@ -64,7 +68,7 @@ function Log.info(message) end
 
 -- * -- * -- * Registry -- * -- * -- *
 ---@param componentName string
----@return UUIDComponent | NameComponent | TransformComponent | nil
+---@return UUIDComponent | NameComponent | TransformComponent | AudioSourceComponent | nil
 ---Searches componentName in the current script entity's registry
 function find_component(componentName) end
 

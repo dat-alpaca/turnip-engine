@@ -1,12 +1,12 @@
 #pragma once
 #include "assets/asset_library.hpp"
-#include "assets/texture_asset_binder.hpp"
-#include "platform/platform.hpp"
-#include "rhi/rhi.hpp"
+#include "audio/audio_handler.hpp"
 #include "script/script_system.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
 
+#include "platform/platform.hpp"
+#include "rhi/rhi.hpp"
 #include <filesystem>
 
 namespace tur
@@ -31,18 +31,17 @@ namespace tur
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	public:
-		TextureAssetBinder& get_texture_asset_binder() { return mTextureAssetBinder; }
 		const EventCallback& get_event_callback() const { return mMainEventCallback; }
 
 	private:
 		RenderInterface mRenderInterface;
 		ViewSystem mViewSystem;
 		WorkerPool mWorkerPool;
+		AudioHandler mAudioHandler;
 		tur_unique<Window> mWindow;
 
 	private:
 		AssetLibrary mAssetLibrary;
-		TextureAssetBinder mTextureAssetBinder;
 
 	private:
 		EventCallback mMainEventCallback;

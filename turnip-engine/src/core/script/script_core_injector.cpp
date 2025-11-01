@@ -1,4 +1,4 @@
-#include "scene/common_components.hpp"
+#include "scene/components.hpp"
 #include "scene/entity.hpp"
 #include "script_system.hpp"
 
@@ -47,29 +47,31 @@ namespace
 		);
 
 		lua.new_usertype<TransformComponent>("TransformComponent", "transform", &TransformComponent::transform);
+
+		// Audio:
+		lua.new_usertype<AudioSourceComponent>("AudioSourceComponent", "_handle", &AudioSourceComponent::assetHandle);
 	}
 }
 
 // Methods:
 namespace tur
 {
-	inline sol::object script_find_component(
-		const sol::state& luaState, Scene* scene, entt::entity entity, const std::string& componentName
-	)
+	inline sol::object
+	script_find_component(const sol::state& luaState, Entity entity, const std::string& componentName)
 	{
-		const auto& registry = scene->get_registry();
 		const auto& lua = luaState;
 
-		// TODO: consider caching
+		if (componentName == "uuid" && entity.has_component<UUIDComponent>())
+			return sol::make_object(lua, &entity.get_component<UUIDComponent>());
 
-		if (componentName == "uuid" && registry.any_of<UUIDComponent>(entity))
-			return sol::make_object(lua, &registry.get<UUIDComponent>(entity));
+		if (componentName == "name" && entity.has_component<NameComponent>())
+			return sol::make_object(lua, &entity.get_component<NameComponent>());
 
-		if (componentName == "name" && registry.any_of<NameComponent>(entity))
-			return sol::make_object(lua, &registry.get<NameComponent>(entity));
+		if (componentName == "transform" && entity.has_component<TransformComponent>())
+			return sol::make_object(lua, &entity.get_component<TransformComponent>());
 
-		if (componentName == "transform" && registry.any_of<TransformComponent>(entity))
-			return sol::make_object(lua, &registry.get<TransformComponent>(entity));
+		if (componentName == "audio_source" && entity.has_component<AudioSourceComponent>())
+			return sol::make_object(lua, &entity.get_component<AudioSourceComponent>());
 
 		return sol::nil;
 	}
@@ -85,9 +87,16 @@ namespace tur
 		setup_script_core_components(sLua);
 	}
 
+	void ScriptManager::initialize(NON_OWNING AudioHandler* audioHandler)
+	{
+		srAudioHandler = audioHandler;
+	}
+
 	void ScriptManager::initialize_entity_environment(Entity entity, sol::environment environment)
 	{
-		environment["find_component"] = [&, entity](const std::string& componentName)
-		{ return script_find_component(sLua, entity.get_scene(), entity.get_handle(), componentName); };
+		initialize_audio_environment(entity, environment);
+
+		environment["find_component"] = [entity](const std::string& componentName)
+		{ return script_find_component(ScriptManager::sLua, entity, componentName); };
 	}
 }

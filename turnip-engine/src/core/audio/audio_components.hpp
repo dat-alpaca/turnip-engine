@@ -1,5 +1,5 @@
 #pragma once
-#include "audio/audio.hpp"
+#include "assets/asset.hpp"
 
 namespace tur
 {
@@ -7,12 +7,12 @@ namespace tur
 	{
 	public:
 		AudioSourceComponent() = default;
-		AudioSourceComponent(audio_handle audioHandle)
-			: audioHandle(audioHandle)
+		AudioSourceComponent(asset_handle assetHandle)
+			: assetHandle(assetHandle)
 		{
 		}
 
 	public:
-		audio_handle audioHandle = invalid_handle;
+		asset_handle assetHandle = invalid_handle;
 	};
 }

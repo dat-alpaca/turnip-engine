@@ -8,6 +8,7 @@ namespace tur
 		script.environment = ScriptManager::create_env();
 		script.filepath = filepath;
 		ScriptManager::initialize_entity_environment(entity, script.environment);
+
 		script.start(ScriptManager::get_state());
 	}
 }

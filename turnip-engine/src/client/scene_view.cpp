@@ -11,6 +11,7 @@ namespace tur
 	void SceneView::on_view_added()
 	{
 		mSceneHolder.set_event_callback(engine->get_event_callback());
+		mTextureAgent.set_event_callback(engine->get_event_callback());
 		add_scene(true);
 
 		// Camera:
@@ -24,6 +25,10 @@ namespace tur
 
 		// ScriptSystem:
 		scriptSystem.initialize(mSceneHolder.get_current_scene());
+
+		// Binders:
+		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
+		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
 	}
 	void SceneView::on_update()
 	{
@@ -43,6 +48,7 @@ namespace tur
 			{
 				scriptSystem.set_scene(viewSwitch.currentScene);
 				quadSystem.set_scene(viewSwitch.currentScene);
+				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
 				return false;
 			}
 		);
@@ -57,6 +63,8 @@ namespace tur
 			}
 		);
 
+		mTextureAgent.on_event(event);
+		mTextureAssetBinder.on_event(event);
 		quadSystem.on_event(event);
 	}
 

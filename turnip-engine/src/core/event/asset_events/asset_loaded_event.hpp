@@ -9,12 +9,14 @@ namespace tur
 		DEFINE_EVENT(EventType::ASSET_LOADED);
 
 	public:
-		AssetLoadedEvent(asset_handle assetHandle)
-			: assetHandle(assetHandle)
+		AssetLoadedEvent(asset_handle assetHandle, AssetType type)
+			: assetHandle(assetHandle),
+			  type(type)
 		{
 		}
 
 	public:
 		asset_handle assetHandle;
+		AssetType type;
 	};
 }

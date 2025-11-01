@@ -84,6 +84,7 @@
         "valarray": "cpp",
         "variant": "cpp",
         "filesystem": "cpp",
-        "*.def": "cpp"
+        "*.def": "cpp",
+        "asset_libraryhpp": "cpp"
     },
 }

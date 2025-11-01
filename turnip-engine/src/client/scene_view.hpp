@@ -1,8 +1,12 @@
 #pragma once
 #include "scene/scene_holder.hpp"
+#include "view/view.hpp"
+
 #include "system/imm_quad_system.hpp"
 #include "system/script_system.hpp"
-#include "view/view.hpp"
+#include "system/texture_asset_binder_system.hpp"
+
+#include "agents/texture_asset_agent.hpp"
 
 namespace tur
 {
@@ -43,6 +47,8 @@ namespace tur
 		Camera mainCamera;
 
 	private:
+		TextureAssetBinderSystem mTextureAssetBinder;
+		TextureAssetBinderAgent mTextureAgent;
 		SceneHolder mSceneHolder;
 	};
 }

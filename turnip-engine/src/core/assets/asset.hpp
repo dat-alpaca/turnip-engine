@@ -2,7 +2,7 @@
 #include "utils/uuid/uuid.hpp"
 #include <filesystem>
 
-namespace tur::asset
+namespace tur
 {
 	using asset_handle = handle_type;
 

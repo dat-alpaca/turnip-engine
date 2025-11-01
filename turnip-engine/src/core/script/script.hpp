@@ -9,7 +9,16 @@ namespace tur
 	struct Script
 	{
 	public:
-		void start(sol::state& lua) { lua.script_file(filepath, environment); }
+		void start(sol::state& lua)
+		{
+			sol::protected_function_result result = lua.safe_script_file(filepath, environment);
+
+			if (!result.valid())
+			{
+				sol::error err = result;
+				TUR_LOG_ERROR("[Lua]: {}", err.what());
+			}
+		}
 
 		void call(std::string_view functionName)
 		{

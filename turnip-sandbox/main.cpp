@@ -8,23 +8,32 @@ public:
 	void on_view_added() final
 	{
 		SceneView::on_view_added();
+
+		initialize_resources();
 		initialize_entities();
 
 		wake_scene();
 	}
 
 private:
+	void initialize_resources()
+	{
+		AssetLibrary& library = engine->get_asset_library();
+
+		mFaceAsset = library.load_texture_async("res/textures/face.png");
+		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
+	}
+
 	void initialize_entities()
 	{
-		mEntity = get_current_scene().add_entity("bloky");
-		auto script = mEntity.add_component<ScriptComponent>(mEntity, "res/player.lua");
+		auto entity = get_current_scene().add_entity("bloky");
+		auto script = entity.add_component<ScriptComponent>(entity, "res/player.lua");
 
 		// Textures:
-		mEntity.add_component<Sprite2DComponent>();
+		entity.add_component<Sprite2DComponent>(mFaceAsset);
 
-		engine->get_asset_library().load_texture_imm(
-			"res/textures/face.png", mEntity.get_component<Sprite2DComponent>().textureHandle
-		);
+		// Audio:
+		entity.add_component<AudioSourceComponent>(mSoundAsset);
 
 		// Transform:
 		TransformComponent transformComponent;
@@ -32,11 +41,12 @@ private:
 			transformComponent.transform.position = glm::vec3(0.f);
 			transformComponent.transform.scale = glm::vec3(100.0f, 100.f, 1.f);
 		}
-		mEntity.add_component<TransformComponent>(transformComponent);
+		entity.add_component<TransformComponent>(transformComponent);
 	}
 
 private:
-	Entity mEntity;
+	asset_handle mSoundAsset;
+	asset_handle mFaceAsset;
 };
 
 int main()

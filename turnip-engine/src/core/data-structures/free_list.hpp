@@ -53,6 +53,11 @@ namespace tur
 			mFreeList.clear();
 		}
 
+		size_t size() const
+		{
+			return mData.size();
+		}
+
 	public:
 		const_iterator cbegin() const
 		{

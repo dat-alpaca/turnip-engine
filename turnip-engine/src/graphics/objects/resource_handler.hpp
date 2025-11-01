@@ -1,7 +1,7 @@
 #pragma once
 #include <span>
 
-#include "assets/texture_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"

@@ -76,18 +76,19 @@ namespace tur
 		mRenderInterface.initialize(configData, *mWindow);
 
 		// Script:
+		ScriptManager::initialize(&mAudioHandler);
 		ScriptManager::initialize_core();
 		ScriptManager::initialize_input(*mWindow);
 
 		// Worker Pool:
 		mWorkerPool.initialize(configData.workerConfig);
 
-		// Asset Library:
-		mAssetLibrary.initialize(&mWorkerPool, &mTextureAssetBinder);
-		mAssetLibrary.set_event_callback(mMainEventCallback);
+		// Audio:
+		mAudioHandler.initialize(&mAssetLibrary);
 
-		// Binders:
-		mTextureAssetBinder.initialize(&mRenderInterface, &mAssetLibrary);
+		// Asset Library:
+		mAssetLibrary.initialize(&mWorkerPool, &mAudioHandler);
+		mAssetLibrary.set_event_callback(mMainEventCallback);
 	}
 
 	void TurnipEngine::start()
@@ -109,6 +110,8 @@ namespace tur
 		engine::shutdown(mViewSystem);
 
 		mRenderInterface.shutdown();
+		mAssetLibrary.shutdown();
+		mAudioHandler.shutdown();
 
 		mWindow->destroy();
 		platform::WindowingSystem::shutdown();

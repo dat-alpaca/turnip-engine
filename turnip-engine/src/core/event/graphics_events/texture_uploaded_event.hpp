@@ -9,12 +9,14 @@ namespace tur
 		DEFINE_EVENT(EventType::TEXTURE_UPLOADED);
 
 	public:
-		TextureUploadedEvent(texture_handle textureHandle)
-			: textureHandle(textureHandle)
+		TextureUploadedEvent(asset_handle assetHandle, texture_handle textureHandle)
+			: assetHandle(assetHandle),
+			  textureHandle(textureHandle)
 		{
 		}
 
 	public:
+		asset_handle assetHandle;
 		texture_handle textureHandle;
 	};
 }

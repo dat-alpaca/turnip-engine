@@ -1,5 +1,5 @@
 #pragma once
-#include "core/assets/texture_asset.hpp"
+#include "core/assets/texture/texture_asset.hpp"
 
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/render_target.hpp"

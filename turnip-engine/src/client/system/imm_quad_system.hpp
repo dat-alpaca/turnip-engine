@@ -9,7 +9,7 @@ namespace tur
 	class ImmQuadSystem
 	{
 	public:
-		void initialize(RenderInterface* rhi, Scene* scene, Camera* camera)
+		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
 		{
 			mQuadRenderer.initialize(rhi);
 			mQuadRenderer.set_clear_color({}, ClearFlags::COLOR);
