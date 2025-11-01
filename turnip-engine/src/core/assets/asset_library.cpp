@@ -75,7 +75,8 @@ namespace tur
 		audioAsset.state = AssetState::READY;
 
 		ma_result result = ma_sound_init_from_file(
-			&rAudioHandler->mEngine, filepath.string().c_str(), 0, nullptr, nullptr, &audioAsset.sound
+			&rAudioHandler->mEngine, filepath.string().c_str(), MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_NO_SPATIALIZATION,
+			nullptr, nullptr, &audioAsset.sound
 		);
 
 		if (result != MA_SUCCESS)
