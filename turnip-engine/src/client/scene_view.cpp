@@ -26,6 +26,9 @@ namespace tur
 		// ScriptSystem:
 		scriptSystem.initialize(mSceneHolder.get_current_scene());
 
+		// Physics system:
+		physicsSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_physics_handler());
+
 		// Binders:
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
 		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
@@ -49,6 +52,8 @@ namespace tur
 				scriptSystem.set_scene(viewSwitch.currentScene);
 				quadSystem.set_scene(viewSwitch.currentScene);
 				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
+				physicsSystem.set_scene(mSceneHolder.get_current_scene());
+
 				return false;
 			}
 		);
