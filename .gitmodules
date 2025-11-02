@@ -44,3 +44,6 @@
 [submodule "extern/miniaudio"]
 	path = extern/miniaudio
 	url = https://github.com/mackron/miniaudio
+[submodule "extern/box2d"]
+	path = extern/box2d
+	url = https://github.com/erincatto/box2d
