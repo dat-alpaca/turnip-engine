@@ -5,6 +5,7 @@
             "includePath": [
                 "${workspaceFolder}/**",
                 "${workspaceFolder}/build/turnip/gladsources/glad/include",
+                "${workspaceFolder}/extern/box2d/include"
             ],
             "defines": [
                 "TUR_GRAPHICS_VK",

@@ -3,6 +3,7 @@
 #include "view/view.hpp"
 
 #include "system/imm_quad_system.hpp"
+#include "system/physics_system.hpp"
 #include "system/script_system.hpp"
 #include "system/texture_asset_binder_system.hpp"
 
@@ -44,6 +45,7 @@ namespace tur
 	protected:
 		ScriptSystem scriptSystem;
 		ImmQuadSystem quadSystem;
+		PhysicsSystem physicsSystem;
 		Camera mainCamera;
 
 	private:

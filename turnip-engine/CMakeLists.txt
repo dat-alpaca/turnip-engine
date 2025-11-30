@@ -31,6 +31,8 @@ target_link_libraries(turnip-core PUBLIC
     pfd
     spirv-cross-glsl
     miniaudio
+    box2d::box2d
+    box2dinclude
 )
 
 # Platform & Graphics specific:

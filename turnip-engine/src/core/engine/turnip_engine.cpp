@@ -89,6 +89,9 @@ namespace tur
 		// Asset Library:
 		mAssetLibrary.initialize(&mWorkerPool, &mAudioHandler);
 		mAssetLibrary.set_event_callback(mMainEventCallback);
+
+		// Physics:
+		mPhysicsHandler.initialize(configData.physicsConfig);
 	}
 
 	void TurnipEngine::start()

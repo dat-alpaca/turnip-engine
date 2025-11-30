@@ -1,6 +1,7 @@
 #pragma once
 #include "assets/asset_library.hpp"
 #include "audio/audio_handler.hpp"
+#include "physics/physics_handler.hpp"
 #include "script/script_system.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
@@ -28,6 +29,7 @@ namespace tur
 		RenderInterface& get_render_interface() { return mRenderInterface; }
 		ViewSystem& get_view_system() { return mViewSystem; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
+		PhysicsHandler& get_physics_handler() { return mPhysicsHandler; }
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 
 	public:
@@ -41,6 +43,7 @@ namespace tur
 		ViewSystem mViewSystem;
 		WorkerPool mWorkerPool;
 		AudioHandler mAudioHandler;
+		PhysicsHandler mPhysicsHandler;
 		tur_unique<Window> mWindow;
 
 	private:
