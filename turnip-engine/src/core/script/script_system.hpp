@@ -1,37 +1,40 @@
 #pragma once
-#include "event/event.hpp"
-#include "memory/memory.hpp"
+#include "common.hpp"
 #include "platform/platform.hpp"
-#include "scene/entity.hpp"
-#include "script.hpp"
+#include "scene/components.hpp"
+#include "scene/scene.hpp"
 
 #include <filesystem>
 #include <sol/sol.hpp>
+#include <string_view>
 #include <vector>
 
 namespace tur
 {
 	class AudioHandler;
 
-	class ScriptManager
+	class ScriptSystem
 	{
 	public:
-		static void initialize(NON_OWNING AudioHandler* audioHandler);
+		void initialize();
 
-	public:
-		static void initialize_core();
-		static void initialize_input(Window& window);
+		void initialize_input(Window& window);
 
-	public:
-		static void initialize_entity_environment(Entity entity, sol::environment environment);
-		static void initialize_audio_environment(Entity entity, sol::environment environment);
-
-	public:
-		static inline sol::environment create_env() { return sol::environment(sLua, sol::create, sLua.globals()); }
-		static inline sol::state& get_state() { return sLua; }
+		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
 
 	private:
-		static inline NON_OWNING AudioHandler* srAudioHandler;
-		static inline sol::state sLua;
+		void initialize_logging();
+
+		void initialize_usertypes();
+
+	public:
+		inline sol::environment create_environment() { return sol::environment(mLua, sol::create, mLua.globals()); }
+
+	public:
+		sol::state& get_state() { return mLua; }
+
+	private:
+		NON_OWNING AudioHandler* rAudioHandler = nullptr;
+		sol::state mLua;
 	};
 }

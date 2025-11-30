@@ -4,17 +4,19 @@
 
 #include "common.hpp"
 #include "scene/entity.hpp"
-#include "script.hpp"
 
 namespace tur
 {
 	struct ScriptComponent
 	{
 	public:
-		ScriptComponent(Entity entity, const std::filesystem::path& filepath);
-		ScriptComponent() = default;
+		ScriptComponent(const std::filesystem::path& filepath)
+			: filepath(filepath)
+		{
+		}
 
 	public:
-		Script script;
+		std::filesystem::path filepath;
+		sol::environment environment;
 	};
 }

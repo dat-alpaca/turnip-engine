@@ -26,7 +26,7 @@ private:
 	void initialize_entities()
 	{
 		auto entity = get_current_scene().add_entity("bloky");
-		auto script = entity.add_component<ScriptComponent>(entity, "res/player.lua");
+		auto script = entity.add_component<ScriptComponent>("res/player.lua");
 
 		entity.add_component<Sprite2DComponent>(mFaceAsset);
 		entity.add_component<AudioSourceComponent>(mSoundAsset);
