@@ -32,17 +32,24 @@ namespace tur
 		Transform() = default;
 
 	public:
-		Transform operator*(Transform& rhs)
+		Transform operator*(const Transform& rhs)
 		{
-			Transform transform(*this);
-			transform.mTransform = rhs.transform() * transform.transform();
+			Transform out;
+			glm::mat4 model = rhs.to_matrix() * this->to_matrix();
 
-			transform.decompose_transform();
-			return transform;
+			out.mTransform = model;
+			out.decompose_transform();
+			return out;
 		}
 
 	public:
 		glm::mat4& transform()
+		{
+			mTransform = to_matrix();
+			return mTransform;
+		}
+
+		glm::mat4 to_matrix() const
 		{
 			glm::mat4 model(1.0f);
 			model = glm::translate(model, position);
@@ -51,9 +58,7 @@ namespace tur
 			model *= glm::mat4_cast(quaternion);
 
 			model = glm::scale(model, scale);
-
-			mTransform = model;
-			return mTransform;
+			return model;
 		}
 
 		glm::mat4& raw_transform() { return mTransform; }

@@ -43,8 +43,11 @@ namespace tur
 						Entity parent = Entity{hierarchy.parent, rScene};
 						auto& parentTransform = parent.get_component<TransformComponent>();
 
-						transform.worldTransform = parentTransform.transform * transform.transform;
-						TUR_LOG_WARN("{}", transform.worldTransform.position.x);
+						transform.worldTransform = parentTransform.worldTransform * transform.transform;
+						TUR_LOG_WARN(
+							"{} {} {}", transform.worldTransform.position.x, transform.worldTransform.position.y,
+							transform.worldTransform.position.z
+						);
 					}
 					else
 						transform.worldTransform = transform.transform;
