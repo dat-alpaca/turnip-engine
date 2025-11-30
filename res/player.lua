@@ -1,6 +1,5 @@
 ---@type AudioSourceComponent
 audio_c = nil
-
 transform_c = nil
 
 function on_wake()
@@ -14,23 +13,23 @@ function on_update()
         return
     end
 
-    local leftPressed = Input.get_mouse_pressed(MouseButton.MOUSE_LEFT)
+    local leftPressed = Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT)
     if leftPressed then
         audio_c:play()
     end
 
-    local rightPressed = Input.get_mouse_pressed(MouseButton.MOUSE_RIGHT)
+    local rightPressed = Input.get_mouse_pressed(Input.MouseButton.MOUSE_RIGHT)
     if rightPressed then
         Log.info("Mouse pressed at location: " .. mouse_pos.x .. ", " .. mouse_pos.y)
 
         if transform_c ~= nil then
-            transform_c.transform.position.x = mouse_pos.x
-            transform_c.transform.position.y = mouse_pos.y
+            transform_c.position.x = mouse_pos.x
+            transform_c.position.y = mouse_pos.y
         end
     end
 
-    local enterPressed = Input.get_key_pressed(Key.ENTER)
+    local enterPressed = Input.get_key_pressed(Input.Key.ENTER)
     if enterPressed then
-        transform_c.transform.rotation.z = transform_c.transform.rotation.z + 0.9
+        transform_c.rotation.z = transform_c.rotation.z + 0.9
     end
 end

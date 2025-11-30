@@ -31,6 +31,7 @@ namespace tur
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
 		PhysicsHandler& get_physics_handler() { return mPhysicsHandler; }
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
+		ScriptSystem& get_script_system() { return mScriptSystem; }
 
 	public:
 		glm::vec2 get_window_dimensions() const { return mWindow->get_dimensions(); }
@@ -44,6 +45,7 @@ namespace tur
 		WorkerPool mWorkerPool;
 		AudioHandler mAudioHandler;
 		PhysicsHandler mPhysicsHandler;
+		ScriptSystem mScriptSystem;
 		tur_unique<Window> mWindow;
 
 	private:

@@ -23,6 +23,6 @@
 
 #include "client/scene_view.hpp"
 #include "client/system/imm_quad_system.hpp"
-#include "client/system/script_system.hpp"
+#include "client/system/script_subsystem.hpp"
 
 #include "common.hpp"

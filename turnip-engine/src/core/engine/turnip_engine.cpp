@@ -76,9 +76,9 @@ namespace tur
 		mRenderInterface.initialize(configData, *mWindow);
 
 		// Script:
-		ScriptManager::initialize(&mAudioHandler);
-		ScriptManager::initialize_core();
-		ScriptManager::initialize_input(*mWindow);
+		mScriptSystem.initialize();
+		mScriptSystem.initialize_input(*mWindow);
+		mScriptSystem.initialize_audio(&mAudioHandler);
 
 		// Worker Pool:
 		mWorkerPool.initialize(configData.workerConfig);

@@ -13,7 +13,7 @@ Input = {}
 ---@field MOUSE_8           MouseButton
 ---@field MOUSE_LEFT        MouseButton
 ---@field MOUSE_RIGHT       MouseButton
-MouseButton = {}
+Input["MouseButton"] = {}
 
 ---@class Key
 ---@field MOUSE_UNKNOWN        Key
@@ -134,7 +134,7 @@ MouseButton = {}
 ---@field RIGHT_ALT            Key
 ---@field RIGHT_SUPER          Key
 ---@field MENU                 Key
-Key = {}
+Input["Key"] = {}
 
 
 ---@return vec2 | nil

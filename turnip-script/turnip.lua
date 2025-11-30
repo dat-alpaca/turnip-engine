@@ -1,9 +1,13 @@
 require "logging"
 require "audio"
+require "input"
 
 -- * -- * -- * Base Types -- * -- * -- *
 ---@class UUID
 ---@field uuid number
+
+---@class Name
+---@field name string
 
 ---@class vec2
 ---@field x number
@@ -25,17 +29,7 @@ require "audio"
 ---@field rotation vec3
 ---@field scale vec3
 
--- * -- * -- * Component Types -- * -- * -- *
----@class UUIDComponent
----@field uuid UUID
-
----@class NameComponent
----@field name string
-
----@class TransformComponent
----@field transform Transform
-
----@alias PossibleComponent UUIDComponent | NameComponent | TransformComponent | AudioSourceComponent
+---@alias PossibleComponent UUID | Name | Transform | AudioSourceComponent
 
 -- * -- * -- * Registry -- * -- * -- *
 ---@param name string
