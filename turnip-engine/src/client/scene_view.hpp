@@ -4,6 +4,7 @@
 
 #include "system/imm_quad_system.hpp"
 #include "system/physics_system.hpp"
+#include "system/scenegraph_subsystem.hpp"
 #include "system/script_subsystem.hpp"
 #include "system/texture_asset_binder_system.hpp"
 
@@ -43,6 +44,7 @@ namespace tur
 		Scene& get_current_scene() { return *mSceneHolder.get_current_scene(); }
 
 	protected:
+		ScenegraphSubsystem scenegraphSubsystem;
 		ScriptSubsystem scriptSubsystem;
 		ImmQuadSystem quadSystem;
 		PhysicsSystem physicsSystem;

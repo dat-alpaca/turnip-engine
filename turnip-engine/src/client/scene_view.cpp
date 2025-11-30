@@ -23,6 +23,9 @@ namespace tur
 		// Renderers:
 		initialize_renderers();
 
+		// Scenegraph:
+		scenegraphSubsystem.initialize(mSceneHolder.get_current_scene());
+
 		// Physics system:
 		physicsSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_physics_handler());
 
@@ -35,6 +38,8 @@ namespace tur
 	}
 	void SceneView::on_update()
 	{
+		scenegraphSubsystem.update();
+
 		mainCamera.update_view();
 		quadSystem.update();
 
@@ -50,10 +55,11 @@ namespace tur
 		subscriber.subscribe<ViewSwitchedEvent>(
 			[&](const ViewSwitchedEvent& viewSwitch) -> bool
 			{
+				scenegraphSubsystem.set_scene(viewSwitch.currentScene);
 				scriptSubsystem.set_scene(viewSwitch.currentScene);
 				quadSystem.set_scene(viewSwitch.currentScene);
 				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
-				physicsSystem.set_scene(mSceneHolder.get_current_scene());
+				physicsSystem.set_scene(viewSwitch.currentScene);
 
 				return false;
 			}

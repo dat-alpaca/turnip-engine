@@ -1,10 +1,21 @@
 #pragma once
 #include "utils/transform.hpp"
 #include "utils/uuid/uuid.hpp"
+#include <entt/entt.hpp>
 #include <string>
 
 namespace tur
 {
+	struct HierarchyComponent
+	{
+	public:
+		HierarchyComponent() = default;
+
+	public:
+		entt::entity parent;
+		u64 level = 0;
+	};
+
 	struct UUIDComponent
 	{
 	public:
@@ -49,5 +60,6 @@ namespace tur
 
 	public:
 		Transform transform;
+		Transform worldTransform;
 	};
 }

@@ -21,7 +21,25 @@ namespace tur
 		{
 		}
 
+		Transform(const Transform& transform)
+			: mTransform(transform.mTransform),
+			  position(transform.position),
+			  rotation(transform.rotation),
+			  scale(transform.scale)
+		{
+		}
+
 		Transform() = default;
+
+	public:
+		Transform operator*(Transform& rhs)
+		{
+			Transform transform(*this);
+			transform.mTransform = rhs.transform() * transform.transform();
+
+			transform.decompose_transform();
+			return transform;
+		}
 
 	public:
 		glm::mat4& transform()

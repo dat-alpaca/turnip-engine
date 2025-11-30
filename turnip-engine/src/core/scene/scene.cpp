@@ -25,6 +25,12 @@ namespace tur
 			nameComp.name = entityName.empty() ? "Entity #" + std::to_string(mDiagnostics.entityCount) : entityName;
 		}
 
+		// Hierarchy:
+		HierarchyComponent& hierarchyComp = entity.add_component<HierarchyComponent>();
+		{
+			hierarchyComp.level = 0;
+		}
+
 		// Record:
 		++mDiagnostics.entityCount;
 
