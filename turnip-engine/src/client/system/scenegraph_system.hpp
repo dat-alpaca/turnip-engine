@@ -48,8 +48,8 @@ namespace tur
 
 						transform.worldTransform = parentTransform.worldTransform * transform.transform;
 						TUR_LOG_WARN(
-							"{} {} {}", transform.worldTransform.scale.x, transform.worldTransform.scale.y,
-							transform.worldTransform.scale.z
+							"{} {} {}", transform.worldTransform.position.x, transform.worldTransform.position.y,
+							transform.worldTransform.position.z
 						);
 					}
 					else
