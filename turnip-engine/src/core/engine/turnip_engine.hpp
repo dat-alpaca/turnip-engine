@@ -27,11 +27,11 @@ namespace tur
 
 	public:
 		RenderInterface& get_render_interface() { return mRenderInterface; }
-		ViewSystem& get_view_system() { return mViewSystem; }
+		ViewHandler& get_view_handler() { return mViewHandler; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
 		PhysicsHandler& get_physics_handler() { return mPhysicsHandler; }
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
-		ScriptSystem& get_script_system() { return mScriptSystem; }
+		ScriptHandler& get_script_handler() { return mScriptHandler; }
 
 	public:
 		glm::vec2 get_window_dimensions() const { return mWindow->get_dimensions(); }
@@ -41,11 +41,11 @@ namespace tur
 
 	private:
 		RenderInterface mRenderInterface;
-		ViewSystem mViewSystem;
+		ViewHandler mViewHandler;
 		WorkerPool mWorkerPool;
 		AudioHandler mAudioHandler;
 		PhysicsHandler mPhysicsHandler;
-		ScriptSystem mScriptSystem;
+		ScriptHandler mScriptHandler;
 		tur_unique<Window> mWindow;
 
 	private:

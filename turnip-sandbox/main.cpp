@@ -55,8 +55,8 @@ private:
 			// Transform:
 			TransformComponent transformComponent0;
 			{
-				transformComponent0.transform.position = glm::vec3(0.2f, 0.1f, 1.0f);
-				transformComponent0.transform.scale = glm::vec3(0.5f, 0.5f, 1.f);
+				transformComponent0.transform.position = glm::vec3(0.0f, 0.0f, 1.0f);
+				transformComponent0.transform.scale = glm::vec3(2.5f, 2.f, 1.f);
 			}
 			entity0.add_component<TransformComponent>(transformComponent0);
 		}

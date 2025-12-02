@@ -15,7 +15,7 @@ namespace tur
 
 namespace tur
 {
-	view_handle ViewSystem::add(tur_unique<View> view)
+	view_handle ViewHandler::add(tur_unique<View> view)
 	{
 		mViews.push_back(std::move(view));
 
@@ -25,14 +25,14 @@ namespace tur
 
 		return viewHandle;
 	}
-	void ViewSystem::remove(view_handle handle)
+	void ViewHandler::remove(view_handle handle)
 	{
-		auto viewSystemIterator = mViews.begin() + handle;
-		viewSystemIterator->get()->on_view_removed();
+		auto viewHandlerIterator = mViews.begin() + handle;
+		viewHandlerIterator->get()->on_view_removed();
 
-		mViews.erase(viewSystemIterator);
+		mViews.erase(viewHandlerIterator);
 	}
-	tur_unique<View>& ViewSystem::get(view_handle handle)
+	tur_unique<View>& ViewHandler::get(view_handle handle)
 	{
 		return mViews[handle];
 	}

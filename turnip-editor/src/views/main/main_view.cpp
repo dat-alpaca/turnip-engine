@@ -30,7 +30,7 @@ void MainView::set_project_data(const ProjectData& projectData)
 		m_ProjectData = projectData;
 		load_project_data(m_ProjectData, &engine->assetLibrary, &engine->workerPool, get_main_event_callback());
 
-		ScriptSystem::set_project(m_ProjectData);
+		ScriptHandler::set_project(m_ProjectData);
 	}
 }
 
@@ -106,7 +106,8 @@ void MainView::on_event(Event& event)
 		{
 			append_window_title(m_ProjectData.projectName + "*");
 			return false;
-		});
+		}
+	);
 
 	subscriber.subscribe<OnProjectSaved>(
 		[&](OnProjectSaved&) -> bool
@@ -118,14 +119,16 @@ void MainView::on_event(Event& event)
 
 			append_window_title(m_ProjectData.projectName);
 			return false;
-		});
+		}
+	);
 
 	subscriber.subscribe<OnEntityInspectorInitialize>(
 		[&](const OnEntityInspectorInitialize&) -> bool
 		{
 			TUR_LOG_INFO("Inspector initialized");
 			return false;
-		});
+		}
+	);
 
 	subscriber.subscribe<SceneEditorResized>(
 		[&](const SceneEditorResized& resizeEvent) -> bool
@@ -138,21 +141,25 @@ void MainView::on_event(Event& event)
 
 			// Viewport:
 			if (r_QuadRenderer)
-				renderer_set_viewport(r_QuadRenderer,
-									  {0.0f, 0.0f, (float)resizeEvent.width, (float)resizeEvent.height});
+				renderer_set_viewport(
+					r_QuadRenderer, {0.0f, 0.0f, (float)resizeEvent.width, (float)resizeEvent.height}
+				);
 
 			// Camera:
-			m_SceneData.editorCamera.camera.set_orthogonal(0.f, (float)resizeEvent.width, 0.f,
-														   (float)resizeEvent.height, -1.f, 1.f);
+			m_SceneData.editorCamera.camera.set_orthogonal(
+				0.f, (float)resizeEvent.width, 0.f, (float)resizeEvent.height, -1.f, 1.f
+			);
 			return false;
-		});
+		}
+	);
 
 	subscriber.subscribe<SceneEditorClicked>(
 		[&](const SceneEditorClicked& clickEvent) -> bool
 		{
 			// Select object on view:
 			return false;
-		});
+		}
+	);
 
 	m_EntityInspector.on_event(event);
 	m_SceneEditor.on_event(event);

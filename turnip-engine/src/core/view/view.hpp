@@ -39,7 +39,7 @@ namespace tur
 }
 namespace tur
 {
-	class ViewSystem
+	class ViewHandler
 	{
 	public:
 		view_handle add(tur_unique<View> view);

@@ -14,11 +14,13 @@ namespace tur
 			  rotation(rotation),
 			  scale(scale)
 		{
+			transform();
 		}
 
 		Transform(const glm::mat4& transform)
 			: mTransform(transform)
 		{
+			decompose_transform();
 		}
 
 		Transform(const Transform& transform)
@@ -32,13 +34,11 @@ namespace tur
 		Transform() = default;
 
 	public:
-		Transform operator*(const Transform& rhs)
+		Transform operator*(const Transform& rhs) const
 		{
-			Transform out;
-			glm::mat4 model = rhs.to_matrix() * this->to_matrix();
+			glm::mat4 model = to_matrix() * rhs.to_matrix();
 
-			out.mTransform = model;
-			out.decompose_transform();
+			Transform out(model);
 			return out;
 		}
 

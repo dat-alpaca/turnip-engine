@@ -3,14 +3,14 @@
 
 namespace tur
 {
-	void ScriptSystem::initialize()
+	void ScriptHandler::initialize()
 	{
 		mLua.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
 		initialize_logging();
 		initialize_usertypes();
 	}
 
-	void ScriptSystem::initialize_input(Window& window)
+	void ScriptHandler::initialize_input(Window& window)
 	{
 		mLua["Input"] = mLua.create_table();
 		mLua["Input"]["get_mouse_position"] = [&]() -> glm::vec2 { return window.get_mouse_position(); };
@@ -159,12 +159,12 @@ namespace tur
 		// clang-format on
 	}
 
-	void ScriptSystem::initialize_audio(NON_OWNING AudioHandler* audioHandler)
+	void ScriptHandler::initialize_audio(NON_OWNING AudioHandler* audioHandler)
 	{
 		rAudioHandler = audioHandler;
 	}
 
-	void ScriptSystem::initialize_logging()
+	void ScriptHandler::initialize_logging()
 	{
 		// clang-format off
 			mLua["Log"] = mLua.create_table();
@@ -177,7 +177,7 @@ namespace tur
 		// clang-format on
 	}
 
-	void ScriptSystem::initialize_usertypes()
+	void ScriptHandler::initialize_usertypes()
 	{
 		// clang-format off
 
