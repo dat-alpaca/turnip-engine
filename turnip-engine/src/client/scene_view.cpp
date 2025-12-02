@@ -6,6 +6,7 @@ namespace tur
 	void SceneView::wake_scene()
 	{
 		scriptSystem.wake();
+		physicsSystem.wake();
 	}
 
 	void SceneView::on_view_added()
@@ -38,11 +39,11 @@ namespace tur
 	}
 	void SceneView::on_update()
 	{
-		scenegraphSystem.update();
-
 		mainCamera.update_view();
 		quadSystem.update();
 
+		physicsSystem.update();
+		scenegraphSystem.update();
 		scriptSystem.on_update();
 	}
 	void SceneView::on_render()

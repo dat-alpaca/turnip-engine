@@ -13,6 +13,9 @@ namespace tur
 	public:
 		void step();
 
+	public:
+		b2WorldId get_world_id() const { return mWorldId; }
+
 	private:
 		b2WorldId mWorldId;
 		u32 mSubstepCount;

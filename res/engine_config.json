@@ -14,8 +14,8 @@
     },
     "physicsConfig": {
         "fixedTimeStep": 0.016666000708937645,
-        "gravityAcceleration": -9.806699752807617,
-        "substepCount": 4
+        "gravityAcceleration": 9.806699752807617,
+        "substepCount": 1
     },
     "scriptingInfo": {
         "stubFilepath": "lib"

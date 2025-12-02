@@ -42,6 +42,9 @@ private:
 		}
 		entity.add_component<TransformComponent>(transformComponent);
 
+		entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
+		entity.add_component<RectCollider2D>(1.f, 1.f);
+
 		// Entity 1:
 		{
 			auto entity0 = get_current_scene().add_entity("newone");
