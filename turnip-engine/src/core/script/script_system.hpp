@@ -13,7 +13,7 @@ namespace tur
 {
 	class AudioHandler;
 
-	class ScriptSystem
+	class ScriptHandler
 	{
 	public:
 		void initialize();

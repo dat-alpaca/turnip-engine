@@ -5,7 +5,7 @@ namespace tur
 {
 	void SceneView::wake_scene()
 	{
-		scriptSubsystem.wake();
+		scriptSystem.wake();
 	}
 
 	void SceneView::on_view_added()
@@ -23,11 +23,14 @@ namespace tur
 		// Renderers:
 		initialize_renderers();
 
+		// Scenegraph:
+		scenegraphSystem.initialize(mSceneHolder.get_current_scene());
+
 		// Physics system:
 		physicsSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_physics_handler());
 
 		// Scripts subsystem:
-		scriptSubsystem.initialize(mSceneHolder.get_current_scene(), &engine->get_script_system());
+		scriptSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_script_handler());
 
 		// Binders:
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
@@ -35,10 +38,12 @@ namespace tur
 	}
 	void SceneView::on_update()
 	{
+		scenegraphSystem.update();
+
 		mainCamera.update_view();
 		quadSystem.update();
 
-		scriptSubsystem.on_update();
+		scriptSystem.on_update();
 	}
 	void SceneView::on_render()
 	{
@@ -50,10 +55,11 @@ namespace tur
 		subscriber.subscribe<ViewSwitchedEvent>(
 			[&](const ViewSwitchedEvent& viewSwitch) -> bool
 			{
-				scriptSubsystem.set_scene(viewSwitch.currentScene);
+				scenegraphSystem.set_scene(viewSwitch.currentScene);
+				scriptSystem.set_scene(viewSwitch.currentScene);
 				quadSystem.set_scene(viewSwitch.currentScene);
 				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
-				physicsSystem.set_scene(mSceneHolder.get_current_scene());
+				physicsSystem.set_scene(viewSwitch.currentScene);
 
 				return false;
 			}

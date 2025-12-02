@@ -5,39 +5,38 @@
 
 namespace tur::engine
 {
-	static void startup(ViewSystem& viewSystem)
+	static void startup(ViewHandler& viewHandler)
 	{
-		for (const auto& view : viewSystem.get_views())
+		for (const auto& view : viewHandler.get_views())
 			view->on_engine_startup();
 	}
-	static void shutdown(ViewSystem& viewSystem)
+	static void shutdown(ViewHandler& viewHandler)
 	{
-		for (const auto& view : viewSystem.get_views())
+		for (const auto& view : viewHandler.get_views())
 			view->on_engine_shutdown();
 	}
 
-	static void on_update(ViewSystem& viewSystem)
+	static void on_update(ViewHandler& viewHandler)
 	{
-		for (const auto& view : viewSystem.get_views())
+		for (const auto& view : viewHandler.get_views())
 			view->on_update();
 	}
-	static void on_render(RenderInterface& renderInterface, ViewSystem& viewSystem)
+	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{
-		for (const auto& view : viewSystem.get_views())
+		for (const auto& view : viewHandler.get_views())
 			view->on_render();
 	}
-	static void on_render_gui(ViewSystem& viewSystem)
+	static void on_render_gui(ViewHandler& viewHandler)
 	{
-		for (const auto& view : viewSystem.get_views())
+		for (const auto& view : viewHandler.get_views())
 			view->on_render_gui();
 	}
 
 	static void on_event(Event& event, TurnipEngine& engine)
 	{
-		// Systems:
 		engine.get_render_interface().on_event(event);
 
-		for (const auto& view : engine.get_view_system().get_views())
+		for (const auto& view : engine.get_view_handler().get_views())
 			view->on_event(event);
 	}
 }
@@ -76,9 +75,9 @@ namespace tur
 		mRenderInterface.initialize(configData, *mWindow);
 
 		// Script:
-		mScriptSystem.initialize();
-		mScriptSystem.initialize_input(*mWindow);
-		mScriptSystem.initialize_audio(&mAudioHandler);
+		mScriptHandler.initialize();
+		mScriptHandler.initialize_input(*mWindow);
+		mScriptHandler.initialize_audio(&mAudioHandler);
 
 		// Worker Pool:
 		mWorkerPool.initialize(configData.workerConfig);
@@ -96,21 +95,21 @@ namespace tur
 
 	void TurnipEngine::start()
 	{
-		engine::startup(mViewSystem);
+		engine::startup(mViewHandler);
 
 		while (!mShutdownRequested && mWindow->is_open())
 		{
 			mWindow->poll_events();
 			mWorkerPool.poll_tasks();
 
-			engine::on_update(mViewSystem);
+			engine::on_update(mViewHandler);
 
-			engine::on_render(mRenderInterface, mViewSystem);
+			engine::on_render(mRenderInterface, mViewHandler);
 
-			engine::on_render_gui(mViewSystem);
+			engine::on_render_gui(mViewHandler);
 		}
 
-		engine::shutdown(mViewSystem);
+		engine::shutdown(mViewHandler);
 
 		mRenderInterface.shutdown();
 		mAssetLibrary.shutdown();
@@ -127,10 +126,10 @@ namespace tur
 	void TurnipEngine::add_view(tur_unique<View> view)
 	{
 		view->set_engine(this);
-		mViewSystem.add(std::move(view));
+		mViewHandler.add(std::move(view));
 	}
 	void TurnipEngine::remove_view(view_handle viewHandle)
 	{
-		mViewSystem.remove(viewHandle);
+		mViewHandler.remove(viewHandle);
 	}
 }

@@ -25,6 +25,7 @@ private:
 
 	void initialize_entities()
 	{
+		// Entity 0:
 		auto entity = get_current_scene().add_entity("bloky");
 		auto script = entity.add_component<ScriptComponent>("res/player.lua");
 
@@ -40,6 +41,25 @@ private:
 			transformComponent.transform.scale = glm::vec3(100.f, 100.f, 1.f);
 		}
 		entity.add_component<TransformComponent>(transformComponent);
+
+		// Entity 1:
+		{
+			auto entity0 = get_current_scene().add_entity("newone");
+
+			entity0.add_component<Sprite2DComponent>(mFaceAsset);
+
+			auto& hierarchy = entity0.get_component<HierarchyComponent>();
+			hierarchy.level = 1;
+			hierarchy.parent = entity.get_handle();
+
+			// Transform:
+			TransformComponent transformComponent0;
+			{
+				transformComponent0.transform.position = glm::vec3(0.5f, 0.5f, -0.1f);
+				transformComponent0.transform.scale = glm::vec3(0.5f, 0.5f, 1.f);
+			}
+			entity0.add_component<TransformComponent>(transformComponent0);
+		}
 	}
 
 private:

@@ -7,12 +7,12 @@
 
 namespace tur
 {
-	class ScriptSubsystem
+	class ScriptSystem
 	{
 	public:
-		void initialize(NON_OWNING Scene* scene, NON_OWNING ScriptSystem* scriptSystem)
+		void initialize(NON_OWNING Scene* scene, NON_OWNING ScriptHandler* scriptHandler)
 		{
-			rScriptSystem = scriptSystem;
+			rScriptHandler = scriptHandler;
 			set_scene(scene);
 		}
 		void set_scene(Scene* scene) { rScene = scene; }
@@ -41,15 +41,15 @@ namespace tur
 	private:
 		void initialize_registry()
 		{
-			TUR_ASSERT(rScriptSystem, "Script System not bound.");
+			TUR_ASSERT(rScriptHandler, "Script Handler not bound.");
 			TUR_ASSERT(rScene, "Scene not bound.");
 
-			auto& lua = rScriptSystem->get_state();
+			auto& lua = rScriptHandler->get_state();
 
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{
-				script.environment = rScriptSystem->create_environment();
+				script.environment = rScriptHandler->create_environment();
 				initialize_environment(script.environment, e);
 
 				sol::protected_function_result result = lua.safe_script_file(script.filepath, script.environment);
@@ -83,7 +83,7 @@ namespace tur
 	private:
 		sol::object find_component(Entity entity, const std::string& componentName)
 		{
-			auto& lua = rScriptSystem->get_state();
+			auto& lua = rScriptHandler->get_state();
 
 			if (componentName == "uuid" && entity.has_component<UUIDComponent>())
 				return sol::make_object(lua, &entity.get_component<UUIDComponent>().uuid);
@@ -101,7 +101,7 @@ namespace tur
 		}
 
 	private:
-		NON_OWNING ScriptSystem* rScriptSystem = nullptr;
+		NON_OWNING ScriptHandler* rScriptHandler = nullptr;
 		NON_OWNING Scene* rScene = nullptr;
 	};
 }

@@ -41,12 +41,12 @@ namespace tur
 			{
 				if (mHandleCache.find(e) == mHandleCache.end())
 				{
-					mHandleCache[e] = mQuadRenderer.add_quad(transform.transform, sprite.textureHandle);
+					mHandleCache[e] = mQuadRenderer.add_quad(transform.worldTransform, sprite.textureHandle);
 					break;
 				}
 
 				auto& quad = mQuadRenderer.get_quad(mHandleCache[e]);
-				quad.transform = transform.transform;
+				quad.transform = transform.worldTransform;
 				quad.textureHandle = sprite.textureHandle;
 			}
 		}

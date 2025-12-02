@@ -14,17 +14,42 @@ namespace tur
 			  rotation(rotation),
 			  scale(scale)
 		{
+			transform();
 		}
 
 		Transform(const glm::mat4& transform)
 			: mTransform(transform)
+		{
+			decompose_transform();
+		}
+
+		Transform(const Transform& transform)
+			: mTransform(transform.mTransform),
+			  position(transform.position),
+			  rotation(transform.rotation),
+			  scale(transform.scale)
 		{
 		}
 
 		Transform() = default;
 
 	public:
+		Transform operator*(const Transform& rhs) const
+		{
+			glm::mat4 model = to_matrix() * rhs.to_matrix();
+
+			Transform out(model);
+			return out;
+		}
+
+	public:
 		glm::mat4& transform()
+		{
+			mTransform = to_matrix();
+			return mTransform;
+		}
+
+		glm::mat4 to_matrix() const
 		{
 			glm::mat4 model(1.0f);
 			model = glm::translate(model, position);
@@ -33,9 +58,7 @@ namespace tur
 			model *= glm::mat4_cast(quaternion);
 
 			model = glm::scale(model, scale);
-
-			mTransform = model;
-			return mTransform;
+			return model;
 		}
 
 		glm::mat4& raw_transform() { return mTransform; }
