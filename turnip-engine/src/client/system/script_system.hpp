@@ -1,6 +1,10 @@
 #pragma once
+#include <sol/forward.hpp>
+#include <sol/overload.hpp>
 #include <string_view>
 
+#include "physics/physics_components.hpp"
+#include "scene/common_components.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "script/script_handler.hpp"
@@ -69,6 +73,11 @@ namespace tur
 		{
 			instance["_id"] = static_cast<u32>(entity);
 
+			instance["add_entity"] = [&]() { return rScene->add_entity(); };
+
+			instance["add_component"] = [&, entity](const std::string& componentName)
+			{ add_component(Entity{entity, rScene}, componentName); };
+			
 			instance["find_component"] = [&, entity](const std::string& componentName)
 			{ return find_component(Entity{entity, rScene}, componentName); };
 		}
@@ -99,7 +108,24 @@ namespace tur
 			if (componentName == "audio_source" && entity.has_component<AudioSourceComponent>())
 				return sol::make_object(lua, &entity.get_component<AudioSourceComponent>());
 
+			if (componentName == "body2d" && entity.has_component<Body2DComponent>())
+				return sol::make_object(lua, &entity.get_component<Body2DComponent>());
+
 			return sol::nil;
+		}
+
+		void add_component(Entity entity, const std::string& componentName)
+		{
+			auto& lua = rScriptHandler->get_state();
+
+			if (componentName == "transform" && !entity.has_component<TransformComponent>())
+				entity.add_component<TransformComponent>();
+
+			if (componentName == "audio_source" && !entity.has_component<AudioSourceComponent>())
+				entity.add_component<AudioSourceComponent>();
+			
+			if (componentName == "body2d" && !entity.has_component<Body2DComponent>())
+				entity.add_component<Body2DComponent>();
 		}
 
 	private:

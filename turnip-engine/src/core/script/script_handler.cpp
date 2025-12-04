@@ -1,5 +1,6 @@
 #include "script_handler.hpp"
 #include "audio/audio_handler.hpp"
+#include "physics/physics_types.hpp"
 
 namespace tur
 {
@@ -289,8 +290,21 @@ namespace tur
 
 		// physics:
 		{
+			// Body type:
+			mLua["Physics"] = mLua.create_table();
+			mLua["Physics"]["BodyType"] = mLua.create_table_with(
+				"STATIC", 		BodyType::STATIC,
+				"KINEMATIC", 	BodyType::KINEMATIC,
+				"DYNAMIC", 		BodyType::DYNAMIC
+			);
+
+			// Body2D:
 			sol::usertype<Body2DComponent> body2dType = mLua.new_usertype<Body2DComponent>("body2d");
 			body2dType["id"] = &Body2DComponent::bodyID;
+
+			body2dType["set_type"] = [&](Body2DComponent* component, BodyType type) {
+				component->set_type(type);
+			};
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.
 		}

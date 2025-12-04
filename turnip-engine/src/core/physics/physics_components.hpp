@@ -11,6 +11,17 @@ namespace tur
 		Body2DComponent(BodyType type)
 		{
 			bodyDef = b2DefaultBodyDef();
+			set_type(type);
+		}
+
+		Body2DComponent()
+		{
+			bodyDef = b2DefaultBodyDef();
+		}
+
+	public:
+		void set_type(BodyType type)
+		{
 			bodyDef.type = static_cast<b2BodyType>(type);
 		}
 

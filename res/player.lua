@@ -1,8 +1,9 @@
 local player = {
     _description = "Default player",
     
-    _transform_c = nil,
-    _audio_c = nil,
+    transform_c = nil,
+    audio_c = nil,
+    body2d_c = nil,
 
     _direction = vec2(0.0, 0.0)
 }
@@ -17,6 +18,9 @@ end
 function player:on_wake()
     self.transform_c = self.find_component("transform")
     self.audio_c = self.find_component("audio_source")
+    self.body2d_c = self.find_component("body2d") 
+
+    self.body2d_c:set_type(Physics.BodyType.STATIC)
 end
 
 function player:on_update()
