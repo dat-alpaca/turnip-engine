@@ -15,6 +15,7 @@ namespace tur
 	void PhysicsHandler::shutdown()
 	{
 		b2DestroyWorld(mWorldId);
+		mWorldId = b2_nullWorldId;
 	}
 
 	void PhysicsHandler::step()
