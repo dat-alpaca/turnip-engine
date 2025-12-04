@@ -24,10 +24,10 @@ namespace tur
 		virtual void on_event(Event& event) override;
 
 	public:
-		virtual void on_engine_startup(){};
-		virtual void on_engine_shutdown(){};
-		virtual void on_view_removed(){};
-		virtual void on_render_gui(){};
+		virtual void on_engine_startup() override {};
+		virtual void on_engine_shutdown() override {};
+		virtual void on_view_removed() override {};
+		virtual void on_render_gui() override {};
 
 	private:
 		void initialize_renderers();

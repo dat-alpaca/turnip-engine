@@ -5,7 +5,7 @@ namespace tur
 {
 	void SceneView::wake_scene()
 	{
-		scriptSystem.wake();
+		scriptSystem.wake_up();
 		physicsSystem.wake();
 	}
 
@@ -43,8 +43,8 @@ namespace tur
 		quadSystem.update();
 
 		physicsSystem.update();
-		scenegraphSystem.update();
 		scriptSystem.on_update();
+		scenegraphSystem.update();
 	}
 	void SceneView::on_render()
 	{

@@ -322,5 +322,7 @@ namespace tur
 		__TRANSLATE_KEY(Key::KEY_RIGHT_SUPER);
 		__TRANSLATE_KEY(Key::KEY_MENU);
 		__TRANSLATE_KEY(Key::KEY_LAST);
+
+		return "Invalid";
 	}
 }

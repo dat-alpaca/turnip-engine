@@ -27,6 +27,7 @@ namespace tur::vulkan
 	{
 		switch (type)
 		{
+			case TextureType::ARRAY_TEXTURE_2D:
 			case TextureType::TEXTURE_2D:
 				return vk::ImageType::e2D;
 
@@ -44,6 +45,7 @@ namespace tur::vulkan
 	{
 		switch (type)
 		{
+			case TextureType::ARRAY_TEXTURE_2D:
 			case TextureType::TEXTURE_2D:
 				return vk::ImageViewType::e2D;
 
@@ -180,9 +182,12 @@ namespace tur::vulkan
 
 			case vk::Format::eB8G8R8A8Unorm:
 				return TextureFormat::B8G8R8A8_UNORM;
-		}
 
-		TUR_LOG_ERROR("Invalid Texture Format: {}. Default: RGBA (32-bit)", static_cast<int>(format));
-		return TextureFormat::RGBA8_UNORM;
+			default:
+			{
+				TUR_LOG_ERROR("Invalid Texture Format: {}. Default: RGBA (32-bit)", static_cast<int>(format));
+				return TextureFormat::RGBA8_UNORM;
+			}
+		}
 	}
 }

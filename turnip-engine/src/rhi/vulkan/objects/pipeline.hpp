@@ -45,6 +45,9 @@ namespace tur::vulkan
 	{
 		switch (polygonMode)
 		{
+			case PolygonMode::FILL_RECTANGLE:
+				return vk::PolygonMode::eFill;
+
 			case PolygonMode::FILL:
 				return vk::PolygonMode::eFill;
 

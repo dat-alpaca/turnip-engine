@@ -1,35 +1,59 @@
----@type AudioSourceComponent
-audio_c = nil
-transform_c = nil
+local player = {
+    _description = "Default player",
+    
+    _transform_c = nil,
+    _audio_c = nil,
 
-function on_wake()
-    transform_c = find_component("transform")
-    audio_c = find_component("audio_source")
+    _direction = vec2(0.0, 0.0)
+}
+
+function player:new(object)
+    object = object or {}
+    setmetatable(object, self)
+    self.__index = self
+    return object
 end
 
-function on_update()
+function player:on_wake()
+    self.transform_c = self.find_component("transform")
+    self.audio_c = self.find_component("audio_source")
+end
+
+function player:on_update()
     local mouse_pos = Input.get_mouse_position()
-    if mouse_pos == nil then
-        return
+    if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
+        self.audio_c:play()
+
+        self.transform_c.position.x = mouse_pos.x
+        self.transform_c.position.y = mouse_pos.y
     end
 
-    local leftPressed = Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT)
-    if leftPressed then
-        audio_c:play()
+    self:get_direction()
+    self:move()
+end
+
+function player:get_direction()
+    if Input.get_key_pressed(Input.Key.UP) then
+        self._direction = vec2(self._direction.x, -1.0)
     end
 
-    local rightPressed = Input.get_mouse_pressed(Input.MouseButton.MOUSE_RIGHT)
-    if rightPressed then
-        Log.info("Mouse pressed at location: " .. mouse_pos.x .. ", " .. mouse_pos.y)
-
-        if transform_c ~= nil then
-            transform_c.position.x = mouse_pos.x
-            transform_c.position.y = mouse_pos.y
-        end
+    if Input.get_key_pressed(Input.Key.DOWN) then
+        self._direction = vec2(self._direction.x, 1.0)
     end
 
-    local enterPressed = Input.get_key_pressed(Input.Key.ENTER)
-    if enterPressed then
-        transform_c.rotation.z = transform_c.rotation.z + 0.9
+    if Input.get_key_pressed(Input.Key.LEFT) then
+        self._direction = vec2(-1.0, self._direction.y)
+    end
+
+    if Input.get_key_pressed(Input.Key.RIGHT) then
+        self._direction = vec2(1.0, self._direction.y)
     end
 end
+
+function player:move()
+    self.transform_c.position.x = self.transform_c.position.x + 4.0 * self._direction.x
+    self.transform_c.position.y = self.transform_c.position.y + 4.0 * self._direction.y
+    self._direction = vec2(0.0, 0.0)
+end
+
+return player

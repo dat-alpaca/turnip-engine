@@ -1,4 +1,4 @@
-#include "script_system.hpp"
+#include "script_handler.hpp"
 #include "audio/audio_handler.hpp"
 
 namespace tur
@@ -9,7 +9,6 @@ namespace tur
 		initialize_logging();
 		initialize_usertypes();
 	}
-
 	void ScriptHandler::initialize_input(Window& window)
 	{
 		mLua["Input"] = mLua.create_table();
@@ -35,7 +34,10 @@ namespace tur
 				"MOUSE_LEFT", 			MouseButton::MOUSE_BUTTON_LEFT,
 				"MOUSE_RIGHT", 			MouseButton::MOUSE_BUTTON_RIGHT
 			);
+		}
 
+		// Keyboard:
+		{
 			mLua["Input"]["Key"] = mLua.create_table_with(
 				"SPACE", 				Key::KEY_SPACE,                            
 				"APOSTROPHE", 			Key::KEY_APOSTROPHE,                  
@@ -158,22 +160,20 @@ namespace tur
 		}
 		// clang-format on
 	}
-
 	void ScriptHandler::initialize_audio(NON_OWNING AudioHandler* audioHandler)
 	{
 		rAudioHandler = audioHandler;
 	}
-
 	void ScriptHandler::initialize_logging()
 	{
 		// clang-format off
-			mLua["Log"] = mLua.create_table();
-			mLua["Log"]["critical"] 	= [](const std::string& message) { TUR_LOG_CRITICAL(message); };
-			mLua["Log"]["error"] 		= [](const std::string& message) { TUR_LOG_ERROR(message); };
-			mLua["Log"]["warn"] 		= [](const std::string& message) { TUR_LOG_WARN(message); };
-			mLua["Log"]["debug"] 		= [](const std::string& message) { TUR_LOG_DEBUG(message); };
-			mLua["Log"]["trace"] 		= [](const std::string& message) { TUR_LOG_TRACE(message); };
-			mLua["Log"]["info"] 		= [](const std::string& message) { TUR_LOG_INFO(message); };
+		mLua["Log"] = mLua.create_table();
+		mLua["Log"]["critical"] 	= [](const std::string& message) { TUR_LOG_CRITICAL(message); };
+		mLua["Log"]["error"] 		= [](const std::string& message) { TUR_LOG_ERROR(message); };
+		mLua["Log"]["warn"] 		= [](const std::string& message) { TUR_LOG_WARN(message); };
+		mLua["Log"]["debug"] 		= [](const std::string& message) { TUR_LOG_DEBUG(message); };
+		mLua["Log"]["trace"] 		= [](const std::string& message) { TUR_LOG_TRACE(message); };
+		mLua["Log"]["info"] 		= [](const std::string& message) { TUR_LOG_INFO(message); };
 		// clang-format on
 	}
 
@@ -181,109 +181,119 @@ namespace tur
 	{
 		// clang-format off
 
-			// UUID:
-			sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
-			uuidType["value"] = &UUID::uuid;
-			uuidType["uuid"] = &UUID::uuid;
+		// TODO: add registry methods for entity creation and component attachment
+		// TODO: add body2d creation methods: create new body2d.
 
-			// vec2:
-			{
-				sol::usertype<glm::vec2> vec2Type = mLua.new_usertype<glm::vec2>(
-					"vec2", 
-					sol::constructors<glm::vec2()>(),
+		// UUID:
+		sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
+		uuidType["value"] = &UUID::uuid;
+		uuidType["uuid"] = &UUID::uuid;
+		// vec2:
+		{
+			sol::usertype<glm::vec2> vec2Type = mLua.new_usertype<glm::vec2>(
+				"vec2", 
+				sol::call_constructor,
+				sol::constructors<glm::vec2(), glm::vec2(float, float)>(),
+				sol::meta_function::addition, 
+				[](const glm::vec2& lhs, const glm::vec2& rhs) -> glm::vec2 {
+					return { lhs.x + rhs.x, lhs.y + rhs.y };
+				},
+				sol::meta_function::subtraction, 
+				[](const glm::vec2& lhs, const glm::vec2& rhs) -> glm::vec2 {
+					return { lhs.x - rhs.x, lhs.y - rhs.y };
+				},
+				sol::meta_function::equal_to,
+				[](const glm::vec2& lhs, const glm::vec2& rhs) -> bool {
+					return lhs.x == rhs.x && lhs.y == rhs.y;
+				}
+			);
 
-					sol::meta_function::addition, 
-					[](const glm::vec2& lhs, const glm::vec2& rhs) -> glm::vec2 {
-						return { lhs.x + rhs.x, lhs.y + rhs.y };
-					},
+			vec2Type["x"] = &glm::vec2::x;
+			vec2Type["y"] = &glm::vec2::y;
+		}
 
-					sol::meta_function::subtraction, 
-					[](const glm::vec2& lhs, const glm::vec2& rhs) -> glm::vec2 {
-						return { lhs.x - rhs.x, lhs.y - rhs.y };
-					}				
-				);
-
-				vec2Type["x"] = &glm::vec2::x;
-				vec2Type["y"] = &glm::vec2::y;
-			}
-
-			// vec3
-			{
-				sol::usertype<glm::vec3> vec3Type = mLua.new_usertype<glm::vec3>(
-					"vec3", 
-					sol::constructors<glm::vec3()>(),
-
-					sol::meta_function::addition, 
-					[](const glm::vec3& lhs, const glm::vec3& rhs) -> glm::vec3 {
-						return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z - rhs.z };
-					},
-
-					sol::meta_function::subtraction, 
-					[](const glm::vec3& lhs, const glm::vec3& rhs) -> glm::vec3 {
-						return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
-					}				
-				);
-				
-				vec3Type["x"] = &glm::vec3::x;
-				vec3Type["y"] = &glm::vec3::y;
-				vec3Type["z"] = &glm::vec3::z;
-			}
-
-			// vec4
-			{
-				sol::usertype<glm::vec4> vec4Type = mLua.new_usertype<glm::vec4>(
-					"vec4", 
-					sol::constructors<glm::vec4()>(),
-
-					sol::meta_function::addition, 
-					[](const glm::vec4& lhs, const glm::vec4& rhs) -> glm::vec4 {
-						return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
-					},
-
-					sol::meta_function::subtraction, 
-					[](const glm::vec4& lhs, const glm::vec4& rhs) -> glm::vec4 {
-						return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
-					}				
-				);
-				
-				vec4Type["x"] = &glm::vec4::x;
-				vec4Type["y"] = &glm::vec4::y;
-				vec4Type["z"] = &glm::vec4::z;
-				vec4Type["w"] = &glm::vec4::w;
-			}
+		// vec3
+		{
+			sol::usertype<glm::vec3> vec3Type = mLua.new_usertype<glm::vec3>(
+				"vec3", 
+				sol::call_constructor,
+				sol::constructors<glm::vec3(), glm::vec3(float, float, float)>(),
+				sol::meta_function::addition, 
+				[](const glm::vec3& lhs, const glm::vec3& rhs) -> glm::vec3 {
+					return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z - rhs.z };
+				},
+				sol::meta_function::subtraction, 
+				[](const glm::vec3& lhs, const glm::vec3& rhs) -> glm::vec3 {
+					return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z };
+				}				
+			);
 			
-			// transform:
-			{
-				sol::usertype<Transform> transformType = mLua.new_usertype<Transform>(
-					"transform", 
-					sol::constructors<
-						Transform(const glm::vec3&, const glm::vec3&, const glm::vec3&), 
-						Transform()
-					>()
-				);
-				
-				transformType["position"] = &Transform::position;
-				transformType["rotation"] = &Transform::rotation;
-				transformType["scale"] = &Transform::scale;
-			}
+			vec3Type["x"] = &glm::vec3::x;
+			vec3Type["y"] = &glm::vec3::y;
+			vec3Type["z"] = &glm::vec3::z;
+		}
+
+		// vec4
+		{
+			sol::usertype<glm::vec4> vec4Type = mLua.new_usertype<glm::vec4>(
+				"vec4", 
+				sol::call_constructor,
+				sol::constructors<glm::vec4(), glm::vec4(float, float, float, float)>(),
+				sol::meta_function::addition, 
+				[](const glm::vec4& lhs, const glm::vec4& rhs) -> glm::vec4 {
+					return { lhs.x + rhs.x, lhs.y + rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
+				},
+				sol::meta_function::subtraction, 
+				[](const glm::vec4& lhs, const glm::vec4& rhs) -> glm::vec4 {
+					return { lhs.x - rhs.x, lhs.y - rhs.y, lhs.z - rhs.z, lhs.w - rhs.w };
+				}				
+			);
+			
+			vec4Type["x"] = &glm::vec4::x;
+			vec4Type["y"] = &glm::vec4::y;
+			vec4Type["z"] = &glm::vec4::z;
+			vec4Type["w"] = &glm::vec4::w;
+		}
+			
+		// transform:
+		{
+			sol::usertype<Transform> transformType = mLua.new_usertype<Transform>(
+				"transform", 
+				sol::call_constructor,
+				sol::constructors<
+					Transform(const glm::vec3&, const glm::vec3&, const glm::vec3&), 
+					Transform()
+				>()
+			);
+			
+			transformType["position"] = &Transform::position;
+			transformType["rotation"] = &Transform::rotation;
+			transformType["scale"] = &Transform::scale;
+		}
 		
-			// audio:
+		// audio:
+		{
+			sol::usertype<AudioSourceComponent> audioSourceType = mLua.new_usertype<AudioSourceComponent>("audio_source");
+			audioSourceType["handle"] = &AudioSourceComponent::assetHandle;
+			audioSourceType["play"] = [&](AudioSourceComponent* component)
 			{
-				sol::usertype<AudioSourceComponent> audioSourceType = mLua.new_usertype<AudioSourceComponent>("audio_source");
-				audioSourceType["handle"] = &AudioSourceComponent::assetHandle;
+				asset_handle assetHandle = component->assetHandle;
+				rAudioHandler->play(assetHandle);
+			};
+			audioSourceType["set_volume"] = [&](AudioSourceComponent* component, float volume)
+			{
+				asset_handle assetHandle = component->assetHandle;
+				rAudioHandler->set_volume(assetHandle, volume);
+			};
+		}
 
-				audioSourceType["play"] = [&](AudioSourceComponent* component)
-				{
-					asset_handle assetHandle = component->assetHandle;
-					rAudioHandler->play(assetHandle);
-				};
+		// physics:
+		{
+			sol::usertype<Body2DComponent> body2dType = mLua.new_usertype<Body2DComponent>("body2d");
+			body2dType["id"] = &Body2DComponent::bodyID;
 
-				audioSourceType["set_volume"] = [&](AudioSourceComponent* component, float volume)
-				{
-					asset_handle assetHandle = component->assetHandle;
-					rAudioHandler->set_volume(assetHandle, volume);
-				};
-			}
+			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.
+		}
 
 		// clang-format on
 	}

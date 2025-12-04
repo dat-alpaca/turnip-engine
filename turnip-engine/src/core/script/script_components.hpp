@@ -17,6 +17,6 @@ namespace tur
 
 	public:
 		std::filesystem::path filepath;
-		sol::environment environment;
+		sol::table instance;
 	};
 }

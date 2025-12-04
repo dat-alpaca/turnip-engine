@@ -2,6 +2,7 @@
 #include "physics/physics_handler.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
+#include <cmath>
 
 namespace tur
 {
@@ -50,10 +51,21 @@ namespace tur
 	private:
 		void synchronize_physics_world()
 		{
-			/*
 			auto view = rScene->get_registry().view<TransformComponent, Body2DComponent>();
-			*/
-			// TODO : fix
+			for (auto entity : view)
+			{
+				// TODO: check if transform is dirty. reset velocities.
+
+				auto& transform = view.get<TransformComponent>(entity).transform;
+				auto& body = view.get<Body2DComponent>(entity);
+
+				b2Vec2 position = {transform.position.x, transform.position.y};
+
+				float angle = glm::radians(transform.rotation.z);
+				b2Rot rotation = b2Rot{cosf(angle), sinf(angle)};
+
+				b2Body_SetTransform(body.bodyID, position, rotation);
+			}
 		}
 
 		void synchronize_transform()
@@ -68,12 +80,10 @@ namespace tur
 
 				transform.position.x = position.x;
 				transform.position.y = position.y;
-				TUR_LOG_WARN("{}", position.y);
-				continue;
 
 				b2Rot rotation = b2Body_GetRotation(body.bodyID);
 				float angleInRadians = b2Rot_GetAngle(rotation);
-				transform.rotation.z = glm::degrees(angleInRadians);
+				transform.rotation.z = angleInRadians;
 			}
 		}
 
@@ -82,6 +92,6 @@ namespace tur
 		NON_OWNING Scene* rScene = nullptr;
 
 	private:
-		bool mEnableTransformSync = false;
+		bool mEnableTransformSync = true;
 	};
 }

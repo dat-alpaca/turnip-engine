@@ -22,6 +22,8 @@ namespace tur
 
 		if (type == AssetType::AUDIO)
 			return "Audio";
+
+		return "Invalid";
 	}
 
 	struct AssetMetadata

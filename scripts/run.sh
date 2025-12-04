@@ -1,1 +1,1 @@
-./build/turnip/turnip-sandbox/turnip-sandbox
+./build/turnip-sandbox/turnip-sandbox

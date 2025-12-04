@@ -3,7 +3,7 @@
 
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
-#include "script/script_system.hpp"
+#include "script/script_handler.hpp"
 
 namespace tur
 {
@@ -18,7 +18,7 @@ namespace tur
 		void set_scene(Scene* scene) { rScene = scene; }
 
 	public:
-		void wake()
+		void wake_up()
 		{
 			initialize_registry();
 			on_wake();
@@ -28,14 +28,14 @@ namespace tur
 		void on_wake()
 		{
 			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
-				call_function(script.environment, "on_wake");
+				call_function(script.instance, "on_wake");
 		}
 
 		void on_update()
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
-				call_function(script.environment, "on_update");
+				call_function(script.instance, "on_update");
 		}
 
 	private:
@@ -49,35 +49,37 @@ namespace tur
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{
-				script.environment = rScriptHandler->create_environment();
-				initialize_environment(script.environment, e);
+				auto scriptFile = lua.script_file(script.filepath);
 
-				sol::protected_function_result result = lua.safe_script_file(script.filepath, script.environment);
-
-				if (result.valid())
+				if (!scriptFile.valid())
+				{
+					sol::error err = scriptFile;
+					TUR_LOG_ERROR("[Lua]: {}. File: {}", err.what(), script.filepath.string());
 					continue;
+				}
 
-				sol::error err = result;
-				TUR_LOG_ERROR("[Lua]: {}", err.what());
+				sol::table instance = scriptFile;
+				script.instance = instance["new"](instance);
+
+				initialize_environment(script.instance, e);
 			}
 		}
 
-		void initialize_environment(sol::environment& environment, entt::entity entity)
+		void initialize_environment(sol::table& instance, entt::entity entity)
 		{
-			environment["_id"] = static_cast<u32>(entity);
+			instance["_id"] = static_cast<u32>(entity);
 
-			environment["find_component"] = [&, entity](const std::string& componentName) {
-				return find_component(Entity{entity, rScene}, componentName);
-			};
+			instance["find_component"] = [&, entity](const std::string& componentName)
+			{ return find_component(Entity{entity, rScene}, componentName); };
 		}
 
-		void call_function(sol::environment& environment, std::string_view functionName)
+		void call_function(sol::table& instance, std::string_view functionName)
 		{
-			auto function = environment[functionName];
+			auto function = instance[functionName];
 			if (!function.valid() || function.get_type() != sol::type::function)
 				TUR_LOG_ERROR("Failed to call function: {}", functionName);
 
-			function();
+			function(instance);
 		}
 
 	private:

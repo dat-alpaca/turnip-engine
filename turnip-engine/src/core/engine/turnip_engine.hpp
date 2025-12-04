@@ -2,7 +2,7 @@
 #include "assets/asset_library.hpp"
 #include "audio/audio_handler.hpp"
 #include "physics/physics_handler.hpp"
-#include "script/script_system.hpp"
+#include "script/script_handler.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
 

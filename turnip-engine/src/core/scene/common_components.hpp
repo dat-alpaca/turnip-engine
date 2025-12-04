@@ -12,7 +12,7 @@ namespace tur
 		HierarchyComponent() = default;
 
 	public:
-		entt::entity parent;
+		entt::entity parent = entt::null;
 		u64 level = 0;
 	};
 

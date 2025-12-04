@@ -16,7 +16,7 @@
 #include "core/scene/scene.hpp"
 
 #include "core/script/script_components.hpp"
-#include "core/script/script_system.hpp"
+#include "core/script/script_handler.hpp"
 
 #include "core/view/view.hpp"
 #include "core/windowing/windowing.hpp"

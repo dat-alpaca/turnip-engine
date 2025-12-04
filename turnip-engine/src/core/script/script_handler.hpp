@@ -17,14 +17,11 @@ namespace tur
 	{
 	public:
 		void initialize();
-
 		void initialize_input(Window& window);
-
 		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
 
 	private:
 		void initialize_logging();
-
 		void initialize_usertypes();
 
 	public:

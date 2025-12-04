@@ -3,19 +3,18 @@
     "configurePresets": [
         {
             "name": "turnip",
-            "displayName": "Turnip Default Configuration",
-            "description": "Configure with GCC compiler",
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/${presetName}/",
+            "binaryDir": "${sourceDir}/build/",
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "/usr/bin/gcc",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
-                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON"
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "GCC_INSTALL_PREFIX": ""
             }
         }
-    ], 
+    ],
     "buildPresets": [
         {
             "name": "turnip-build",

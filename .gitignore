@@ -12,6 +12,9 @@
 *.vcxproj
 *.csproj
 
+# clangd:
+.cache
+
 # Makefiles:
 Makefile
 *.make

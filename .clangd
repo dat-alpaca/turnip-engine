@@ -1,0 +1,14 @@
+CompileFlags:
+    Add: [
+        -std=gnu++20,
+        -isystem,
+        /usr/include/c++/11,
+        -isystem,
+        /usr/include/c++/11/backward,
+        -isystem,
+        /usr/local/include,
+        -isystem,
+        /usr/include,
+        -isystem,
+        /usr/include/x86_64-linux-gnu/c++/11,
+    ]
