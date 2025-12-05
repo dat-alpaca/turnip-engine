@@ -1,3 +1,4 @@
+#include "client/scene_serialization.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -44,6 +45,9 @@ private:
 
 		entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
 		entity.add_component<RectCollider2D>(1.f, 1.f);
+
+		auto& scene = get_current_scene(); 
+		serialize_scene(&scene, "scene.json");
 		return;
 		// Entity 1:
 		{

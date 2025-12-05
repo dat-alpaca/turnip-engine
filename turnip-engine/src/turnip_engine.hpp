@@ -24,5 +24,6 @@
 #include "client/scene_view.hpp"
 #include "client/system/imm_quad_system.hpp"
 #include "client/system/script_system.hpp"
+#include "client/scene_serialization.hpp"
 
 #include "common.hpp"
