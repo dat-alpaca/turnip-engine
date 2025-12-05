@@ -14,6 +14,8 @@ namespace tur
 			: filepath(filepath)
 		{
 		}
+		
+		ScriptComponent() = default;
 
 	public:
 		std::filesystem::path filepath;

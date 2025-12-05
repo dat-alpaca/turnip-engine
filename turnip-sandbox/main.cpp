@@ -1,3 +1,5 @@
+#include "client/project/project.hpp"
+#include "client/scene_serialization.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -8,6 +10,7 @@ public:
 	void on_view_added() final
 	{
 		SceneView::on_view_added();
+		mProject.initialize("res/project");
 
 		initialize_resources();
 		initialize_entities();
@@ -44,7 +47,9 @@ private:
 
 		entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
 		entity.add_component<RectCollider2D>(1.f, 1.f);
-		return;
+
+		auto& scene = get_current_scene(); 
+		
 		// Entity 1:
 		{
 			auto entity0 = get_current_scene().add_entity("newone");
@@ -63,11 +68,15 @@ private:
 			}
 			entity0.add_component<TransformComponent>(transformComponent0);
 		}
+
+		mProject.add_scene(&scene, "main_scene.json");
+		mProject.save();
 	}
 
 private:
 	asset_handle mSoundAsset;
 	asset_handle mFaceAsset;
+	Project mProject;
 };
 
 int main()
