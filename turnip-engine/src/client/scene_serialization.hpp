@@ -39,7 +39,7 @@ namespace tur
     public:
         void operator()(entt::entity entity)
         {
-            mObject.push_back(static_cast<u32>(entity));
+            mCurrent.push_back(static_cast<u32>(entity));
         }
 
         void operator()(std::underlying_type_t<entt::entity> size)
