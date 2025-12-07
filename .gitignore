@@ -12,6 +12,9 @@
 *.vcxproj
 *.csproj
 
+# Projects:
+res/project/
+
 # clangd:
 .cache
 
