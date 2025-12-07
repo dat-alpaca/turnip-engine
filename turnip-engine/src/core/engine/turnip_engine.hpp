@@ -41,11 +41,11 @@ namespace tur
 
 	private:
 		RenderInterface mRenderInterface;
+		ScriptHandler mScriptHandler;
 		ViewHandler mViewHandler;
 		WorkerPool mWorkerPool;
 		AudioHandler mAudioHandler;
 		PhysicsHandler mPhysicsHandler;
-		ScriptHandler mScriptHandler;
 		tur_unique<Window> mWindow;
 
 	private:
