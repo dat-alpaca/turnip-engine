@@ -60,7 +60,6 @@ namespace tur
 
 	inline void json_write_file(const std::filesystem::path& filepath, nlohmann::json jsonObject)
 	{
-		TUR_LOG_INFO("{}", filepath.string());
 		std::ofstream jsonFile(filepath);
 		jsonFile << std::setfill(' ') << std::setw(4) << jsonObject;
 	}

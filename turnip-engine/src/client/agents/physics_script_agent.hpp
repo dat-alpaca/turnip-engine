@@ -68,7 +68,7 @@ namespace tur
                 auto& instance = A.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_begin");
                 if (function.valid())
-                    function(instance, entityB);
+                    function(instance, B);
             }
 
             if(B.has_component<ScriptComponent>())
@@ -76,7 +76,7 @@ namespace tur
                 auto& instance = B.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_begin");
                 if (function.valid())
-                    function(instance, entityA);
+                    function(instance, A);
             }
         }
 
@@ -90,7 +90,7 @@ namespace tur
                 auto& instance = A.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_end");
                 if (function.valid())
-                    function(instance, entityB);
+                    function(instance, B);
             }
 
             if(B.has_component<ScriptComponent>())
@@ -98,7 +98,7 @@ namespace tur
                 auto& instance = B.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_end");
                 if (function.valid())
-                    function(instance, entityA);
+                    function(instance, A);
             }
         }
 
@@ -112,7 +112,7 @@ namespace tur
                 auto& instance = A.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_hit");
                 if(function.valid())
-                    function(instance, entityB, approachSpeed);
+                    function(instance, B, approachSpeed);
             }
 
             if(B.has_component<ScriptComponent>())
@@ -120,7 +120,7 @@ namespace tur
                 auto& instance = B.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_hit");
                 if(function.valid())
-                    function(instance, entityA, approachSpeed);
+                    function(instance, A, approachSpeed);
             }
         }
 

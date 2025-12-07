@@ -21,7 +21,7 @@ function player:on_wake()
     self.body2d_c = self.find_component("body2d") 
 
     -- self._entity:find_component("transform");
-    --self.body2d_c:set_type(Physics.BodyType.STATIC)
+    --  self.body2d_c:set_type(Physics.BodyType.STATIC)
 end
 
 function player:on_update()
@@ -63,9 +63,9 @@ function player:on_contact_begin(otherEntity)
     local force = vec2(0.0, -70.0)
     self.body2d_c:add_force(force)
     self.audio_c:play()
-    
-    local t = otherEntity.find_component("transform") -- fix
-    Log.info(t.position.x)
+
+    local name = otherEntity:find_component("name").value
+    Log.debug("object: " .. name)
 end
 
 return player

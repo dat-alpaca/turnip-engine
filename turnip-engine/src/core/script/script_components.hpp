@@ -1,6 +1,7 @@
 #pragma once
 #include <filesystem>
 #include <sol/sol.hpp>
+#include <sol/types.hpp>
 
 #include "common.hpp"
 #include "scene/entity.hpp"
@@ -16,6 +17,10 @@ namespace tur
 		}
 		
 		ScriptComponent() = default;
+		~ScriptComponent()
+		{
+			instance = sol::nil;
+		}
 
 	public:
 		std::filesystem::path filepath;

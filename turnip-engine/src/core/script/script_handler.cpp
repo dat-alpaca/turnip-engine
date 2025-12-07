@@ -4,6 +4,7 @@
 #include "box2d/math_functions.h"
 #include "entt/entity/fwd.hpp"
 #include "physics/physics_types.hpp"
+#include "scene/common_components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
 #include <sol/raii.hpp>
@@ -208,6 +209,11 @@ namespace tur
 		sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
 		uuidType["value"] = &UUID::uuid;
 		uuidType["uuid"] = &UUID::uuid;
+
+		// Name:
+		sol::usertype<NameComponent> nameType = mLua.new_usertype<NameComponent>("name");
+		nameType["value"] = &NameComponent::name;
+		
 		// vec2:
 		{
 			sol::usertype<glm::vec2> vec2Type = mLua.new_usertype<glm::vec2>(
@@ -339,10 +345,13 @@ namespace tur
 	{
 		auto& lua = get_state();
 		if (componentName == "uuid" && entity.has_component<UUIDComponent>())
+		{
+			auto a = entity.get_component<UUIDComponent>().uuid;
 			return sol::make_object(lua, &entity.get_component<UUIDComponent>().uuid);
+		}
 
 		if (componentName == "name" && entity.has_component<NameComponent>())
-			return sol::make_object(lua, &entity.get_component<NameComponent>().name);
+			return sol::make_object(lua, &entity.get_component<NameComponent>());
 
 		if (componentName == "transform" && entity.has_component<TransformComponent>())
 			return sol::make_object(lua, &entity.get_component<TransformComponent>().transform);
