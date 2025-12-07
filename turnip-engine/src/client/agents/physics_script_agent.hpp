@@ -67,14 +67,16 @@ namespace tur
             {
                 auto& instance = A.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_begin");
-                function(instance, entityB);
+                if (function.valid())
+                    function(instance, entityB);
             }
 
             if(B.has_component<ScriptComponent>())
             {
                 auto& instance = B.get_component<ScriptComponent>().instance;
                 auto function = rScriptSystem->get_function(instance, "on_contact_begin");
-                function(instance, entityA);
+                if (function.valid())
+                    function(instance, entityA);
             }
         }
 
@@ -83,12 +85,21 @@ namespace tur
             Entity A { entityA, rScriptSystem->get_scene() };
             Entity B { entityB, rScriptSystem->get_scene() };
        
-            if(!A.has_component<ScriptComponent>())
-                return;
+            if(A.has_component<ScriptComponent>())
+            {
+                auto& instance = A.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_end");
+                if (function.valid())
+                    function(instance, entityB);
+            }
 
-            auto& instance = A.get_component<ScriptComponent>().instance;
-            auto function = rScriptSystem->get_function(instance, "on_contact_end");
-            function(instance, entityB);
+            if(B.has_component<ScriptComponent>())
+            {
+                auto& instance = B.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_end");
+                if (function.valid())
+                    function(instance, entityA);
+            }
         }
 
         void handle_hit_event(entt::entity entityA, entt::entity entityB, float approachSpeed)
@@ -96,12 +107,21 @@ namespace tur
             Entity A { entityA, rScriptSystem->get_scene() };
             Entity B { entityB, rScriptSystem->get_scene() };
        
-            if(!A.has_component<ScriptComponent>())
-                return;
+            if(A.has_component<ScriptComponent>())
+            {
+                auto& instance = A.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_hit");
+                if(function.valid())
+                    function(instance, entityB, approachSpeed);
+            }
 
-            auto& instance = A.get_component<ScriptComponent>().instance;
-            auto function = rScriptSystem->get_function(instance, "on_contact_hit");
-            function(instance, entityB, approachSpeed);
+            if(B.has_component<ScriptComponent>())
+            {
+                auto& instance = B.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_hit");
+                if(function.valid())
+                    function(instance, entityA, approachSpeed);
+            }
         }
 
     private:
