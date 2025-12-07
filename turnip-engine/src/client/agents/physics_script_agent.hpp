@@ -63,12 +63,19 @@ namespace tur
             Entity A { entityA, rScriptSystem->get_scene() };
             Entity B { entityB, rScriptSystem->get_scene() };
        
-            if(!A.has_component<ScriptComponent>())
-                return;
+            if(A.has_component<ScriptComponent>())
+            {
+                auto& instance = A.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_begin");
+                function(instance, entityB);
+            }
 
-            auto& instance = A.get_component<ScriptComponent>().instance;
-            auto function = rScriptSystem->get_function(instance, "on_contact_begin");
-            function(instance, entityB);
+            if(B.has_component<ScriptComponent>())
+            {
+                auto& instance = B.get_component<ScriptComponent>().instance;
+                auto function = rScriptSystem->get_function(instance, "on_contact_begin");
+                function(instance, entityA);
+            }
         }
 
         void handle_end_event(entt::entity entityA, entt::entity entityB)

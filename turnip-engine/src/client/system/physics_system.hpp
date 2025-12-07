@@ -46,27 +46,6 @@ namespace tur
 		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
-		void wake()
-		{
-			auto view0 = rScene->get_registry().view<Body2DComponent, TransformComponent>();
-			for (auto [e, body, transformComp] : view0.each())
-			{
-				const auto& worldPos = transformComp.transform.position;
-				body.bodyDef.position = {worldPos.x, worldPos.y};
-			}
-
-			auto view1 = rScene->get_registry().view<Body2DComponent>();
-			for (auto entity : view1)
-			{
-				auto& body = view1.get<Body2DComponent>(entity);
-				body.bodyID = b2CreateBody(rPhysicsHandler->get_world_id(), &body.bodyDef);
-			}
-
-			auto view2 = rScene->get_registry().view<Body2DComponent, RectCollider2D>();
-			for (auto [e, body, rectCollider] : view2.each())
-				b2CreatePolygonShape(body.bodyID, &rectCollider.shapeDef, &rectCollider.polygon);
-		}
-
 		void update()
 		{
 			if (mEnableTransformSync)
@@ -82,7 +61,10 @@ namespace tur
 		void setup_registry_events()
 		{
 			auto& registry = rScene->get_registry();
+			registry.on_construct<Body2DComponent>().connect<&PhysicsSystem::on_body2d_added>(this);
 			registry.on_construct<RectCollider2D>().connect<&PhysicsSystem::on_rect2d_added>(this);
+		
+			
 		}
 
 		void synchronize_physics_world()
@@ -160,10 +142,25 @@ namespace tur
 		}
 
 	private:
+		void on_body2d_added(entt::registry& registry, entt::entity entity)
+		{
+			Entity sceneEntity { entity, rScene };
+			auto& body = sceneEntity.get_component<Body2DComponent>();
+			const auto& transform = sceneEntity.get_component<TransformComponent>().transform;
+
+			const auto& worldPos = transform.position;
+			body.bodyDef.position = {worldPos.x, worldPos.y};
+
+			body.bodyID = b2CreateBody(rPhysicsHandler->get_world_id(), &body.bodyDef);
+		}
+
 		void on_rect2d_added(entt::registry& registry, entt::entity entity) 
 		{
 			Entity sceneEntity { entity, rScene };
-			auto rectCollider = sceneEntity.get_component<RectCollider2D>();
+			const auto& body = sceneEntity.get_component<Body2DComponent>();
+			auto& rectCollider = sceneEntity.get_component<RectCollider2D>();
+
+			rectCollider.shapeID = b2CreatePolygonShape(body.bodyID, &rectCollider.shapeDef, &rectCollider.polygon);
 			mShapeMap[rectCollider.shapeID] = entity;
 		}
 
