@@ -1,6 +1,10 @@
 #include "script_handler.hpp"
 #include "audio/audio_handler.hpp"
+#include "entt/entity/fwd.hpp"
 #include "physics/physics_types.hpp"
+#include "scene/entity.hpp"
+#include "scene/scene.hpp"
+#include <sol/raii.hpp>
 
 namespace tur
 {
@@ -180,10 +184,23 @@ namespace tur
 
 	void ScriptHandler::initialize_usertypes()
 	{
-		// clang-format off
-
 		// TODO: add registry methods for entity creation and component attachment
 		// TODO: add body2d creation methods: create new body2d.
+
+		// Entity:
+		sol::usertype<Entity> entityType = mLua.new_usertype<Entity>(
+			"entity", 
+			sol::constructors<
+				Entity(), 
+				Entity(entt::entity, Scene* scene)
+			>()
+		);
+		entityType["id"] = [](Entity* entity) {
+			return entity->get_handle();	
+		};
+		entityType["find_component"] = [&](Entity* entity, const std::string& componentName) {
+			return find_component(*entity, componentName);
+		};
 
 		// UUID:
 		sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
@@ -308,7 +325,51 @@ namespace tur
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.
 		}
+	}
 
-		// clang-format on
+	sol::object ScriptHandler::find_component(Entity entity, const std::string& componentName)
+	{
+		auto& lua = get_state();
+		if (componentName == "uuid" && entity.has_component<UUIDComponent>())
+			return sol::make_object(lua, &entity.get_component<UUIDComponent>().uuid);
+
+		if (componentName == "name" && entity.has_component<NameComponent>())
+			return sol::make_object(lua, &entity.get_component<NameComponent>().name);
+
+		if (componentName == "transform" && entity.has_component<TransformComponent>())
+			return sol::make_object(lua, &entity.get_component<TransformComponent>().transform);
+
+		if (componentName == "audio_source" && entity.has_component<AudioSourceComponent>())
+			return sol::make_object(lua, &entity.get_component<AudioSourceComponent>());
+
+		if (componentName == "body2d" && entity.has_component<Body2DComponent>())
+			return sol::make_object(lua, &entity.get_component<Body2DComponent>());
+
+		return sol::nil;
+	}
+
+	sol::object ScriptHandler::add_component(Entity entity, const std::string& componentName)
+	{
+		auto& lua = get_state();
+		
+		if (componentName == "transform" && !entity.has_component<TransformComponent>())
+		{
+			entity.add_component<TransformComponent>();
+			return find_component(entity, componentName);
+		}
+
+		if (componentName == "audio_source" && !entity.has_component<AudioSourceComponent>())
+		{
+			entity.add_component<AudioSourceComponent>();
+			return find_component(entity, componentName);
+		}
+		
+		if (componentName == "body2d" && !entity.has_component<Body2DComponent>())
+		{
+			entity.add_component<Body2DComponent>();
+			return find_component(entity, componentName);
+		}
+
+		return sol::nil;
 	}
 }

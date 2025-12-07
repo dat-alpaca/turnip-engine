@@ -20,7 +20,8 @@ function player:on_wake()
     self.audio_c = self.find_component("audio_source")
     self.body2d_c = self.find_component("body2d") 
 
-    self.body2d_c:set_type(Physics.BodyType.STATIC)
+    -- self._entity:find_component("transform");
+    --self.body2d_c:set_type(Physics.BodyType.STATIC)
 end
 
 function player:on_update()
@@ -28,8 +29,8 @@ function player:on_update()
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
         self.audio_c:play()
 
-        self.transform_c.position.x = mouse_pos.x
-        self.transform_c.position.y = mouse_pos.y
+        self.transform_c.position.x = mouse_pos.x / 100
+        self.transform_c.position.y = mouse_pos.y / 100
     end
 
     self:get_direction()
@@ -58,6 +59,10 @@ function player:move()
     self.transform_c.position.x = self.transform_c.position.x + 4.0 * self._direction.x
     self.transform_c.position.y = self.transform_c.position.y + 4.0 * self._direction.y
     self._direction = vec2(0.0, 0.0)
+end
+
+function player:on_contact_begin(otherEntity)
+    Log.info("hi")
 end
 
 return player

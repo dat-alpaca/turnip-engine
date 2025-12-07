@@ -25,3 +25,5 @@
 #include "scene_events/scene_switched_event.hpp"
 
 #include "graphics_events/texture_uploaded_event.hpp"
+
+#include "physics_events/contact_event.hpp"

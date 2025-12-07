@@ -1,5 +1,8 @@
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
+#include "client/scene_view.hpp"
+#include "event/subscriber.hpp"
+#include "physics/physics_components.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -11,6 +14,7 @@ public:
 	{
 		SceneView::on_view_added();
 		mProject.initialize("res/project");
+		mainCamera.set_orthogonal(0.0f, 30.0f, 0, 30.f);
 
 		initialize_resources();
 		initialize_entities();
@@ -24,6 +28,7 @@ private:
 
 		mFaceAsset = library.load_texture_async("res/textures/face.png");
 		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
+		mFloorAsset = library.load_texture_async("res/textures/floor.png");
 	}
 
 	void initialize_entities()
@@ -40,8 +45,8 @@ private:
 		// Transform:
 		TransformComponent transformComponent;
 		{
-			transformComponent.transform.position = glm::vec3(windowSize.x / 2.f, windowSize.y / 2.f, 0.0f);
-			transformComponent.transform.scale = glm::vec3(100.f, 100.f, 1.f);
+			transformComponent.transform.position = glm::vec3(3.0f, 1.0f, 0.0f);
+			transformComponent.transform.scale = glm::vec3(1.f, 1.f, 1.f);
 		}
 		entity.add_component<TransformComponent>(transformComponent);
 
@@ -69,13 +74,55 @@ private:
 			entity0.add_component<TransformComponent>(transformComponent0);
 		}
 
+		// Floor:
+		{
+			auto floor = get_current_scene().add_entity("floor");
+
+			floor.add_component<Sprite2DComponent>(mFloorAsset);
+
+			// Transform:
+			TransformComponent transformComponent0;
+			{
+				transformComponent0.transform.position = glm::vec3(3.0, 5.f, 0.0f);
+				transformComponent0.transform.scale = glm::vec3(1.f, 1.0f, 1.f);
+			}
+			floor.add_component<TransformComponent>(transformComponent0);
+
+			floor.add_component<Body2DComponent>();
+			floor.add_component<RectCollider2D>(1.f, 1.f);
+		}
+
 		mProject.add_scene(&scene, "main_scene.json");
 		mProject.save();
 	}
 
+	void on_event(Event& event) override
+	{
+		SceneView::on_event(event);
+
+		Subscriber subscriber(event);
+		subscriber.subscribe<WindowResizeEvent>(
+			[&](const WindowResizeEvent& resizeEvent) -> bool
+			{
+				auto dimensions = engine->get_window_dimensions();
+
+				mainCamera.set_orthogonal(
+					0.0f, 
+					static_cast<f32>(dimensions.x / PixelPerMeter), 
+					0.0f, 
+					static_cast<f32>(dimensions.y / PixelPerMeter)
+				);
+				return false;
+			}
+		);
+	}
+
 private:
+	static constexpr inline float PixelPerMeter = 100.f;
+
 	asset_handle mSoundAsset;
 	asset_handle mFaceAsset;
+	asset_handle mFloorAsset;
 	Project mProject;
 };
 

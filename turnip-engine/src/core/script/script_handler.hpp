@@ -20,12 +20,13 @@ namespace tur
 		void initialize_input(Window& window);
 		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
 
+	public:
+		sol::object find_component(Entity entity, const std::string& componentName);
+		sol::object add_component(Entity entity, const std::string& componentName);
+
 	private:
 		void initialize_logging();
 		void initialize_usertypes();
-
-	public:
-		inline sol::environment create_environment() { return sol::environment(mLua, sol::create, mLua.globals()); }
 
 	public:
 		sol::state& get_state() { return mLua; }

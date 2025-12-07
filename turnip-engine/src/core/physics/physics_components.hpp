@@ -1,4 +1,5 @@
 #pragma once
+#include "box2d/id.h"
 #include "physics_types.hpp"
 #include <box2d/box2d.h>
 #include <glm/glm.hpp>
@@ -26,6 +27,8 @@ namespace tur
 		}
 
 	public:
+		// TODO: enableContactEvents
+		// TODO: getType
 		b2BodyDef bodyDef;
 		b2BodyId bodyID;
 	};
@@ -36,12 +39,18 @@ namespace tur
 		RectCollider2D(float width, float height)
 		{
 			polygon = b2MakeBox(width / 2.f, height / 2.f);
-			shape = b2DefaultShapeDef();
-			shape.density = 1.0f;
+			shapeDef = b2DefaultShapeDef();
+			shapeDef.density = 1.0f;
+			shapeDef.material.friction = 0.3f; // TODO: rest
+
+			shapeDef.enableContactEvents = true;
+			shapeDef.filter.categoryBits = 0x0001;
+			shapeDef.filter.maskBits = 0xFFFF;
 		}
 
 	public:
 		b2Polygon polygon;
-		b2ShapeDef shape;
+		b2ShapeDef shapeDef;
+		b2ShapeId shapeID;
 	};
 }

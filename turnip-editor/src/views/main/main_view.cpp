@@ -141,9 +141,13 @@ void MainView::on_event(Event& event)
 
 			// Viewport:
 			if (r_QuadRenderer)
+			{
+				float lowerX = -25.0f, upperX = 25.0f, lowerY = -5.0f, upperY = 25.0f;
 				renderer_set_viewport(
-					r_QuadRenderer, {0.0f, 0.0f, (float)resizeEvent.width, (float)resizeEvent.height}
+					r_QuadRenderer, {lowerX, upperX, lowerY, upperY}
 				);
+			}
+
 
 			// Camera:
 			m_SceneData.editorCamera.camera.set_orthogonal(

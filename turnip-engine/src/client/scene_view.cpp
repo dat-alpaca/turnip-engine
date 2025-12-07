@@ -29,9 +29,13 @@ namespace tur
 
 		// Physics system:
 		physicsSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_physics_handler());
-
+		physicsSystem.set_event_callback(engine->get_event_callback());
+		
 		// Scripts subsystem:
 		scriptSystem.initialize(mSceneHolder.get_current_scene(), &engine->get_script_handler());
+		
+		// Physics-Script Agent:
+		mPhysicsScriptAgent.initialize(mSceneHolder.get_current_scene(), &physicsSystem, &scriptSystem);
 
 		// Binders:
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
@@ -61,21 +65,13 @@ namespace tur
 				quadSystem.set_scene(viewSwitch.currentScene);
 				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
 				physicsSystem.set_scene(viewSwitch.currentScene);
+				mPhysicsScriptAgent.set_scene(viewSwitch.currentScene);
 
 				return false;
 			}
 		);
 
-		subscriber.subscribe<WindowResizeEvent>(
-			[&](const WindowResizeEvent& resizeEvent) -> bool
-			{
-				mainCamera.set_orthogonal(
-					0.0f, static_cast<f32>(resizeEvent.width), 0.0f, static_cast<f32>(resizeEvent.height)
-				);
-				return false;
-			}
-		);
-
+		mPhysicsScriptAgent.on_event(event);
 		mTextureAgent.on_event(event);
 		mTextureAssetBinder.on_event(event);
 		quadSystem.on_event(event);

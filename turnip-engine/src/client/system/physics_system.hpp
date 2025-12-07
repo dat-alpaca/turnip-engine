@@ -1,18 +1,47 @@
 #pragma once
+#include "box2d/id.h"
+#include "box2d/types.h"
+#include "entt/entity/fwd.hpp"
+
+#include "event/physics_events/contact_event.hpp"
+#include "logging/logging.hpp"
+#include "physics/physics_components.hpp"
 #include "physics/physics_handler.hpp"
+
 #include "scene/components.hpp"
+#include "scene/entity.hpp"
 #include "scene/scene.hpp"
-#include <cmath>
+
+#include "client/agents/event_emitter.hpp"
+
+#include <unordered_map>
+
+inline bool operator==(const b2ShapeId& lhs, const b2ShapeId& rhs)
+{
+	return lhs.index1 == rhs.index1 && lhs.world0 == rhs.world0 && lhs.generation == rhs.generation;
+}
 
 namespace tur
 {
-	class PhysicsSystem
+	struct ShapeIdHash
+	{
+		std::size_t operator()(const b2ShapeId& id) const
+		{
+			return std::hash<int32_t>{}(id.index1) ^ (std::hash<uint16_t>{}(id.generation) << 1);
+		}
+	};
+}
+
+namespace tur
+{
+	class PhysicsSystem : public IEventEmitter
 	{
 	public:
 		void initialize(NON_OWNING Scene* scene, NON_OWNING PhysicsHandler* physicsHandler)
 		{
 			rPhysicsHandler = physicsHandler;
 			set_scene(scene);
+			setup_registry_events();
 		}
 		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
@@ -35,7 +64,7 @@ namespace tur
 
 			auto view2 = rScene->get_registry().view<Body2DComponent, RectCollider2D>();
 			for (auto [e, body, rectCollider] : view2.each())
-				b2CreatePolygonShape(body.bodyID, &rectCollider.shape, &rectCollider.polygon);
+				b2CreatePolygonShape(body.bodyID, &rectCollider.shapeDef, &rectCollider.polygon);
 		}
 
 		void update()
@@ -44,11 +73,18 @@ namespace tur
 				synchronize_physics_world();
 
 			rPhysicsHandler->step();
+			process_contact_events(rPhysicsHandler->get_contact_events());
 
 			synchronize_transform();
 		}
 
 	private:
+		void setup_registry_events()
+		{
+			auto& registry = rScene->get_registry();
+			registry.on_construct<RectCollider2D>().connect<&PhysicsSystem::on_rect2d_added>(this);
+		}
+
 		void synchronize_physics_world()
 		{
 			auto view = rScene->get_registry().view<TransformComponent, Body2DComponent>();
@@ -87,11 +123,59 @@ namespace tur
 			}
 		}
 
+		void process_contact_events(b2ContactEvents events)
+		{
+			// Begin:
+			for (int i = 0; i < events.beginCount; ++i)
+			{
+				b2ContactBeginTouchEvent* beginEvent = &events.beginEvents[i];
+				auto entityAHandle = mShapeMap.at(beginEvent->shapeIdA);
+				auto entityBHandle = mShapeMap.at(beginEvent->shapeIdB);
+
+				OnContactEvent contactEvent(ContactType::BEGIN, entityAHandle, entityBHandle);
+				callback(contactEvent);
+			}
+
+			// End:
+			for (int i = 0; i < events.endCount; ++i)
+			{
+				b2ContactEndTouchEvent* endEvent = &events.endEvents[i];
+				auto entityAHandle = mShapeMap.at(endEvent->shapeIdA);
+				auto entityBHandle = mShapeMap.at(endEvent->shapeIdB);
+
+				OnContactEvent contactEvent(ContactType::END, entityAHandle, entityBHandle);
+				callback(contactEvent);
+			}
+
+			// End:
+			for (int i = 0; i < events.hitCount; ++i)
+			{
+				b2ContactHitEvent* hitEvent = &events.hitEvents[i];
+				auto entityAHandle = mShapeMap.at(hitEvent->shapeIdA);
+				auto entityBHandle = mShapeMap.at(hitEvent->shapeIdB);
+
+				OnContactEvent contactEvent(ContactType::HIT, entityAHandle, entityBHandle, hitEvent->approachSpeed);
+				callback(contactEvent);
+			}
+		}
+
+	private:
+		void on_rect2d_added(entt::registry& registry, entt::entity entity) 
+		{
+			Entity sceneEntity { entity, rScene };
+			auto rectCollider = sceneEntity.get_component<RectCollider2D>();
+			mShapeMap[rectCollider.shapeID] = entity;
+		}
+
+	public:
+		Scene* get_scene() const { return rScene; }
+
 	private:
 		NON_OWNING PhysicsHandler* rPhysicsHandler = nullptr;
 		NON_OWNING Scene* rScene = nullptr;
 
 	private:
+		std::unordered_map<b2ShapeId, entt::entity, ShapeIdHash> mShapeMap;
 		bool mEnableTransformSync = true;
 	};
 }

@@ -8,6 +8,7 @@
 #include "system/script_system.hpp"
 #include "system/texture_asset_binder_system.hpp"
 
+#include "agents/physics_script_agent.hpp"
 #include "agents/texture_asset_agent.hpp"
 
 namespace tur
@@ -47,12 +48,13 @@ namespace tur
 		ScenegraphSystem scenegraphSystem;
 		ScriptSystem scriptSystem;
 		ImmQuadSystem quadSystem;
-		PhysicsSystem physicsSystem;
 		Camera mainCamera;
+		PhysicsSystem physicsSystem;
 
 	private:
 		TextureAssetBinderSystem mTextureAssetBinder;
 		TextureAssetBinderAgent mTextureAgent;
+		PhysicsScriptAgent mPhysicsScriptAgent;
 		SceneHolder mSceneHolder;
 	};
 }

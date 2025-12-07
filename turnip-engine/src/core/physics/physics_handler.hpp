@@ -1,5 +1,8 @@
 #pragma once
 #include "config/physics_config.hpp"
+#include "event/event.hpp"
+#include "event/events.hpp"
+
 #include <box2d/box2d.h>
 
 namespace tur
@@ -12,6 +15,7 @@ namespace tur
 
 	public:
 		void step();
+		b2ContactEvents get_contact_events();
 
 	public:
 		b2WorldId get_world_id() const { return mWorldId; }
