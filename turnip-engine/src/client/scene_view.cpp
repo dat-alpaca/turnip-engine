@@ -45,8 +45,8 @@ namespace tur
 		mainCamera.update_view();
 		quadSystem.update();
 
-		physicsSystem.update();
 		scriptSystem.on_update();
+		physicsSystem.update();
 		scenegraphSystem.update();
 	}
 	void SceneView::on_render()

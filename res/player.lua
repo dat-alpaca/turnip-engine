@@ -27,8 +27,6 @@ end
 function player:on_update()
     local mouse_pos = Input.get_mouse_position()
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
-        self.audio_c:play()
-
         self.transform_c.position.x = mouse_pos.x / 100
         self.transform_c.position.y = mouse_pos.y / 100
     end
@@ -62,7 +60,9 @@ function player:move()
 end
 
 function player:on_contact_begin(otherEntity)
-    Log.info("hi")
+    local force = vec2(0.0, -70.0)
+    self.body2d_c:add_force(force)
+    self.audio_c:play()
 end
 
 return player

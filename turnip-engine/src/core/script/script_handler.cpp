@@ -1,5 +1,7 @@
 #include "script_handler.hpp"
 #include "audio/audio_handler.hpp"
+#include "box2d/box2d.h"
+#include "box2d/math_functions.h"
 #include "entt/entity/fwd.hpp"
 #include "physics/physics_types.hpp"
 #include "scene/entity.hpp"
@@ -321,6 +323,12 @@ namespace tur
 
 			body2dType["set_type"] = [&](Body2DComponent* component, BodyType type) {
 				component->set_type(type);
+			};
+
+			body2dType["add_force"] = [&](Body2DComponent* component, glm::vec2 force) {
+				b2Vec2 forceVector = {force.x, force.y};
+				b2Vec2 position = b2Body_GetWorldCenterOfMass(component->bodyID);
+				b2Body_ApplyForce(component->bodyID, forceVector, position, true);
 			};
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.

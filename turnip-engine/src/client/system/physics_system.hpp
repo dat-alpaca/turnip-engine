@@ -63,8 +63,6 @@ namespace tur
 			auto& registry = rScene->get_registry();
 			registry.on_construct<Body2DComponent>().connect<&PhysicsSystem::on_body2d_added>(this);
 			registry.on_construct<RectCollider2D>().connect<&PhysicsSystem::on_rect2d_added>(this);
-		
-			
 		}
 
 		void synchronize_physics_world()
