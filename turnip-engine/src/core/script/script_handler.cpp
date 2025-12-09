@@ -168,6 +168,13 @@ namespace tur
 		}
 		// clang-format on
 	}
+	void ScriptHandler::initialize_physics(NON_OWNING PhysicsHandler* physicsHandler)
+	{
+		// Timesteps:
+		mLua["Timestep"] = mLua.create_table();
+		mLua["Timestep"]["fixedDelta"] = physicsHandler->get_fixed_timestep();
+		mLua["Timestep"]["substep"] = physicsHandler->get_substep_count();
+	}
 	void ScriptHandler::initialize_audio(NON_OWNING AudioHandler* audioHandler)
 	{
 		rAudioHandler = audioHandler;

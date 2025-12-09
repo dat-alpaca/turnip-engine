@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "physics/physics_handler.hpp"
 #include "platform/platform.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -12,12 +13,14 @@
 namespace tur
 {
 	class AudioHandler;
+	class PhysicsHandler;
 
 	class ScriptHandler
 	{
 	public:
 		void initialize();
 		void initialize_input(Window& window);
+		void initialize_physics(NON_OWNING PhysicsHandler* physicsHandler);
 		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
 
 	public:

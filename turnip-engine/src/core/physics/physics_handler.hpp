@@ -20,6 +20,10 @@ namespace tur
 	public:
 		b2WorldId get_world_id() const { return mWorldId; }
 
+	public:
+		inline u32 get_substep_count() const { return mSubstepCount; }
+		inline float get_fixed_timestep() const { return mFixedTimeStep; }
+	
 	private:
 		b2WorldId mWorldId;
 		u32 mSubstepCount;
