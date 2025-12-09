@@ -34,6 +34,16 @@ namespace tur
 		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
     public:
+        void on_wake()
+        {
+            auto view = rScene->get_registry().view<const Body2DComponent>();
+			for (auto [entity, body] : view.each())
+			{
+                // TODO: Update body properties
+                b2Body_SetType(body.bodyID, body.bodyDef.type);
+            }
+        }
+
         void on_event(Event& event)
         {
             Subscriber subscriber(event);

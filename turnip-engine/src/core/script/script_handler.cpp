@@ -333,8 +333,7 @@ namespace tur
 
 			body2dType["add_force"] = [&](Body2DComponent* component, glm::vec2 force) {
 				b2Vec2 forceVector = {force.x, force.y};
-				b2Vec2 position = b2Body_GetWorldCenterOfMass(component->bodyID);
-				b2Body_ApplyForce(component->bodyID, forceVector, position, true);
+				b2Body_ApplyForceToCenter(component->bodyID, forceVector, true);
 			};
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.

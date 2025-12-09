@@ -21,7 +21,7 @@ function player:on_wake()
     self.body2d_c = self.find_component("body2d") 
 
     -- self._entity:find_component("transform");
-    --  self.body2d_c:set_type(Physics.BodyType.STATIC)
+    self.body2d_c:set_type(Physics.BodyType.KINEMATIC)
 end
 
 function player:on_update()
@@ -54,18 +54,15 @@ function player:get_direction()
 end
 
 function player:move()
-    self.transform_c.position.x = self.transform_c.position.x + 4.0 * self._direction.x
-    self.transform_c.position.y = self.transform_c.position.y + 4.0 * self._direction.y
+    self.transform_c.position.x = self.transform_c.position.x + 0.1 * self._direction.x
+    self.transform_c.position.y = self.transform_c.position.y + 0.1 * self._direction.y
     self._direction = vec2(0.0, 0.0)
 end
 
 function player:on_contact_begin(otherEntity)
     local force = vec2(0.0, -70.0)
     self.body2d_c:add_force(force)
-    self.audio_c:play()
-
-    local name = otherEntity:find_component("name").value
-    Log.debug("object: " .. name)
+    -- self.audio_c:play()
 end
 
 return player

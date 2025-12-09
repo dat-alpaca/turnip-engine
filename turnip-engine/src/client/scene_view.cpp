@@ -1,4 +1,5 @@
 #include "scene_view.hpp"
+#include "client/agents/physics_script_agent.hpp"
 #include "engine/turnip_engine.hpp"
 
 namespace tur
@@ -6,6 +7,7 @@ namespace tur
 	void SceneView::wake_scene()
 	{
 		scriptSystem.wake_up();
+		mPhysicsScriptAgent.on_wake();
 	}
 
 	void SceneView::on_view_added()
