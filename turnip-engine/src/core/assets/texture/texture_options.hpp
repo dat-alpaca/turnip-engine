@@ -26,5 +26,6 @@ namespace tur
 
 		TextureTiling tiling = TextureTiling::OPTIMAL;
 		bool generateMipmaps = false;
+		bool isTextureArray = false;
 	};
 }

@@ -29,6 +29,7 @@ namespace tur
 		R32G32B32A32_SFLOAT, // VEC4
 		R32G32_SINT,         // IVEC2
 		R32G32B32A32_UINT,   // UVEC4
+		R32_UINT,   		 // UINT
 	};
 
 	struct BindingDescriptor

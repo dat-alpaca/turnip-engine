@@ -45,6 +45,7 @@ namespace tur
 	requires(T t, descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding)
 	{
 		{ t.write_uniform_buffer_to_set(setHandle, bufferHandle, range, binding) };
+		{ t.write_storage_buffer_to_set(setHandle, bufferHandle, range, binding) };
 	} &&
 
 	requires(T t, const PipelineDescriptor& desc, pipeline_handle handle)

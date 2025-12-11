@@ -132,8 +132,35 @@ namespace tur::vulkan
 
 		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
 	}
-	void
-	ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
+	void ResourceHandler::write_storage_buffer_to_set(
+		descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
+	)
+	{
+		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
+		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer_handle");
+
+		const Buffer& buffer = mBuffers.get(bufferHandle);
+
+		vk::DescriptorBufferInfo bufferInfo = {};
+		{
+			bufferInfo.buffer = buffer.buffer;
+			bufferInfo.offset = range.offset;
+			bufferInfo.range = range.size;
+		}
+
+		vk::WriteDescriptorSet descriptorWrite = {};
+		{
+			descriptorWrite.dstSet = mDescriptorSets.get(setHandle).set;
+			descriptorWrite.dstBinding = binding;
+			descriptorWrite.dstArrayElement = 0; // TODO: allow modification
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.descriptorType = vk::DescriptorType::eStorageBuffer;
+			descriptorWrite.pBufferInfo = &bufferInfo;
+		}
+
+		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+	}
+	void ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
 	{
 		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
 		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");

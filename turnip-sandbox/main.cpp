@@ -1,3 +1,4 @@
+#include "assets/texture/texture_options.hpp"
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
@@ -26,9 +27,9 @@ private:
 	{
 		AssetLibrary& library = engine->get_asset_library();
 
-		mFaceAsset = library.load_texture_async("res/textures/face.png");
+		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
 		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/floor.png");
+		mFloorAsset = library.load_texture_async("res/textures/floor.png", TextureOptions{.isTextureArray=false});
 	}
 
 	void initialize_entities()

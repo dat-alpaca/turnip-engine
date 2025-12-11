@@ -24,12 +24,12 @@ namespace tur
 			subscriber.subscribe<AssetLoadedEvent>(
 				[&](const AssetLoadedEvent& event) -> bool
 				{
-					if (event.type != AssetType::TEXTURE)
+					if (event.type != AssetType::TEXTURE && event.type != AssetType::TEXTURE_ARRAY)
 						return false;
 
 					texture_handle textureHandle = upload_texture(event.assetHandle);
 
-					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle);
+					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
 
 					return false;

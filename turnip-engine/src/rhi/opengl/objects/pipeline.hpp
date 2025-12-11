@@ -118,6 +118,9 @@ namespace tur::gl
 			case DescriptorType::UNIFORM_BUFFER:
 				return GL_UNIFORM_BUFFER;
 
+			case DescriptorType::STORAGE_BUFFER:
+				return GL_SHADER_STORAGE_BUFFER;
+
 			case DescriptorType::COMBINED_IMAGE_SAMPLER:
 				return GL_UNIFORM_BUFFER;
 		}
@@ -149,6 +152,9 @@ namespace tur::gl
 				return GL_INT;
 
 			case AttributeFormat::R32G32B32A32_UINT:
+				return GL_UNSIGNED_INT;
+
+			case AttributeFormat::R32_UINT:
 				return GL_UNSIGNED_INT;
 		}
 

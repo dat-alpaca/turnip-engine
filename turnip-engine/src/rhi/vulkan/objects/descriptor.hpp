@@ -13,6 +13,9 @@ namespace tur::vulkan
 			case DescriptorType::COMBINED_IMAGE_SAMPLER:
 				return vk::DescriptorType::eCombinedImageSampler;
 
+			case DescriptorType::STORAGE_BUFFER:
+				return vk::DescriptorType::eStorageBuffer;
+			
 			case DescriptorType::UNIFORM_BUFFER:
 				return vk::DescriptorType::eUniformBuffer;
 		}

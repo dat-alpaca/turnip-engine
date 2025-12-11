@@ -2,6 +2,7 @@
 #include <miniaudio.h>
 #include <stb_image.h>
 
+#include "assets/asset.hpp"
 #include "audio/audio_asset.hpp"
 #include "texture/texture_loader.hpp"
 
@@ -56,7 +57,11 @@ namespace tur
 
 				mFilepathCache[filepath] = assetHandle;
 
-				AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::TEXTURE);
+				AssetType type = AssetType::TEXTURE;
+				if(loadedTextureAsset.options.isTextureArray)
+					type = AssetType::TEXTURE_ARRAY;
+
+				AssetLoadedEvent assetLoadedEvent(assetHandle, type);		
 				mEventCallback(assetLoadedEvent);
 			}
 		);
