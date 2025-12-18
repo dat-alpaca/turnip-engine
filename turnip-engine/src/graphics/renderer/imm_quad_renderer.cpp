@@ -1,10 +1,14 @@
 #include "imm_quad_renderer.hpp"
 #include "graphics/constants.hpp"
+#include "vulkan/objects/vulkan_command_buffer.hpp"
 
 namespace tur
 {
 	void ImmQuadRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
+		commandBuffer = rhi->create_command_buffer();
+		commandBuffer.initialize_secondary();
+
 		rRHI = rhi;
 		initialize_resources();
 	}
@@ -12,17 +16,9 @@ namespace tur
 	{
 		rCamera = camera;
 	}
-	void ImmQuadRenderer::set_viewport(const Viewport& viewport)
-	{
-		mViewport = viewport;
-	}
-	void ImmQuadRenderer::set_scissor(const Extent2D& scissor)
-	{
-		mScissor = scissor;
-	}
 	void ImmQuadRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
 	{
-		mCommandBuffer.set_clear_color(color, flags);
+		commandBuffer.set_clear_color(color, flags);
 	}
 
 	void ImmQuadRenderer::render()
@@ -49,33 +45,22 @@ namespace tur
 				resources.write_texture_to_set(quad.setHandle, defaultTextureHandle, 1);
 		}
 
-		// Render:
-		if (!rhi.begin_frame())
-			return;
+		commandBuffer.begin(invalid_handle);
 
-		mCommandBuffer.reset(rhi.get_current_command_buffer());
+			commandBuffer.set_viewport(viewport);
+			commandBuffer.set_scissor(scissor);
 
-		mCommandBuffer.set_viewport(mViewport);
-		mCommandBuffer.set_scissor(mScissor);
-		{
-			mCommandBuffer.begin();
-
-			mCommandBuffer.bind_index_buffer(ebo, BufferIndexType::UNSIGNED_INT);
-			mCommandBuffer.bind_vertex_buffer(vbo, 0);
-			mCommandBuffer.bind_pipeline(pipeline);
+			commandBuffer.bind_index_buffer(ebo, BufferIndexType::UNSIGNED_INT);
+			commandBuffer.bind_vertex_buffer(vbo, 0);
+			commandBuffer.bind_pipeline(pipeline);
 
 			for (const auto& quad : mQuads)
 			{
-				mCommandBuffer.bind_descriptor_set(quad.setHandle);
-				mCommandBuffer.draw_indexed(6, 1, 0, 0);
+				commandBuffer.bind_descriptor_set(quad.setHandle);
+				commandBuffer.draw_indexed(6, 1, 0, 0);
 			}
 
-			mCommandBuffer.end();
-		}
-
-		rhi.end_frame();
-		rhi.submit(graphicsQueue);
-		rhi.present(presentQueue);
+		commandBuffer.end();
 	}
 
 	ImmQuadRenderer::quad_handle ImmQuadRenderer::add_quad(const Transform& transform, texture_handle textureHandle)
@@ -116,11 +101,6 @@ namespace tur
 
 	void ImmQuadRenderer::initialize_resources()
 	{
-		mCommandBuffer = rRHI->create_command_buffer();
-
-		graphicsQueue = rRHI->get_queue(QueueOperation::GRAPHICS);
-		presentQueue = rRHI->get_queue(QueueOperation::PRESENT);
-
 		initialize_buffers();
 		initialize_descriptors();
 		initialize_pipeline();
@@ -158,7 +138,6 @@ namespace tur
 				.type = BufferType::VERTEX_BUFFER,
 			};
 
-			// clang-format off
 				std::array<Vertex, 4> vertices = 
 				{
 					Vertex{glm::vec3{ -0.5f, -0.5f, 0.0f },	glm::vec2{ 0.0f, 0.0f }},
@@ -166,7 +145,6 @@ namespace tur
 					Vertex{glm::vec3{  0.5f,  0.5f, 0.0f }, glm::vec2{ 1.0f, 1.0f }},
 					Vertex{glm::vec3{ -0.5f,  0.5f, 0.0f }, glm::vec2{ 0.0f, 1.0f }},
 				};
-			// clang-format on
 
 			vbo = resources.create_buffer(descriptor, vertices.data(), {.size = sizeof(Vertex) * 4});
 		}
@@ -184,8 +162,7 @@ namespace tur
 		auto& resources = rRHI->get_resource_handler();
 
 		/* Descriptor Set */
-		// clang-format off
-		constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
+		auto LayoutEntries = std::vector<DescriptorSetLayoutEntry>
 		({
 			{
 				.binding = 0,
@@ -200,12 +177,10 @@ namespace tur
 			  	.stage = PipelineStage::FRAGMENT_STAGE
 			}
 		});
-		// clang-format on
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
 	}
 	void ImmQuadRenderer::initialize_pipeline()
 	{
-		// clang-format off
 		auto& resources = rRHI->get_resource_handler();
 
 		// Shaders:
@@ -274,6 +249,5 @@ namespace tur
 		};
 
 		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
-		// clang-format on
 	}
 }

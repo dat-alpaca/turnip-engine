@@ -7,7 +7,6 @@
 
 namespace tur
 {
-	// clang-format off
 	template <typename T>
 	concept IsRenderInterface = requires(T t, const ConfigData& configData, Window& window, Event& event)
 	{
@@ -35,7 +34,6 @@ namespace tur
 		{ t.get_queue(operation) }			-> std::same_as<queue_handle>;
 		{ t.get_resource_handler() };
 	};
-	// clang-format on
 
 	template <IsRenderInterface Interface>
 	class BaseRenderInterface : public Interface

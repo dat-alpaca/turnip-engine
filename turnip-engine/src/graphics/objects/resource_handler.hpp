@@ -13,7 +13,6 @@
 
 namespace tur
 {
-	// clang-format off
 	template <typename T, typename RHI>
 	concept IsGraphicsResourceHandler = requires(T t, RHI* rhi)
 	{
@@ -84,8 +83,6 @@ namespace tur
 	{
 		{ t.template update_buffer<const DataType>(handle, data, offset) };
 	};
-
-	// clang-format on
 
 	template <typename T, typename RHI>
 	requires IsGraphicsResourceHandler<T, RHI>

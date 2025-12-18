@@ -1,38 +1,33 @@
 #pragma once
+#include "graphics/renderer/renderer.hpp"
 #include "graphics/camera.hpp"
+#include "graphics/tile.hpp"
+
 #include "rhi/rhi.hpp"
 #include "utils/transform.hpp"
 
+#include <vector>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 namespace tur
 {
-	class TilemapRenderer
+	class TilemapRenderer : public Renderer
 	{
 	public:
-		struct Tile
+		struct WorldUBO
 		{
-			glm::vec2 pos;
-			u32 layer;
-		};
-
-		struct CameraUBO
-		{
-			glm::mat4 view;
-			glm::mat4 projection;
+			alignas(16) glm::mat4 viewProjection;
 		};
 
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi, u64 maxTilemapSize);
 		void set_camera(NON_OWNING Camera* camera);
-		void set_viewport(const Viewport& viewport);
-		void set_scissor(const Extent2D& scissor);
 		void set_clear_color(const ClearColor& color, ClearFlags flags);
 		void render();
 
     public:
-        void update_tile_data(const glm::vec2& worldPosition, const Tile& tile);
+        void set_tile_data(const std::vector<Tile>& tiles);
 
 	private:
 		void initialize_resources();
@@ -43,19 +38,18 @@ namespace tur
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
 		NON_OWNING Camera* rCamera = nullptr;
-		CommandBuffer mCommandBuffer;
-
+	
 	private:
-		Viewport mViewport;
-		Extent2D mScissor;
-
-	private:
+		std::vector<Tile> mTiles;
+		
 		descriptor_set_layout_handle setLayout;
-		queue_handle graphicsQueue, presentQueue;
+		descriptor_set_handle mainSet;
 
 		pipeline_handle pipeline;
-		buffer_handle cameraUBO, ssbo;
+		buffer_handle worldUBO, ssbo;
 
-		u64 mMaxTilemapSize = 0;		
+		u32 mUploadTileAmount = 16; // TODO: change
+		u32 mMaxTilemapSize = 0;
+		u32 mTileSize = 32; // TODO : change		
 	};
 }

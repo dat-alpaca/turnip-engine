@@ -169,20 +169,9 @@ namespace tur::vulkan
 				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 		}
 
-		// Begin:
+		// Reset main command buffer:
 		auto _ = device.resetFences({frameData.recordingFence});
-
-		vk::CommandBufferBeginInfo beginInfo = {};
-		{
-			beginInfo.pInheritanceInfo = nullptr;
-			beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-		}
-
 		auto __ = frameData.commandBuffer.reset();
-
-		result = frameData.commandBuffer.begin(beginInfo);
-		if (result != vk::Result::eSuccess)
-			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
 
 		return true;
 	}
@@ -246,11 +235,7 @@ namespace tur::vulkan
 	}
 	void RenderInterfaceVulkan::end_frame()
 	{
-		auto& currentCommandBuffer = mFrameDataHolder.get_current_frame_data().commandBuffer;
-
-		vk::Result result = currentCommandBuffer.end();
-		if (result != vk::Result::eSuccess)
-			TUR_LOG_CRITICAL("Failed to end() recording to vulkan command buffer.")
+		/* Blank */
 	}
 }
 
@@ -347,7 +332,7 @@ namespace tur::vulkan::utils
 
 		if (texture.layout == description.newLayout)
 		{
-			TUR_LOG_WARN("Attempted to transition to the same image layout.");
+			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
 		}
 
@@ -392,7 +377,7 @@ namespace tur::vulkan::utils
 	{
 		if (texture.layout == description.newLayout)
 		{
-			TUR_LOG_WARN("Attempted to transition to the same image layout.");
+			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
 		}
 

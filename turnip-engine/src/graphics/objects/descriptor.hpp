@@ -31,6 +31,6 @@ namespace tur
 
 	struct DescriptorSetLayoutDescriptor
 	{
-		std::span<const DescriptorSetLayoutEntry> entries;
+		std::vector<DescriptorSetLayoutEntry> entries;
 	};
 }

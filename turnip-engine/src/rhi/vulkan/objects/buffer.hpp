@@ -46,6 +46,9 @@ namespace tur::vulkan
 		if (typeValue & static_cast<u32>(BufferType::VERTEX_BUFFER))
 			valueFlags |= static_cast<u32>(vk::BufferUsageFlagBits::eVertexBuffer);
 
+		if (typeValue & static_cast<u32>(BufferType::STORAGE_BUFFER))
+			valueFlags |= static_cast<u32>(vk::BufferUsageFlagBits::eStorageBuffer);
+
 		if (typeValue & static_cast<u32>(BufferType::INDEX_BUFFER))
 			valueFlags |= static_cast<u32>(vk::BufferUsageFlagBits::eIndexBuffer);
 

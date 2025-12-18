@@ -1,6 +1,10 @@
 #include "scene_view.hpp"
 #include "client/agents/physics_script_agent.hpp"
 #include "engine/turnip_engine.hpp"
+#include "graphics/types/clear_color.hpp"
+#include "utils/color.hpp"
+#include "vulkan/objects/vulkan_command_buffer.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur
 {
@@ -46,6 +50,7 @@ namespace tur
 	{
 		mainCamera.update_view();
 		quadSystem.update();
+		tilemapSystem.update();
 
 		scriptSystem.on_update();
 		physicsSystem.update();
@@ -53,7 +58,27 @@ namespace tur
 	}
 	void SceneView::on_render()
 	{
+		auto& rhi = engine->get_render_interface();
+
+		CommandBuffer commandBuffer = rhi.create_command_buffer();
+		commandBuffer.reset(rhi.get_current_command_buffer());
+
+		tilemapSystem.render();
 		quadSystem.render();
+
+		commandBuffer.begin();
+		commandBuffer.begin_rendering();
+
+			vk::CommandBuffer buffers[] = {
+				quadSystem.renderer().get_command_buffer().get_command_buffer(),
+				// tilemapSystem.renderer().get_command_buffer().get_command_buffer()
+			};
+
+			commandBuffer.execute_secondary_buffers(std::span{buffers, 1});
+		
+		commandBuffer.end_rendering();
+		commandBuffer.blit();
+		commandBuffer.end();
 	}
 	void SceneView::on_event(Event& event)
 	{
@@ -64,6 +89,7 @@ namespace tur
 				scenegraphSystem.set_scene(viewSwitch.currentScene);
 				scriptSystem.set_scene(viewSwitch.currentScene);
 				quadSystem.set_scene(viewSwitch.currentScene);
+				tilemapSystem.set_scene(viewSwitch.currentScene);
 				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
 				physicsSystem.set_scene(viewSwitch.currentScene);
 				mPhysicsScriptAgent.set_scene(viewSwitch.currentScene);
@@ -76,6 +102,7 @@ namespace tur
 		mTextureAgent.on_event(event);
 		mTextureAssetBinder.on_event(event);
 		quadSystem.on_event(event);
+		tilemapSystem.on_event(event);
 	}
 
 	void SceneView::initialize_renderers()
@@ -84,5 +111,10 @@ namespace tur
 		auto& rhi = engine->get_render_interface();
 		quadSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera);
 		quadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+	
+		// Tilemap:
+		// TODO: change max size:
+		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera, 320);
+		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	}
 }

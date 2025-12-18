@@ -3,6 +3,7 @@
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
+#include "graphics/components.hpp"
 #include "physics/physics_components.hpp"
 #include <turnip_engine.hpp>
 
@@ -15,7 +16,7 @@ public:
 	{
 		SceneView::on_view_added();
 		mProject.initialize("res/project");
-		mainCamera.set_orthogonal(0.0f, 30.0f, 0, 30.f);
+		mainCamera.set_orthogonal(0.0f, 600.0f, 0, 600.f);
 
 		initialize_resources();
 		initialize_entities();
@@ -91,6 +92,24 @@ private:
 
 			floor.add_component<Body2DComponent>();
 			floor.add_component<RectCollider2D>(1.f, 1.f);
+		}
+
+		// Big Floor:
+		{
+			auto floor = get_current_scene().add_entity("floor");
+
+			auto& tilemap = floor.add_component<Tilemap2DComponent>(mFloorAsset, 32);
+			tilemap.assetHandle = mFloorAsset;
+			TilemapChunk chunk;
+			{
+				for(size_t x = 0; x < 1; ++x)
+				{
+					for(size_t y = 0; y < 1; ++y)
+						chunk.chunks.push_back(Tile{{x + 100.4f, y + 100.5f}, (u32)(x + y) / 50, 0});						
+				}
+			}
+			
+			tilemap.worldData.push_back(chunk);
 		}
 
 		mProject.add_scene(&scene, "main_scene.json");

@@ -10,6 +10,7 @@ namespace tur
 	class TilemapSystem
 	{
 	public:
+		// TODO: config
 		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera, u32 tilemapMaxSize)
 		{
 			mTilemapRenderer.initialize(rhi, tilemapMaxSize);
@@ -38,10 +39,19 @@ namespace tur
 
 		void update()
 		{
-			auto view = rScene->get_registry().view<TransformComponent, Tilemap2DComponent>();
-			for (auto [e, transform, tilemap] : view.each())
+			auto view = rScene->get_registry().view<Tilemap2DComponent>();
+			for (auto [e, tilemap] : view.each())
 			{
-                
+				std::vector<Tile> flattenMap;
+
+				// TODO: camera culling
+				for (const auto& chunk : tilemap.worldData)
+				{
+					for(const auto& tile : chunk.chunks)
+						flattenMap.push_back(tile);
+				}
+				
+				mTilemapRenderer.set_tile_data(flattenMap);
 			}
 		}
 

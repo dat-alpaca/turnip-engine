@@ -2,6 +2,7 @@
 #include <vector>
 
 #include "assets/asset.hpp"
+#include "graphics/tile.hpp"
 #include "defines.hpp"
 #include "graphics/objects/texture.hpp"
 
@@ -21,27 +22,19 @@ namespace tur
 		texture_handle textureHandle = invalid_handle;
 	};
 
-	struct Tile
-	{
-	public:
-		glm::vec2 position;
-		u32 layer;
-	};
-
-	using tile_handle = handle_type;
-
 	struct Tilemap2DComponent
 	{
 	public:
-		Tilemap2DComponent(asset_handle assetHandle, u32 tileSize)
+		Tilemap2DComponent(asset_handle assetHandle, u32 tilePixelSize)
 			: assetHandle(assetHandle)
-			, tileSize(tileSize)
+			, tilePixelSize(tilePixelSize)
 		{
 		}
 
 	public:
-		std::vector<Tile> tileData;
-		u32 tileSize;
+		std::vector<TilemapChunk> worldData;
+		u32 tilesPerChunk;
+		u32 tilePixelSize;
 
 		asset_handle assetHandle = invalid_handle;
 		texture_handle textureHandle = invalid_handle;

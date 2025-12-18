@@ -17,8 +17,7 @@ namespace tur::vulkan
 		return formats[0];
 	}
 
-	static vk::PresentModeKHR
-	choose_present_mode(const std::vector<vk::PresentModeKHR>& presentModes, vk::PresentModeKHR specifiedPresentMode)
+	static vk::PresentModeKHR choose_present_mode(const std::vector<vk::PresentModeKHR>& presentModes, vk::PresentModeKHR specifiedPresentMode)
 	{
 		for (const auto& presentMode : presentModes)
 		{
@@ -30,8 +29,7 @@ namespace tur::vulkan
 		return vk::PresentModeKHR::eFifo;
 	}
 
-	static vk::Extent2D
-	choose_swapchain_extent(const vk::SurfaceCapabilitiesKHR& capabilities, const Extent2D& requestedExtent)
+	static vk::Extent2D choose_swapchain_extent(const vk::SurfaceCapabilitiesKHR& capabilities, const Extent2D& requestedExtent)
 	{
 		constexpr u32 invalid_unsigned = invalid_handle;
 

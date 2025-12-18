@@ -75,10 +75,12 @@ namespace tur::vulkan
 		// TODO: flexible number of max descriptor sets
 
 		auto& device = rRHI->get_state().logicalDevice;
-		DescriptorSetLayout setLayout{
+		DescriptorSetLayout setLayout
+		{
 			.layoutDescriptor = descriptorSetLayout,
 			.layout = allocate_set_layout(device, descriptorSetLayout),
-			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)};
+			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)
+		};
 
 		return mSetLayouts.add(setLayout);
 	}

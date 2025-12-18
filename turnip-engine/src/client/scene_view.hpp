@@ -1,4 +1,5 @@
 #pragma once
+#include "client/system/tilemap_system.hpp"
 #include "scene/scene_holder.hpp"
 #include "view/view.hpp"
 
@@ -7,6 +8,7 @@
 #include "system/scenegraph_system.hpp"
 #include "system/script_system.hpp"
 #include "system/texture_asset_binder_system.hpp"
+#include "system/tilemap_system.hpp"
 
 #include "agents/physics_script_agent.hpp"
 #include "agents/texture_asset_agent.hpp"
@@ -48,6 +50,7 @@ namespace tur
 		ScenegraphSystem scenegraphSystem;
 		ScriptSystem scriptSystem;
 		ImmQuadSystem quadSystem;
+		TilemapSystem tilemapSystem;
 		Camera mainCamera;
 		PhysicsSystem physicsSystem;
 

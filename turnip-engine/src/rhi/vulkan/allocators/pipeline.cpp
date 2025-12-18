@@ -211,11 +211,13 @@ namespace tur::vulkan
 		vk::PipelineVertexInputStateCreateInfo inputCreateInfo = {};
 		inputCreateInfo.flags = vk::PipelineVertexInputStateCreateFlags();
 
-		inputCreateInfo.vertexBindingDescriptionCount = static_cast<u32>(bindingDescriptions.size());
-		inputCreateInfo.pVertexBindingDescriptions = bindingDescriptions.data();
+		auto bindingCount = static_cast<u32>(bindingDescriptions.size());
+		inputCreateInfo.vertexBindingDescriptionCount = bindingCount;
+		inputCreateInfo.pVertexBindingDescriptions = (bindingCount == 0) ? nullptr : bindingDescriptions.data();
 
-		inputCreateInfo.vertexAttributeDescriptionCount = static_cast<u32>(attributeDescriptions.size());
-		inputCreateInfo.pVertexAttributeDescriptions = attributeDescriptions.data();
+		auto attributeCount = static_cast<u32>(attributeDescriptions.size());
+		inputCreateInfo.vertexAttributeDescriptionCount = attributeCount;
+		inputCreateInfo.pVertexAttributeDescriptions = (attributeCount == 0) ? nullptr : attributeDescriptions.data();
 
 		return inputCreateInfo;
 	}

@@ -6,6 +6,7 @@
 
 namespace tur
 {
+	// TODO: config renderers
 	class ImmQuadSystem
 	{
 	public:

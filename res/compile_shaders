@@ -10,3 +10,6 @@ glslc ./shaders/basic/basic_vk.frag -o ./shaders/basic/basic_frag.spv
 glslc ./shaders/none/none.vert -o ./shaders/none/none_vert.spv
 glslc ./shaders/none/none.frag -o ./shaders/none/none_frag.spv
 
+glslc ./shaders/tile/tile.vert -o ./shaders/tile/tile_vert.spv
+glslc ./shaders/tile/tile.frag -o ./shaders/tile/tile_frag.spv
+

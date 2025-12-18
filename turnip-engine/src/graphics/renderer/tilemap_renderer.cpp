@@ -1,12 +1,18 @@
 #include "tilemap_renderer.hpp"
+#include "data-structures/range.hpp"
+#include "defines.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/buffer.hpp"
+#include <iterator>
 
 namespace tur
 {
 	void TilemapRenderer::initialize(NON_OWNING RenderInterface* rhi, u64 maxTilemapSize)
 	{
+		commandBuffer = rhi->create_command_buffer();
+		commandBuffer.initialize_secondary();
+
 		mMaxTilemapSize = maxTilemapSize;
 		rRHI = rhi;
 		initialize_resources();
@@ -15,51 +21,53 @@ namespace tur
 	{
 		rCamera = camera;
 	}
-	void TilemapRenderer::set_viewport(const Viewport& viewport)
-	{
-		mViewport = viewport;
-	}
-	void TilemapRenderer::set_scissor(const Extent2D& scissor)
-	{
-		mScissor = scissor;
-	}
 	void TilemapRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
 	{
-		mCommandBuffer.set_clear_color(color, flags);
+		commandBuffer.set_clear_color(color, flags);
 	}
 
 	void TilemapRenderer::render()
 	{
 		auto& rhi = *rRHI;
 		auto& resources = rhi.get_resource_handler();
-
-		// Render:
-		if (!rhi.begin_frame())
-			return;
-
-		mCommandBuffer.reset(rhi.get_current_command_buffer());
-
-		mCommandBuffer.set_viewport(mViewport);
-		mCommandBuffer.set_scissor(mScissor);
+		
+		// Tile data:
+		if(!mTiles.empty())
 		{
-			mCommandBuffer.begin();
-
-			mCommandBuffer.draw(mMaxTilemapSize * 6, 1, 0, 0);
-			mCommandBuffer.end();
+			resources.update_buffer(ssbo, mTiles.data(), Range{ .size = mTiles.size() * sizeof(Tile) });
+			resources.write_storage_buffer_to_set(mainSet, ssbo, Range{ .size=mTiles.size() * sizeof(Tile) }, 0);
 		}
+		
+		// World data:
+		{
+			WorldUBO ubo;
+			{
+				ubo.viewProjection = rCamera->view() * rCamera->projection();
+			}
+			
+			resources.update_buffer(worldUBO, &ubo, Range{ .size=sizeof(WorldUBO) });
+			resources.write_uniform_buffer_to_set(mainSet, worldUBO, Range{ .size=sizeof(WorldUBO) }, 1);
+		}
+		
+		commandBuffer.begin(invalid_handle);
+		{
+			commandBuffer.set_viewport(viewport);
+			commandBuffer.set_scissor(scissor);
+			commandBuffer.bind_pipeline(pipeline);
+			commandBuffer.bind_descriptor_set(mainSet);
 
-		rhi.end_frame();
-		rhi.submit(graphicsQueue);
-		rhi.present(presentQueue);
+			commandBuffer.draw(mTiles.size() * 6, 1, 0, 0);
+		}
+		commandBuffer.end();
+	}
+
+	void TilemapRenderer::set_tile_data(const std::vector<Tile>& tiles)
+	{
+		mTiles = tiles;
 	}
 
 	void TilemapRenderer::initialize_resources()
 	{
-		mCommandBuffer = rRHI->create_command_buffer();
-
-		graphicsQueue = rRHI->get_queue(QueueOperation::GRAPHICS);
-		presentQueue = rRHI->get_queue(QueueOperation::PRESENT);
-
 		initialize_buffers();
 		initialize_descriptors();
 		initialize_pipeline();
@@ -70,29 +78,26 @@ namespace tur
 
 		{
 			BufferDescriptor descriptor = {
-				.type = BufferType::STORAGE_BUFFER,
-				.usage = BufferUsage::PERSISTENT | BufferUsage::WRITE | BufferUsage::COHERENT 
+				.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
+				.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 			};
-			ssbo = resources.create_buffer(descriptor, nullptr, {
-				.size = sizeof(Tile) * mMaxTilemapSize
-			});
+			ssbo = resources.create_empty_buffer(descriptor, sizeof(Tile) * mUploadTileAmount);
 		}
 
 		{
 			BufferDescriptor descriptor = {
-				.type = BufferType::UNIFORM_BUFFER,
+				.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST,
+				.usage = BufferUsage::COHERENT | BufferUsage::PERSISTENT
 			};
-			cameraUBO = resources.create_buffer(descriptor, nullptr, {.size = sizeof(CameraUBO)});
+			worldUBO = resources.create_empty_buffer(descriptor, sizeof(WorldUBO));
 		}
-
-		
 	}
 	void TilemapRenderer::initialize_descriptors()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
 		/* Descriptor Set */
-		constexpr auto LayoutEntries = std::to_array<const DescriptorSetLayoutEntry>
+		auto LayoutEntries = std::vector<DescriptorSetLayoutEntry>
 		({
 			{
 				.binding = 0,
@@ -105,15 +110,10 @@ namespace tur
 			  	.amount = 1,
 			  	.type = DescriptorType::UNIFORM_BUFFER,
 			  	.stage = PipelineStage::VERTEX_STAGE
-			},
-			{
-				.binding = 2,
-			  	.amount = 1,
-			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
-			  	.stage = PipelineStage::FRAGMENT_STAGE
 			}
 		});
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
+		mainSet = rRHI->get_resource_handler().create_descriptor_set(setLayout);
 	}
 	void TilemapRenderer::initialize_pipeline()
 	{
@@ -124,26 +124,7 @@ namespace tur
 			resources.create_shader({"res/shaders/tile/tile_vert.spv", ShaderType::VERTEX});
 		shader_handle fragmentShader =
 			resources.create_shader({"res/shaders/tile/tile_frag.spv", ShaderType::FRAGMENT});
-		
-		auto VertexBindings = std::vector<BindingDescriptor>
-		({
-			{
-				.binding = 0,
-				.stride = sizeof(u32), 
-				.inputRate = InputRate::VERTEX
-			},
-		});
-
-		auto Attributes = std::vector<Attribute>
-		({
-			{
-				.binding = 0,
-				.location = 0,
-				.offset = 0,
-				.format = AttributeFormat::R32_UINT
-			}
-		});
-
+	
 		constexpr auto DynamicStates = std::to_array<DynamicState>({
 			DynamicState::VIEWPORT,
 			DynamicState::SCISSOR
@@ -156,8 +137,8 @@ namespace tur
 		PipelineDescriptor pipelineDescriptor = {
 			.vertexInputStage = 
 			{
-				.vertexBindings = VertexBindings,
-				.attributes = Attributes
+				.vertexBindings = {},
+				.attributes = {}
 			},
 			.inputAssemblyStage = 
 			{
