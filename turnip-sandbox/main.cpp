@@ -102,10 +102,10 @@ private:
 			tilemap.assetHandle = mFloorAsset;
 			TilemapChunk chunk;
 			{
-				for(size_t x = 0; x < 1; ++x)
+				for(u8 x = 0; x < 1; ++x)
 				{
-					for(size_t y = 0; y < 1; ++y)
-						chunk.chunks.push_back(Tile{{x, y}, (u32)(x + y) / 100, 0});						
+					for(u8 y = 0; y < 1; ++y)	
+						chunk.chunks.push_back(Tile{{x, y}, 0, 0});
 				}
 			}
 			

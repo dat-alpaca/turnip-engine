@@ -7,9 +7,9 @@ namespace tur
     struct Tile
 	{
 	public:
-		glm::uvec2 position;
-		u32 layer;
-		u32 flags;
+		glm::vec<2, u8, glm::defaultp> position;
+		u8 layer;
+		u8 flags;
 	};
 
 	struct TilemapChunk
