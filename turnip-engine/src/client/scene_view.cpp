@@ -71,10 +71,10 @@ namespace tur
 
 			vk::CommandBuffer buffers[] = {
 				quadSystem.renderer().get_command_buffer().get_command_buffer(),
-				// tilemapSystem.renderer().get_command_buffer().get_command_buffer()
+				tilemapSystem.renderer().get_command_buffer().get_command_buffer()
 			};
 
-			commandBuffer.execute_secondary_buffers(std::span{buffers, 1});
+			commandBuffer.execute_secondary_buffers(std::span{buffers, 2});
 		
 		commandBuffer.end_rendering();
 		commandBuffer.blit();

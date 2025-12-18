@@ -105,7 +105,7 @@ private:
 				for(size_t x = 0; x < 1; ++x)
 				{
 					for(size_t y = 0; y < 1; ++y)
-						chunk.chunks.push_back(Tile{{x + 100.4f, y + 100.5f}, (u32)(x + y) / 50, 0});						
+						chunk.chunks.push_back(Tile{{x, y}, (u32)(x + y) / 100, 0});						
 				}
 			}
 			
