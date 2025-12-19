@@ -15,7 +15,14 @@ namespace tur
 
 	struct ClearColor
 	{
-		Color color = color::White;
+	public:
+		ClearColor() = default;
+
+		ClearColor(Color color)
+			: color(color) {}
+
+	public:
+		Color color = color::Black;
 		float depth = 1.0f;
 		u32 stencil = 0;
 	};

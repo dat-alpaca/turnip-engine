@@ -50,6 +50,9 @@ namespace tur::gl
 		void write_uniform_buffer_to_set(
 			descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
 		);
+		void write_storage_buffer_to_set(
+			descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
+		);
 		void write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding);
 
 	public:

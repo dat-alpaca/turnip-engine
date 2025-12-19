@@ -2,9 +2,11 @@
 #include "graphics/objects/command_buffer.hpp"
 #include "rhi/vulkan/objects/buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
+#include <vector>
 #include <vulkan/vulkan.hpp>
 
 #include "common.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -17,11 +19,16 @@ namespace tur::vulkan
 		CommandBufferVulkan() = default;
 
 	public:
+		void initialize_secondary();
 		void reset(vk::CommandBuffer commandBuffer);
+		void execute_secondary_buffers(std::span<vk::CommandBuffer> buffers);
 
 	public:
 		void begin(render_target_handle renderTargetHandle = invalid_handle);
+		void begin_rendering();
+		void end_rendering();
 		void end();
+		void blit();
 
 	public:
 		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
@@ -39,8 +46,12 @@ namespace tur::vulkan
 		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 
 	private:
+		RenderTarget get_render_target();
 		void copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize);
 		void blit_onto_swapchain();
+
+	public:
+		vk::CommandBuffer get_command_buffer() { return mCommandBuffer; }
 
 	private:
 		NON_OWNING RenderInterfaceVulkan* rRHI = nullptr;
@@ -48,8 +59,9 @@ namespace tur::vulkan
 
 	private:
 		pipeline_handle mBoundPipeline = invalid_handle;
-		render_target_handle mUsedTarget;
+		render_target_handle mUsedTarget = invalid_handle;
 		ClearColor mClearColor;
+		bool mIsSecondary = false;
 	};
 }
 

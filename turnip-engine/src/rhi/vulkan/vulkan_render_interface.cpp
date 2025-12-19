@@ -169,20 +169,9 @@ namespace tur::vulkan
 				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
 		}
 
-		// Begin:
+		// Reset main command buffer:
 		auto _ = device.resetFences({frameData.recordingFence});
-
-		vk::CommandBufferBeginInfo beginInfo = {};
-		{
-			beginInfo.pInheritanceInfo = nullptr;
-			beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
-		}
-
 		auto __ = frameData.commandBuffer.reset();
-
-		result = frameData.commandBuffer.begin(beginInfo);
-		if (result != vk::Result::eSuccess)
-			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
 
 		return true;
 	}
@@ -246,11 +235,7 @@ namespace tur::vulkan
 	}
 	void RenderInterfaceVulkan::end_frame()
 	{
-		auto& currentCommandBuffer = mFrameDataHolder.get_current_frame_data().commandBuffer;
-
-		vk::Result result = currentCommandBuffer.end();
-		if (result != vk::Result::eSuccess)
-			TUR_LOG_CRITICAL("Failed to end() recording to vulkan command buffer.")
+		/* Blank */
 	}
 }
 
@@ -339,15 +324,13 @@ namespace tur::vulkan::utils
 		rhi.create_main_render_target();
 	}
 
-	void transition_texture_layout(
-		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-	)
+	void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description)
 	{
 		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
 
 		if (texture.layout == description.newLayout)
 		{
-			TUR_LOG_WARN("Attempted to transition to the same image layout.");
+			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
 		}
 
@@ -374,7 +357,7 @@ namespace tur::vulkan::utils
 			subresourceRange.baseMipLevel = 0;
 			subresourceRange.levelCount = texture.descriptor.mipLevels;
 			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = 1; // TODO: change to texture.layers
+			subresourceRange.layerCount = texture.descriptor.arrayLayers;
 
 			imageBarrier.subresourceRange = subresourceRange;
 			imageBarrier.image = texture.image;
@@ -386,13 +369,11 @@ namespace tur::vulkan::utils
 		texture.layout = description.newLayout;
 	}
 
-	void transition_texture_layout_imm(
-		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-	)
+	void transition_texture_layout_imm(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description)
 	{
 		if (texture.layout == description.newLayout)
 		{
-			TUR_LOG_WARN("Attempted to transition to the same image layout.");
+			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
 		}
 
@@ -419,7 +400,7 @@ namespace tur::vulkan::utils
 			subresourceRange.baseMipLevel = 0;
 			subresourceRange.levelCount = texture.descriptor.mipLevels;
 			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = 1; // TODO: change to texture.layers
+			subresourceRange.layerCount = texture.descriptor.arrayLayers;
 
 			imageBarrier.subresourceRange = subresourceRange;
 			imageBarrier.image = texture.image;

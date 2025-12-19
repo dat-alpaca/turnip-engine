@@ -13,7 +13,6 @@
 
 namespace tur
 {
-	// clang-format off
 	template <typename T, typename RHI>
 	concept IsGraphicsResourceHandler = requires(T t, RHI* rhi)
 	{
@@ -45,6 +44,7 @@ namespace tur
 	requires(T t, descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding)
 	{
 		{ t.write_uniform_buffer_to_set(setHandle, bufferHandle, range, binding) };
+		{ t.write_storage_buffer_to_set(setHandle, bufferHandle, range, binding) };
 	} &&
 
 	requires(T t, const PipelineDescriptor& desc, pipeline_handle handle)
@@ -83,8 +83,6 @@ namespace tur
 	{
 		{ t.template update_buffer<const DataType>(handle, data, offset) };
 	};
-
-	// clang-format on
 
 	template <typename T, typename RHI>
 	requires IsGraphicsResourceHandler<T, RHI>

@@ -10,17 +10,21 @@
 
 namespace tur
 {
-	// clang-format off
 	template <typename T, typename CommandBufferType>
-	concept IsCommandBuffer = requires(T t, CommandBufferType commandBuffer)
+	concept IsCommandBuffer = requires(T t, CommandBufferType commandBuffer, std::span<CommandBufferType> buffers)
 	{
+		{ t.execute_secondary_buffers(buffers) };
+        { t.initialize_secondary() };
         { t.reset(commandBuffer) };
 	} &&
 	
 	requires(T t, render_target_handle renderTargetHandle)
 	{
 		{ t.begin(renderTargetHandle) };
+		{ t.begin_rendering() };
+		{ t.end_rendering() };
         { t.end() };
+        { t.blit() };
 	} &&
 	
 	requires(T t, const ClearColor& clearColor, ClearFlags flags)
@@ -53,8 +57,6 @@ namespace tur
         { t.draw(vertexCount, instanceCount, firstVertex, firstInstance) };
         { t.draw_indexed(indexCount, instanceCount, firstVertex, firstInstance) };
 	};
-
-	// clang-format on
 
 	template <typename T, typename CommandBufferType>
 	requires IsCommandBuffer<T, CommandBufferType>

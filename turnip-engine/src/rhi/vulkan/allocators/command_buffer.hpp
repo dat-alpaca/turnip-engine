@@ -16,4 +16,16 @@ namespace tur::vulkan
 
 		return check_vk_object(device.allocateCommandBuffers(allocateInfo), "CommandBuffer").front();
 	}
+
+	inline vk::CommandBuffer allocate_single_secondary_command_buffer(vk::Device device, vk::CommandPool commandPool)
+	{
+		vk::CommandBufferAllocateInfo allocateInfo = {};
+		{
+			allocateInfo.commandPool = commandPool;
+			allocateInfo.commandBufferCount = 1;
+			allocateInfo.level = vk::CommandBufferLevel::eSecondary;
+		}
+
+		return check_vk_object(device.allocateCommandBuffers(allocateInfo), "CommandBuffer").front();
+	}
 }

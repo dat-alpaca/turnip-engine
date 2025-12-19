@@ -30,7 +30,6 @@ namespace tur
 		bool startsMaximized = false;
 	};
 
-	// clang-format off
 	template <typename T>
 	concept IsWindow = requires(T t, EventCallback& callback, const WindowProperties& properties)
 	{
@@ -55,7 +54,6 @@ namespace tur
 		{ t.get_key_pressed(key) }						-> std::same_as<bool>;
 		{ t.get_mouse_position() }						-> std::same_as<glm::vec2>;
 	};
-	// clang-format on
 
 	template <IsWindow T>
 	class BaseWindow : public T

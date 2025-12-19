@@ -1,7 +1,10 @@
+#include "assets/texture/texture_options.hpp"
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
+#include "graphics/components.hpp"
+#include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
 #include <turnip_engine.hpp>
 
@@ -14,7 +17,7 @@ public:
 	{
 		SceneView::on_view_added();
 		mProject.initialize("res/project");
-		mainCamera.set_orthogonal(0.0f, 30.0f, 0, 30.f);
+		mainCamera.set_orthogonal(0.0f, 600.0f, 0, 600.f);
 
 		initialize_resources();
 		initialize_entities();
@@ -26,9 +29,17 @@ private:
 	{
 		AssetLibrary& library = engine->get_asset_library();
 
-		mFaceAsset = library.load_texture_async("res/textures/face.png");
+		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
 		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/floor.png");
+		mFloorAsset = library.load_texture_async("res/textures/faces.png", 
+			TextureOptions
+			{
+				.layerWidth = 32,
+				.layerHeight = 32,
+				.arrayLayers = 2,
+				.isTextureArray = true,
+			}
+		);
 	}
 
 	void initialize_entities()
@@ -90,6 +101,30 @@ private:
 
 			floor.add_component<Body2DComponent>();
 			floor.add_component<RectCollider2D>(1.f, 1.f);
+		}
+
+		// Big Floor:
+		{
+			auto floor = get_current_scene().add_entity("floor");
+
+			auto& tilemap = floor.add_component<Tilemap2DComponent>(mFloorAsset, 32);
+			
+			TilemapChunk chunk;
+			{
+				for(u8 x = 0; x < 3; ++x)
+				{
+					for(u8 y = 0; y < 3; ++y)
+					{
+						TileFlags flags;
+						flags.set_enable(true);
+						flags.set_flip(true);
+
+						chunk.chunks.push_back(Tile{{x, y}, (u8)((x + y) % 2), flags});
+					}
+				}
+			}
+			
+			tilemap.worldData.push_back(chunk);
 		}
 
 		mProject.add_scene(&scene, "main_scene.json");

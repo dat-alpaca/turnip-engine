@@ -99,17 +99,33 @@ namespace tur::gl
 		DescriptorSet& set = mDescriptorSets.get(setHandle);
 		const Buffer& buffer = mBuffers.get(bufferHandle);
 
-		set.descriptors[binding] = {
-			.resourceHandle = buffer.handle, .type = DescriptorType::UNIFORM_BUFFER, .binding = binding};
+		set.descriptors[binding] = 
+		{
+			.resourceHandle = buffer.handle, .type = DescriptorType::UNIFORM_BUFFER, .binding = binding
+		};
 	}
-	void
-	ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
+	void ResourceHandler::write_storage_buffer_to_set(
+		descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding
+	)
+	{
+		// UNUSED: range
+		DescriptorSet& set = mDescriptorSets.get(setHandle);
+		const Buffer& buffer = mBuffers.get(bufferHandle);
+
+		set.descriptors[binding] = 
+		{
+			.resourceHandle = buffer.handle, .type = DescriptorType::STORAGE_BUFFER, .binding = binding
+		};
+	}
+	void ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
 	{
 		DescriptorSet& set = mDescriptorSets.get(setHandle);
 		const Texture& texture = mTextures.get(textureHandle);
 
-		set.descriptors[binding] = {
-			.resourceHandle = texture.handle, .type = DescriptorType::COMBINED_IMAGE_SAMPLER, .binding = binding};
+		set.descriptors[binding] = 
+		{
+			.resourceHandle = texture.handle, .type = DescriptorType::COMBINED_IMAGE_SAMPLER, .binding = binding
+		};
 	}
 
 	pipeline_handle ResourceHandler::create_graphics_pipeline(const PipelineDescriptor& descriptor)

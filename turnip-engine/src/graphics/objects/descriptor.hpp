@@ -12,6 +12,7 @@ namespace tur
 		INVALID = 0,
 		COMBINED_IMAGE_SAMPLER,
 		UNIFORM_BUFFER,
+		STORAGE_BUFFER,
 	};
 }
 
@@ -30,6 +31,6 @@ namespace tur
 
 	struct DescriptorSetLayoutDescriptor
 	{
-		std::span<const DescriptorSetLayoutEntry> entries;
+		std::vector<DescriptorSetLayoutEntry> entries;
 	};
 }

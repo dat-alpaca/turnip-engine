@@ -7,8 +7,7 @@ layout(binding = 0) uniform UBO
 	mat4 model;
 	mat4 view;
 	mat4 proj;
-}
-ubo;
+} ubo;
 
 layout(location = 0) out vec2 v_uvs;
 

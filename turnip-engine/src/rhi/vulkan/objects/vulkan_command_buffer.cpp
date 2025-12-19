@@ -1,5 +1,10 @@
 #include "vulkan_command_buffer.hpp"
+#include "defines.hpp"
+#include "rhi/vulkan/allocators/command_buffer.hpp"
+#include "rhi/vulkan/objects/render_target.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -8,33 +13,78 @@ namespace tur::vulkan
 	{
 	}
 
+	void CommandBufferVulkan::initialize_secondary()
+	{
+		mCommandBuffer = allocate_single_secondary_command_buffer(rRHI->get_state().logicalDevice, rRHI->get_state().commandPool);
+		mIsSecondary = true;
+	}
 	void CommandBufferVulkan::reset(vk::CommandBuffer commandBuffer)
 	{
 		mCommandBuffer = commandBuffer;
+		mIsSecondary = false;
+	}
+	void CommandBufferVulkan::execute_secondary_buffers(std::span<vk::CommandBuffer> buffers)
+	{
+		TUR_ASSERT(!mIsSecondary, "Attempted to execute secondary buffers inside a non-primary command buffer");
+		mCommandBuffer.executeCommands(buffers.size(), buffers.data());
 	}
 
 	void CommandBufferVulkan::begin(render_target_handle renderTargetHandle)
 	{
 		auto& resources = rRHI->get_resource_handler();
-
-		RenderTarget target;
-		if (renderTargetHandle != invalid_handle)
-			target = resources.get_render_targets().get(renderTargetHandle);
-		else
-			target = rRHI->get_state().mainRenderTarget;
-
 		mUsedTarget = renderTargetHandle;
+	
+		// Secondary command buffer setup:
+		vk::CommandBufferInheritanceRenderingInfo renderingInfo = {};
+		
+		vk::CommandBufferInheritanceInfo inheritanceInfo = {};
+		if(mIsSecondary)
+		{
+			renderingInfo.sType = vk::StructureType::eCommandBufferInheritanceRenderingInfo;
+			inheritanceInfo.sType = vk::StructureType::eCommandBufferInheritanceInfo;
+			
+			RenderTarget target = get_render_target();
+			auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
 
+			renderingInfo.colorAttachmentCount = 1;
+			renderingInfo.pColorAttachmentFormats = &colorTexture.format;
+			renderingInfo.depthAttachmentFormat = vk::Format::eUndefined;
+			renderingInfo.stencilAttachmentFormat = vk::Format::eUndefined;
+			renderingInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
+
+			inheritanceInfo.pNext = &renderingInfo;
+		}
+
+		// Command buffer begin setup:
+		vk::CommandBufferBeginInfo beginInfo = {};
+		{
+			beginInfo.pInheritanceInfo = (mIsSecondary) ? &inheritanceInfo : nullptr;
+			beginInfo.flags = (mIsSecondary)
+				? vk::CommandBufferUsageFlagBits::eRenderPassContinue
+				: vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+		}
+
+		auto result = mCommandBuffer.begin(beginInfo);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
+	}
+	void CommandBufferVulkan::begin_rendering()
+	{
+		auto& resources = rRHI->get_resource_handler();
+
+		RenderTarget target = get_render_target();
 		auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
 
 		{
 			utils::transition_texture_layout(
 				*rRHI, colorTexture,
-				{.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
-				 .srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
-				 .srcAccessMask = vk::AccessFlagBits2::eNone,
-				 .dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-				 .dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite}
+				{
+					.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+				 	.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+				 	.srcAccessMask = vk::AccessFlagBits2::eNone,
+				 	.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+				 	.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite
+				}
 			);
 		}
 
@@ -57,21 +107,22 @@ namespace tur::vulkan
 				colorAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
 				colorAttachmentInfo.clearValue =
 					vk::ClearValue({mClearColor.color.r, mClearColor.color.g, mClearColor.color.b, mClearColor.color.a}
-					);
+				);
 			}
 
 			vk::RenderingAttachmentInfo depthAttachmentInfo = {};
 			{
-				depthAttachmentInfo.imageView = colorTexture.imageView;
+				depthAttachmentInfo.imageView = nullptr;
 				depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 				depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
-				depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eClear;
+				depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eLoad;
 				depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
 				depthAttachmentInfo.clearValue =
 					vk::ClearValue(vk::ClearDepthStencilValue(mClearColor.depth, mClearColor.stencil));
 			}
 
 			// TODO: use the 	rendertarget
+			renderInfo.flags |= vk::RenderingFlagBits::eContentsSecondaryCommandBuffers;
 			renderInfo.renderArea = vk::Rect2D({}, {colorTexture.extent.width, colorTexture.extent.height});
 			renderInfo.colorAttachmentCount = 1;
 			renderInfo.layerCount = 1;
@@ -79,17 +130,22 @@ namespace tur::vulkan
 			// renderInfo.pDepthAttachment = &depthAttachmentInfo;
 			// renderInfo.pStencilAttachment = nullptr;
 		}
+
 		mCommandBuffer.beginRendering(renderInfo);
+	}
+	void CommandBufferVulkan::end_rendering()
+	{
+		mBoundPipeline = invalid_handle;
+		mCommandBuffer.endRendering();
 	}
 	void CommandBufferVulkan::end()
 	{
-		mBoundPipeline = invalid_handle;
-
-		mCommandBuffer.endRendering();
-
-		if (mUsedTarget != invalid_handle)
-			return;
-
+		vk::Result result = mCommandBuffer.end();
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_CRITICAL("Failed to end() recording to vulkan command buffer.");
+	}
+	void CommandBufferVulkan::blit()
+	{
 		blit_onto_swapchain();
 	}
 
@@ -155,9 +211,18 @@ namespace tur::vulkan
 
 namespace tur::vulkan
 {
-	void CommandBufferVulkan::copy_image(
-		vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize
-	)
+	RenderTarget CommandBufferVulkan::get_render_target()
+	{
+		auto& resources = rRHI->get_resource_handler();
+
+		RenderTarget target;
+		if (mUsedTarget != invalid_handle)
+			return resources.get_render_targets().get(mUsedTarget);
+		else
+			return rRHI->get_state().mainRenderTarget;
+	}
+
+	void CommandBufferVulkan::copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize)
 	{
 		vk::ImageBlit2 blitRegion = {};
 		{
@@ -197,30 +262,36 @@ namespace tur::vulkan
 
 	void CommandBufferVulkan::blit_onto_swapchain()
 	{
+		if(mUsedTarget != invalid_handle)
+			return;
+
 		const auto& currentImage = rRHI->get_frame_data().get_image_buffer_index();
 		auto& swapchainTexture = rRHI->get_state().swapchainTextures.at(currentImage);
 		auto& swapchainExtent = rRHI->get_state().swapchainExtent;
+		
 		auto& mainRenderTarget = rRHI->get_state().mainRenderTarget;
-
 		auto& colorTextureHandle = mainRenderTarget.colorAttachment.textureHandle;
 		auto& colorTexture = rRHI->get_resource_handler().get_textures().get(colorTextureHandle);
 
 		utils::transition_texture_layout(
 			*rRHI, colorTexture,
-			{.newLayout = vk::ImageLayout::eTransferSrcOptimal,
-			 .srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-			 .srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
-			 .dstStageMask = vk::PipelineStageFlagBits2::eBlit,
-			 .dstAccessMask = vk::AccessFlagBits2::eTransferRead}
+			{
+				.newLayout = vk::ImageLayout::eTransferSrcOptimal,
+			 	.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+			 	.srcAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite,
+			 	.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+			 	.dstAccessMask = vk::AccessFlagBits2::eTransferRead
+			}
 		);
 
 		utils::transition_texture_layout(
-			*rRHI, swapchainTexture,
-			{.newLayout = vk::ImageLayout::eTransferDstOptimal,
-			 .srcStageMask = vk::PipelineStageFlagBits2::eAllCommands,
-			 .srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
-			 .dstStageMask = vk::PipelineStageFlagBits2::eBlit,
-			 .dstAccessMask = vk::AccessFlagBits2::eTransferWrite}
+			*rRHI, swapchainTexture, {
+				.newLayout = vk::ImageLayout::eTransferDstOptimal,
+				.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands,
+				.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
+				.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+				.dstAccessMask = vk::AccessFlagBits2::eTransferWrite
+			}
 		);
 
 		copy_image(
@@ -228,30 +299,14 @@ namespace tur::vulkan
 			swapchainExtent
 		);
 
-		// TODO: Organize barriers
-		vk::MemoryBarrier2 memory_barrier = {};
-		{
-			memory_barrier.srcStageMask = vk::PipelineStageFlagBits2::eBlit;
-			memory_barrier.srcAccessMask = vk::AccessFlagBits2::eTransferWrite;
-			memory_barrier.dstStageMask = vk::PipelineStageFlagBits2::eAllCommands;
-			memory_barrier.dstAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite;
-		}
-
-		vk::DependencyInfo dependencyInfo = {};
-		{
-			dependencyInfo.memoryBarrierCount = 1;
-			dependencyInfo.pMemoryBarriers = &memory_barrier;
-		}
-
-		mCommandBuffer.pipelineBarrier2(&dependencyInfo);
-
 		utils::transition_texture_layout(
-			*rRHI, swapchainTexture,
-			{.newLayout = vk::ImageLayout::ePresentSrcKHR,
-			 .srcStageMask = vk::PipelineStageFlagBits2::eBlit,
-			 .srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
-			 .dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
-			 .dstAccessMask = vk::AccessFlagBits2::eNone}
+			*rRHI, swapchainTexture, {
+				.newLayout = vk::ImageLayout::ePresentSrcKHR,
+			 	.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
+			 	.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,
+			 	.dstStageMask = vk::PipelineStageFlagBits2::eBottomOfPipe,
+			 	.dstAccessMask = vk::AccessFlagBits2::eNone
+			}
 		);
 	}
 }

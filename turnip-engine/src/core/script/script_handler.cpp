@@ -25,8 +25,6 @@ namespace tur
 		{ return window.get_mouse_pressed(mouseButton); };
 		mLua["Input"]["get_key_pressed"] = [&](Key keyButton) -> bool { return window.get_key_pressed(keyButton); };
 
-		// clang-format off
-
 		// Mouse:
 		{
 			mLua["Input"]["MouseButton"] = mLua.create_table_with(
@@ -166,7 +164,6 @@ namespace tur
 				"MENU", 				Key::KEY_MENU                                                  	
 			);
 		}
-		// clang-format on
 	}
 	void ScriptHandler::initialize_physics(NON_OWNING PhysicsHandler* physicsHandler)
 	{
@@ -181,7 +178,6 @@ namespace tur
 	}
 	void ScriptHandler::initialize_logging()
 	{
-		// clang-format off
 		mLua["Log"] = mLua.create_table();
 		mLua["Log"]["critical"] 	= [](const std::string& message) { TUR_LOG_CRITICAL(message); };
 		mLua["Log"]["error"] 		= [](const std::string& message) { TUR_LOG_ERROR(message); };
@@ -189,7 +185,6 @@ namespace tur
 		mLua["Log"]["debug"] 		= [](const std::string& message) { TUR_LOG_DEBUG(message); };
 		mLua["Log"]["trace"] 		= [](const std::string& message) { TUR_LOG_TRACE(message); };
 		mLua["Log"]["info"] 		= [](const std::string& message) { TUR_LOG_INFO(message); };
-		// clang-format on
 	}
 
 	void ScriptHandler::initialize_usertypes()

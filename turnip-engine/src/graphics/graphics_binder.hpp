@@ -3,7 +3,6 @@
 
 namespace tur
 {
-	// clang-format off
 	template <typename T, typename WindowType>
 	concept IsGraphicsBinder = requires(T t, const WindowingCapabilities& capabilities)
 	{
@@ -13,7 +12,6 @@ namespace tur
 		{ t.post_initialize(window) };
 		{ t.present() };
     };
-	// clang-format on
 
 	template <typename Binder, typename WindowType>
 	requires IsGraphicsBinder<Binder, WindowType>

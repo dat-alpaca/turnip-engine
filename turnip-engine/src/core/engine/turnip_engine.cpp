@@ -1,7 +1,13 @@
 #include "turnip_engine.hpp"
+#include "GLFW/glfw3.h"
+#include "assets/asset_library.hpp"
 #include "common.hpp"
 #include "core/config/config_data.hpp"
+#include "graphics/constants.hpp"
+#include "graphics/objects/texture.hpp"
+#include "graphics/types/queue_operations.hpp"
 #include "logging/logging.hpp"
+#include "vulkan/objects/vulkan_command_buffer.hpp"
 
 namespace tur::engine
 {
@@ -23,8 +29,18 @@ namespace tur::engine
 	}
 	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{
+		if (!renderInterface.begin_frame())
+			return;
+
+		CommandBuffer commandBuffer = renderInterface.create_command_buffer();
+		commandBuffer.reset(renderInterface.get_current_command_buffer());
+
 		for (const auto& view : viewHandler.get_views())
 			view->on_render();
+
+		renderInterface.end_frame();
+		renderInterface.submit(renderInterface.get_queue(QueueOperation::GRAPHICS));
+		renderInterface.present(renderInterface.get_queue(QueueOperation::PRESENT));
 	}
 	static void on_render_gui(ViewHandler& viewHandler)
 	{
@@ -89,6 +105,20 @@ namespace tur
 		mAssetLibrary.initialize(&mWorkerPool, &mAudioHandler);
 		mAssetLibrary.set_event_callback(mMainEventCallback);
 
+		{
+			// Default texture:	
+			const auto& asset = mAssetLibrary.get_texture_asset(AssetLibrary::DefaultTextureHandle);
+			TextureDescriptor descriptor;
+			{
+				descriptor.width = DefaultTexture::Width;
+				descriptor.height = DefaultTexture::Height;
+				descriptor.format = DefaultTexture::Format;
+				descriptor.tiling = TextureTiling::RAW;
+			}
+
+			mRenderInterface.DefaultTextureHandle = mRenderInterface.get_resource_handler().create_texture(descriptor, asset);
+		}
+
 		// Physics:
 		mPhysicsHandler.initialize(configData.physicsConfig);
 	}
@@ -97,8 +127,21 @@ namespace tur
 	{
 		engine::startup(mViewHandler);
 
+		float accum = 0;
+		float oldTime = glfwGetTime();
 		while (!mShutdownRequested && mWindow->is_open())
 		{
+			float newTime = glfwGetTime();
+			float dt = newTime - oldTime;
+			accum += dt;
+			oldTime = newTime;
+
+			if(accum >= 1.f)
+			{
+				accum = 0;
+				glfwSetWindowTitle(mWindow->get_window(), std::to_string(1 / dt).c_str());
+			}
+
 			mWindow->poll_events();
 			mWorkerPool.poll_tasks();
 

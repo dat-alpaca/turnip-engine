@@ -22,14 +22,12 @@ namespace tur
 		bool startsVisible = false;
 	};
 
-	// clang-format off
 	template <typename T>
 	concept IsWindowingSystem = requires(const WindowingCapabilities& capabilities, const WindowProperties& props)
 	{
 		{ T::initialize(capabilities, props) };
 		{ T::shutdown() };
 	};
-	// clang-format on
 
 	template <IsWindowingSystem T>
 	class BaseWindowingSystem : public T

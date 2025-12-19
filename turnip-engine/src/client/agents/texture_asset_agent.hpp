@@ -1,9 +1,11 @@
 #pragma once
+#include "assets/asset.hpp"
 #include "event/events.hpp"
 #include "event_consumer.hpp"
 #include "event_emitter.hpp"
 
 #include "assets/asset_library.hpp"
+#include "graphics/objects/texture.hpp"
 #include "rhi/rhi.hpp"
 
 namespace tur
@@ -24,12 +26,23 @@ namespace tur
 			subscriber.subscribe<AssetLoadedEvent>(
 				[&](const AssetLoadedEvent& event) -> bool
 				{
-					if (event.type != AssetType::TEXTURE)
-						return false;
+					texture_handle textureHandle;
 
-					texture_handle textureHandle = upload_texture(event.assetHandle);
+					switch(event.type)
+					{
+						case AssetType::TEXTURE:
+							textureHandle = upload_texture(event.assetHandle);
+							break;
 
-					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle);
+						case AssetType::TEXTURE_ARRAY:
+							textureHandle = upload_texture(event.assetHandle, true);
+							break;
+
+						default:
+							return true;
+					}
+
+					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
 
 					return false;
@@ -38,7 +51,7 @@ namespace tur
 		}
 
 	private:
-		texture_handle upload_texture(asset_handle assetHandle)
+		texture_handle upload_texture(asset_handle assetHandle, bool isArray = false)
 		{
 			auto& resources = rRHI->get_resource_handler();
 			const TextureAsset& textureAsset = rLibrary->get_texture_asset(assetHandle);
@@ -48,12 +61,15 @@ namespace tur
 			{
 				descriptor.width = textureAsset.width;
 				descriptor.height = textureAsset.height;
+				descriptor.layerWidth = options.layerWidth;
+				descriptor.layerHeight = options.layerHeight;
 				descriptor.depth = options.depth;
 				descriptor.mipLevels = options.mipLevels;
 				descriptor.samples = options.samples;
+				descriptor.arrayLayers = options.arrayLayers;
 
 				descriptor.format = options.format;
-				descriptor.type = options.type;
+				descriptor.type = (isArray) ? TextureType::ARRAY_TEXTURE_2D : TextureType::TEXTURE_2D;
 
 				descriptor.generateMipmaps = options.generateMipmaps;
 

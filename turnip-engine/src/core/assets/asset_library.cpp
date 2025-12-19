@@ -2,6 +2,8 @@
 #include <miniaudio.h>
 #include <stb_image.h>
 
+#include "graphics/constants.hpp"
+#include "assets/asset.hpp"
 #include "audio/audio_asset.hpp"
 #include "texture/texture_loader.hpp"
 
@@ -14,6 +16,8 @@ namespace tur
 
 		rAudioHandler = audioHandler;
 		rWorkerPool = workerPool;
+
+		create_default_texture();
 	}
 	void AssetLibrary::shutdown()
 	{
@@ -41,9 +45,9 @@ namespace tur
 			[filepath, options]()
 			{
 				if (!options.floatTexture)
-					return load_texture_task(filepath);
+					return load_texture_task(filepath, options);
 				else
-					return load_float_texture_task(filepath);
+					return load_float_texture_task(filepath, options);
 			},
 			[&, filepath, assetHandle](const texture_asset_opt& textureAsset)
 			{
@@ -54,9 +58,16 @@ namespace tur
 				loadedTextureAsset = textureAsset.value();
 				loadedTextureAsset.state = AssetState::READY;
 
+				AssetType type = AssetType::TEXTURE;
+				if(loadedTextureAsset.options.arrayLayers > 1)
+					loadedTextureAsset.options.isTextureArray = true;
+
+				if(loadedTextureAsset.options.isTextureArray)
+					type = AssetType::TEXTURE_ARRAY;
+
 				mFilepathCache[filepath] = assetHandle;
 
-				AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::TEXTURE);
+				AssetLoadedEvent assetLoadedEvent(assetHandle, type);
 				mEventCallback(assetLoadedEvent);
 			}
 		);
@@ -94,5 +105,26 @@ namespace tur
 		mEventCallback(assetLoadedEvent);
 
 		return assetHandle;
+	}
+}
+
+namespace tur
+{
+	void AssetLibrary::create_default_texture()
+	{
+		TextureAsset asset;
+		{
+			asset.metadata.filepath = "internal/default_texture";
+			asset.metadata.uuid = UUID();
+
+			asset.width = DefaultTexture::Width;
+			asset.height = DefaultTexture::Height;
+			asset.channels = DefaultTexture::Channels;
+
+			u32 size = asset.width * asset.height * asset.channels;
+			asset.data = std::vector<byte>(DefaultTexture::Data, DefaultTexture::Data + size);
+		}
+
+		DefaultTextureHandle = mTextureAssets.add(asset);
 	}
 }

@@ -131,6 +131,9 @@ namespace tur::vulkan
 
 			case AttributeFormat::R32G32B32A32_UINT:
 				return vk::Format::eR32G32B32A32Uint;
+
+			case AttributeFormat::R32_UINT:
+				return vk::Format::eR32Uint;
 		}
 
 		TUR_LOG_CRITICAL("Invalid Attribute Format: {}", static_cast<u32>(format));

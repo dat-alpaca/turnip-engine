@@ -149,6 +149,13 @@ namespace tur::gl
 				}
 				break;
 
+				case DescriptorType::STORAGE_BUFFER:
+				{
+					glBindBuffer(GL_SHADER_STORAGE_BUFFER, descriptor.resourceHandle);
+					glBindBufferBase(GL_SHADER_STORAGE_BUFFER, binding, descriptor.resourceHandle);
+				}
+				break;
+
 				case DescriptorType::COMBINED_IMAGE_SAMPLER:
 				{
 					glBindTextureUnit(binding, descriptor.resourceHandle);

@@ -64,8 +64,8 @@
     },
     "windowingCapabilities": {
         "api": "UNKNOWN",
-        "major": 0,
-        "minor": 0,
+        "major": 1,
+        "minor": 3,
         "patch": 0,
         "variant": 0
     },

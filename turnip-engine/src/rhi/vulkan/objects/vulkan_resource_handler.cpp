@@ -10,6 +10,14 @@ namespace tur::vulkan
 
 		rRHI = rhi;
 		rDevice = rhi->get_state().logicalDevice;
+
+		mShaders.clear();
+		mBuffers.clear();
+		mPipelines.clear();
+		mTextures.clear();
+		mRenderTargets.clear();
+		mSetLayouts.clear();
+		mDescriptorSets.clear();
 	}
 	void ResourceHandler::destroy()
 	{
@@ -75,10 +83,12 @@ namespace tur::vulkan
 		// TODO: flexible number of max descriptor sets
 
 		auto& device = rRHI->get_state().logicalDevice;
-		DescriptorSetLayout setLayout{
+		DescriptorSetLayout setLayout
+		{
 			.layoutDescriptor = descriptorSetLayout,
 			.layout = allocate_set_layout(device, descriptorSetLayout),
-			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)};
+			.pool = allocate_descriptor_pool(device, descriptorSetLayout, 1000)
+		};
 
 		return mSetLayouts.add(setLayout);
 	}
@@ -132,8 +142,33 @@ namespace tur::vulkan
 
 		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
 	}
-	void
-	ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
+	void ResourceHandler::write_storage_buffer_to_set(descriptor_set_handle setHandle, buffer_handle bufferHandle, const Range& range, u32 binding)
+	{
+		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
+		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer_handle");
+
+		const Buffer& buffer = mBuffers.get(bufferHandle);
+
+		vk::DescriptorBufferInfo bufferInfo = {};
+		{
+			bufferInfo.buffer = buffer.buffer;
+			bufferInfo.offset = range.offset;
+			bufferInfo.range = range.size;
+		}
+
+		vk::WriteDescriptorSet descriptorWrite = {};
+		{
+			descriptorWrite.dstSet = mDescriptorSets.get(setHandle).set;
+			descriptorWrite.dstBinding = binding;
+			descriptorWrite.dstArrayElement = 0; // TODO: allow modification
+			descriptorWrite.descriptorCount = 1;
+			descriptorWrite.descriptorType = vk::DescriptorType::eStorageBuffer;
+			descriptorWrite.pBufferInfo = &bufferInfo;
+		}
+
+		rRHI->get_state().logicalDevice.updateDescriptorSets(1, &descriptorWrite, 0, nullptr);
+	}
+	void ResourceHandler::write_texture_to_set(descriptor_set_handle setHandle, texture_handle textureHandle, u32 binding)
 	{
 		TUR_ASSERT(setHandle != invalid_handle, "Invalid descriptor_set_handle");
 		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
@@ -318,9 +353,7 @@ namespace tur::vulkan
 			}
 		);
 	}
-	void ResourceHandler::copy_buffer_to_texture(
-		buffer_handle source, texture_handle destination, u32 width, u32 height, u32 depth
-	)
+	void ResourceHandler::copy_buffer_to_texture(buffer_handle source, texture_handle destination, u32 width, u32 height, u32 depth)
 	{
 		TUR_ASSERT(source != invalid_handle, "Invalid buffer_handle");
 		TUR_ASSERT(destination != invalid_handle, "Invalid texture_handle");
@@ -334,18 +367,31 @@ namespace tur::vulkan
 			{
 				vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
 
-				vk::BufferImageCopy2 region;
-				{
-					region.bufferOffset = 0;
-					region.bufferRowLength = 0;
-					region.bufferImageHeight = 0;
+				std::vector<vk::BufferImageCopy2> regions;
+				regions.resize(texture.descriptor.arrayLayers);
 
-					region.imageSubresource.aspectMask = aspectMask;
-					region.imageSubresource.mipLevel = 0;
-					region.imageSubresource.baseArrayLayer = 0;
-					region.imageSubresource.layerCount = 1;
-					region.imageOffset = vk::Offset3D(0, 0, 0);
-					region.imageExtent = vk::Extent3D(width, height, depth);
+				for(u32 layer = 0; layer < texture.descriptor.arrayLayers; ++layer)
+				{
+					auto formatSize = get_texture_format_byte_size(texture.descriptor.format);
+					vk::BufferImageCopy2 region = {};
+					{
+						region.bufferOffset = layer * texture.descriptor.layerWidth * formatSize;
+						region.bufferRowLength = width;
+        				region.bufferImageHeight = height;
+
+						region.imageSubresource.aspectMask = aspectMask;
+						region.imageSubresource.mipLevel = 0;
+						region.imageSubresource.baseArrayLayer = layer;
+						region.imageSubresource.layerCount = 1;
+
+						region.imageOffset = vk::Offset3D(0, 0, 0);
+
+						u32 usedWidth = texture.descriptor.layerWidth > 0 ? texture.descriptor.layerWidth : width;
+						u32 usedHeight = texture.descriptor.layerHeight > 0 ? texture.descriptor.layerHeight : height;
+						region.imageExtent = vk::Extent3D(usedWidth, usedHeight, depth);
+					}
+
+					regions[layer] = region;
 				}
 
 				vk::CopyBufferToImageInfo2 copyInfo = {};
@@ -353,8 +399,8 @@ namespace tur::vulkan
 					copyInfo.srcBuffer = buffer.buffer;
 					copyInfo.dstImage = texture.image;
 					copyInfo.dstImageLayout = vk::ImageLayout::eTransferDstOptimal;
-					copyInfo.regionCount = 1;
-					copyInfo.pRegions = &region;
+					copyInfo.regionCount = regions.size();
+					copyInfo.pRegions = regions.data();
 				}
 
 				commandBuffer.copyBufferToImage2(copyInfo);
@@ -379,7 +425,6 @@ namespace tur::vulkan
 			update_texture(handle, asset);
 
 		else
-			// TODO: proper masks
 			utils::transition_texture_layout_imm(
 				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
 			);
@@ -403,6 +448,9 @@ namespace tur::vulkan
 			stagingDescriptor.type = BufferType::TRANSFER_SRC | BufferType::TRANSFER_DST;
 		}
 
+		auto width = texture.descriptor.width;
+		auto height = texture.descriptor.height;
+
 		buffer_handle stagingBufferHandle =
 			create_buffer(stagingDescriptor, asset.data.data(), {.size = asset.data.size()});
 
@@ -411,7 +459,7 @@ namespace tur::vulkan
 			// TODO: proper masks
 			utils::transition_texture_layout_imm(*rRHI, texture, {.newLayout = vk::ImageLayout::eTransferDstOptimal});
 
-			copy_buffer_to_texture(stagingBufferHandle, textureHandle, asset.width, asset.height);
+			copy_buffer_to_texture(stagingBufferHandle, textureHandle, width, height);
 
 			// TODO: proper masks
 			utils::transition_texture_layout_imm(

@@ -17,6 +17,6 @@ namespace tur
 		u32 channels = 0;
 
 	public:
-		TextureOptions options;
+		TextureOptions options = {};
 	};
 }

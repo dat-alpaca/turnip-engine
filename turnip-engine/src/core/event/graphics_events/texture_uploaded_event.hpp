@@ -1,5 +1,6 @@
 #pragma once
-#include "core/event/event.hpp"
+#include "event/event.hpp"
+#include "assets/asset.hpp"
 #include "graphics/objects/texture.hpp"
 
 namespace tur
@@ -9,14 +10,16 @@ namespace tur
 		DEFINE_EVENT(EventType::TEXTURE_UPLOADED);
 
 	public:
-		TextureUploadedEvent(asset_handle assetHandle, texture_handle textureHandle)
-			: assetHandle(assetHandle),
-			  textureHandle(textureHandle)
+		TextureUploadedEvent(asset_handle assetHandle, texture_handle textureHandle, AssetType type)
+			: assetHandle(assetHandle)
+			, textureHandle(textureHandle)
+			, type(type)
 		{
 		}
 
 	public:
 		asset_handle assetHandle;
 		texture_handle textureHandle;
+		AssetType type;
 	};
 }
