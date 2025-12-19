@@ -1,6 +1,7 @@
 #pragma once
 #include <glm/glm.hpp>
 #include "common.hpp"
+#include "glm/detail/qualifier.hpp"
 
 namespace tur
 {
@@ -9,23 +10,32 @@ namespace tur
 	public:
 		void set_enable(bool enable)
 		{
-			this->enable = static_cast<u8>(enable); 
+			if (enable)
+            	data |= 0b00000001;
+			else
+            	data &= 0b11111110;
 		}
 
 		void set_flip(bool flip)
 		{
-			this->flip = static_cast<u8>(flip); 
+			if (flip)
+            	data |= 0b00000010;
+			else
+            	data &= 0b11111101;
 		}
 
 		void set_animation_size(u8 animationSize)
 		{
-			this->animationSize = animationSize & 0xFC; 
+			data = (data & 0b00000011) | ((animationSize & 0b00111111) << 2);
+		}
+
+		u8 value() const
+		{
+			return data;
 		}
 
 	public:
-		u8 enable : 1;
-		u8 flip : 1;
-		u8 animationSize : 6;
+		u8 data = 0b00000001;
 	};
 
 	struct Tile

@@ -31,7 +31,7 @@ private:
 
 		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
 		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/floor.png", 
+		mFloorAsset = library.load_texture_async("res/textures/faces.png", 
 			TextureOptions
 			{
 				.layerWidth = 32,
@@ -111,13 +111,13 @@ private:
 			
 			TilemapChunk chunk;
 			{
-				for(u8 x = 0; x < 30; ++x)
+				for(u8 x = 0; x < 3; ++x)
 				{
-					for(u8 y = 0; y < 30; ++y)
+					for(u8 y = 0; y < 3; ++y)
 					{
 						TileFlags flags;
 						flags.set_enable(true);
-						flags.set_flip(x % 2 == 0);
+						flags.set_flip(true);
 
 						chunk.chunks.push_back(Tile{{x, y}, (u8)((x + y) % 2), flags});
 					}
@@ -153,7 +153,7 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 32.f;
+	static constexpr inline float PixelPerMeter = 100.f;
 
 	asset_handle mSoundAsset;
 	asset_handle mFaceAsset;
