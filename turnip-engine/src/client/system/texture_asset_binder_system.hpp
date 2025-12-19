@@ -1,5 +1,6 @@
 #pragma once
 #include "assets/asset.hpp"
+#include "event/asset_events/asset_loaded_event.hpp"
 #include "event/events.hpp"
 #include "graphics/components.hpp"
 #include "logging/logging.hpp"
@@ -45,6 +46,7 @@ namespace tur
 	private:
 		void handle_texture(const TextureUploadedEvent& textureUploaded)
 		{
+			// TODO: handle all sorts of components here using the any<> method
 			auto view = rScene->get_registry().view<Sprite2DComponent>();
 			for (auto [e, sprite] : view.each())
 			{

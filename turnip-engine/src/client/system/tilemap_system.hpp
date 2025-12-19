@@ -10,10 +10,9 @@ namespace tur
 	class TilemapSystem
 	{
 	public:
-		// TODO: config
-		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera, u32 tilemapMaxSize)
+		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
 		{
-			mTilemapRenderer.initialize(rhi, tilemapMaxSize);
+			mTilemapRenderer.initialize(rhi);
 			mTilemapRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mTilemapRenderer.set_camera(camera);
 			set_scene(scene);
@@ -51,6 +50,7 @@ namespace tur
 						flattenMap.push_back(tile);
 				}
 				
+				mTilemapRenderer.set_atlas_texture(tilemap.textureHandle);
 				mTilemapRenderer.set_tile_data(flattenMap);
 			}
 		}

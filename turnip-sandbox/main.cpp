@@ -4,6 +4,7 @@
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
 #include "graphics/components.hpp"
+#include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
 #include <turnip_engine.hpp>
 
@@ -30,7 +31,15 @@ private:
 
 		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
 		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/floor.png", TextureOptions{.isTextureArray=false});
+		mFloorAsset = library.load_texture_async("res/textures/floor.png", 
+			TextureOptions
+			{
+				.layerWidth = 32,
+				.layerHeight = 32,
+				.arrayLayers = 2,
+				.isTextureArray = true,
+			}
+		);
 	}
 
 	void initialize_entities()
@@ -99,13 +108,19 @@ private:
 			auto floor = get_current_scene().add_entity("floor");
 
 			auto& tilemap = floor.add_component<Tilemap2DComponent>(mFloorAsset, 32);
-			tilemap.assetHandle = mFloorAsset;
+			
 			TilemapChunk chunk;
 			{
-				for(u8 x = 0; x < 1; ++x)
+				for(u8 x = 0; x < 30; ++x)
 				{
-					for(u8 y = 0; y < 1; ++y)	
-						chunk.chunks.push_back(Tile{{x, y}, 0, 0});
+					for(u8 y = 0; y < 30; ++y)
+					{
+						TileFlags flags;
+						flags.set_enable(true);
+						flags.set_flip(x % 2 == 0);
+
+						chunk.chunks.push_back(Tile{{x, y}, (u8)((x + y) % 2), flags});
+					}
 				}
 			}
 			
@@ -138,7 +153,7 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 100.f;
+	static constexpr inline float PixelPerMeter = 32.f;
 
 	asset_handle mSoundAsset;
 	asset_handle mFaceAsset;

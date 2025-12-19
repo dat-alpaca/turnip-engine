@@ -4,12 +4,36 @@
 
 namespace tur
 {
-    struct Tile
+	struct TileFlags
+	{
+	public:
+		void set_enable(bool enable)
+		{
+			this->enable = static_cast<u8>(enable); 
+		}
+
+		void set_flip(bool flip)
+		{
+			this->flip = static_cast<u8>(flip); 
+		}
+
+		void set_animation_size(u8 animationSize)
+		{
+			this->animationSize = animationSize & 0xFC; 
+		}
+
+	public:
+		u8 enable : 1;
+		u8 flip : 1;
+		u8 animationSize : 6;
+	};
+
+	struct Tile
 	{
 	public:
 		glm::vec<2, u8, glm::defaultp> position;
 		u8 layer;
-		u8 flags;
+		TileFlags flags;
 	};
 
 	struct TilemapChunk

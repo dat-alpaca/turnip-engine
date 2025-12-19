@@ -46,6 +46,8 @@ namespace tur::vulkan
 		switch (type)
 		{
 			case TextureType::ARRAY_TEXTURE_2D:
+				return vk::ImageViewType::e2DArray;
+
 			case TextureType::TEXTURE_2D:
 				return vk::ImageViewType::e2D;
 

@@ -63,7 +63,6 @@ namespace tur
 	public:
 		descriptor_set_layout_handle setLayout;
 		buffer_handle vbo, ebo;
-		texture_handle defaultTextureHandle;
 		pipeline_handle pipeline;
 	};
 }

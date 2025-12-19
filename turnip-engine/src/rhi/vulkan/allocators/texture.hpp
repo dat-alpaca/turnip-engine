@@ -12,7 +12,11 @@ namespace tur::vulkan
 	{
 		Texture texture = {};
 		texture.format = get_texture_format(descriptor.format);
-		texture.extent = vk::Extent3D{descriptor.width, descriptor.height, descriptor.depth};
+
+		u32 width = descriptor.layerWidth > 0 ? descriptor.layerWidth : descriptor.width;
+		u32 height = descriptor.layerHeight > 0 ? descriptor.layerHeight : descriptor.height;
+
+		texture.extent = vk::Extent3D{width, height, descriptor.depth};
 		texture.layout = vk::ImageLayout::eUndefined;
 		texture.descriptor = descriptor;
 
@@ -25,7 +29,7 @@ namespace tur::vulkan
 			imageCreateInfo.extent = texture.extent;
 
 			imageCreateInfo.mipLevels = descriptor.mipLevels;
-			imageCreateInfo.arrayLayers = 1;
+			imageCreateInfo.arrayLayers = descriptor.arrayLayers;
 
 			TUR_ASSERT(descriptor.samples <= 16, "Invalid sample size");
 			TUR_ASSERT(descriptor.samples > 0, "Invalid sample size");
@@ -100,7 +104,7 @@ namespace tur::vulkan
 			imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 			imageViewCreateInfo.subresourceRange.levelCount = 1;
 			imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-			imageViewCreateInfo.subresourceRange.layerCount = 1;
+			imageViewCreateInfo.subresourceRange.layerCount = descriptor.arrayLayers;
 
 			// TODO: descriptor aspect flags
 			imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;

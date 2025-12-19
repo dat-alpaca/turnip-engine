@@ -42,10 +42,10 @@ namespace tur
 			if (quad.textureHandle != invalid_handle)
 				resources.write_texture_to_set(quad.setHandle, quad.textureHandle, 1);
 			else
-				resources.write_texture_to_set(quad.setHandle, defaultTextureHandle, 1);
+				resources.write_texture_to_set(quad.setHandle, rRHI->DefaultTextureHandle, 1);
 		}
 
-		commandBuffer.begin(invalid_handle);
+		commandBuffer.begin(renderTarget);
 
 			commandBuffer.set_viewport(viewport);
 			commandBuffer.set_scissor(scissor);
@@ -104,30 +104,6 @@ namespace tur
 		initialize_buffers();
 		initialize_descriptors();
 		initialize_pipeline();
-
-		// Default texture:
-		TextureDescriptor descriptor;
-		{
-			descriptor.width = DefaultTexture::Width;
-			descriptor.height = DefaultTexture::Height;
-			descriptor.format = DefaultTexture::Format;
-			descriptor.tiling = TextureTiling::RAW;
-		}
-
-		TextureAsset asset;
-		{
-			asset.metadata.filepath = "internal/default_texture";
-			asset.metadata.uuid = UUID();
-
-			asset.width = DefaultTexture::Width;
-			asset.height = DefaultTexture::Height;
-			asset.channels = DefaultTexture::Channels;
-
-			u32 size = asset.width * asset.height * asset.channels;
-			asset.data = std::vector<byte>(DefaultTexture::Data, DefaultTexture::Data + size);
-		}
-
-		defaultTextureHandle = rRHI->get_resource_handler().create_texture(descriptor, asset);
 	}
 	void ImmQuadRenderer::initialize_buffers()
 	{

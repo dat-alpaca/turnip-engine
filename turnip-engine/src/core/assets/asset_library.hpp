@@ -15,10 +15,14 @@ namespace tur
 	class AssetLibrary
 	{
 	public:
+		static inline asset_handle DefaultTextureHandle = 0; 
+
+	public:
 		void initialize(WorkerPool* workerPool, AudioHandler* audioHandler);
 		void shutdown();
 
 		void set_event_callback(const EventCallback& eventCallback);
+		void create_default_texture();
 
 	public:
 		asset_handle load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options = {});

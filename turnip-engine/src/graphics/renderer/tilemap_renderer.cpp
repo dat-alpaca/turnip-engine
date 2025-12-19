@@ -8,12 +8,11 @@
 
 namespace tur
 {
-	void TilemapRenderer::initialize(NON_OWNING RenderInterface* rhi, u64 maxTilemapSize)
+	void TilemapRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
-		mMaxTilemapSize = maxTilemapSize;
 		rRHI = rhi;
 		initialize_resources();
 	}
@@ -34,8 +33,13 @@ namespace tur
 		// Tile data:
 		if(!mTiles.empty())
 		{
+			if(atlasHandle == invalid_handle)
+				resources.write_texture_to_set(mainSet, rRHI->DefaultTextureHandle, 2);
+			else
+				resources.write_texture_to_set(mainSet, atlasHandle, 2);
+
 			resources.update_buffer(ssbo, mTiles.data(), Range{ .size = mTiles.size() * sizeof(Tile) });
-			resources.write_storage_buffer_to_set(mainSet, ssbo, Range{ .size=mTiles.size() * sizeof(Tile) }, 0);
+			resources.write_storage_buffer_to_set(mainSet, ssbo, Range{ .size = mTiles.size() * sizeof(Tile) }, 0);
 		}
 		
 		// World data:
@@ -49,18 +53,22 @@ namespace tur
 			resources.write_uniform_buffer_to_set(mainSet, worldUBO, Range{ .size=sizeof(WorldUBO) }, 1);
 		}
 		
-		commandBuffer.begin(invalid_handle);
+		commandBuffer.begin(renderTarget);
 		{
 			commandBuffer.set_viewport(viewport);
 			commandBuffer.set_scissor(scissor);
 			commandBuffer.bind_pipeline(pipeline);
 			commandBuffer.bind_descriptor_set(mainSet);
 
-			commandBuffer.draw(mTiles.size() * 6, 1, 0, 0);
+			commandBuffer.draw(6 * mTiles.size(), 1, 0, 0);
 		}
 		commandBuffer.end();
 	}
 
+	void TilemapRenderer::set_atlas_texture(texture_handle textureHandle)
+	{
+		atlasHandle = textureHandle;
+	}
 	void TilemapRenderer::set_tile_data(const std::vector<Tile>& tiles)
 	{
 		mTiles = tiles;
@@ -81,7 +89,7 @@ namespace tur
 				.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
 				.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 			};
-			ssbo = resources.create_empty_buffer(descriptor, sizeof(Tile) * mUploadTileAmount);
+			ssbo = resources.create_empty_buffer(descriptor, sizeof(Tile) * MaxTileAmountSSBO);
 		}
 
 		{
@@ -110,6 +118,12 @@ namespace tur
 			  	.amount = 1,
 			  	.type = DescriptorType::UNIFORM_BUFFER,
 			  	.stage = PipelineStage::VERTEX_STAGE
+			},
+			{
+				.binding = 2,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
 			}
 		});
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});

@@ -1,4 +1,5 @@
 #pragma once
+#include "defines.hpp"
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/tile.hpp"
@@ -21,12 +22,13 @@ namespace tur
 		};
 
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi, u64 maxTilemapSize);
+		void initialize(NON_OWNING RenderInterface* rhi);
 		void set_camera(NON_OWNING Camera* camera);
 		void set_clear_color(const ClearColor& color, ClearFlags flags);
 		void render();
 
     public:
+		void set_atlas_texture(texture_handle textureHandle);
         void set_tile_data(const std::vector<Tile>& tiles);
 
 	private:
@@ -47,9 +49,9 @@ namespace tur
 
 		pipeline_handle pipeline;
 		buffer_handle worldUBO, ssbo;
-
-		u32 mUploadTileAmount = 16; // TODO: change
-		u32 mMaxTilemapSize = 0;
-		u32 mTileSize = 32; // TODO : change		
+		texture_handle atlasHandle = invalid_handle;
+	
+	private:
+		static inline constexpr u32 MaxTileAmountSSBO = 1024;	
 	};
 }

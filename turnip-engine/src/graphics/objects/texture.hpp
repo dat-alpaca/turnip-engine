@@ -50,6 +50,38 @@ namespace tur
 		B8G8R8A8_UNORM
 	};
 
+	inline u32 get_texture_format_byte_size(TextureFormat format)
+	{
+		switch(format)
+		{
+			case TextureFormat::R8_UNORM: 
+				return sizeof(u8);
+
+			case TextureFormat::RG8_UNORM:
+				return sizeof(u8) * 2;
+
+			case TextureFormat::RGB8_UNORM:
+				return sizeof(u8) * 3;
+
+			case TextureFormat::RGBA8_UNORM:
+				return sizeof(u8) * 4;
+
+			case TextureFormat::RGBA16_SFLOAT:
+				return sizeof(float) * 4;
+
+			case TextureFormat::DEPTH_16_UNORM:
+				return sizeof(u16);
+
+			case TextureFormat::DEPTH_STENCIL16_S8U_INT:
+				return sizeof(u32);
+
+			case TextureFormat::B8G8R8A8_UNORM:
+				return sizeof(u32);
+		}
+		
+		return 0;
+	}
+
 	// Represents data formats and is used for loading textures, rather than representing them on the GPU
 	enum class TextureDataFormat
 	{
@@ -120,6 +152,9 @@ namespace tur
 		u32 depth = 1;
 		u32 mipLevels = 1;
 		u32 samples = 1;
+		u32 arrayLayers = 1;
+		u32 layerWidth = 0;
+		u32 layerHeight = 0;
 
 		TextureFormat format = TextureFormat::RGBA8_UNORM;
 		TextureType type = TextureType::TEXTURE_2D;

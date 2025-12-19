@@ -324,9 +324,7 @@ namespace tur::vulkan::utils
 		rhi.create_main_render_target();
 	}
 
-	void transition_texture_layout(
-		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-	)
+	void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description)
 	{
 		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
 
@@ -359,7 +357,7 @@ namespace tur::vulkan::utils
 			subresourceRange.baseMipLevel = 0;
 			subresourceRange.levelCount = texture.descriptor.mipLevels;
 			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = 1; // TODO: change to texture.layers
+			subresourceRange.layerCount = texture.descriptor.arrayLayers;
 
 			imageBarrier.subresourceRange = subresourceRange;
 			imageBarrier.image = texture.image;
@@ -371,9 +369,7 @@ namespace tur::vulkan::utils
 		texture.layout = description.newLayout;
 	}
 
-	void transition_texture_layout_imm(
-		RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-	)
+	void transition_texture_layout_imm(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description)
 	{
 		if (texture.layout == description.newLayout)
 		{
@@ -404,7 +400,7 @@ namespace tur::vulkan::utils
 			subresourceRange.baseMipLevel = 0;
 			subresourceRange.levelCount = texture.descriptor.mipLevels;
 			subresourceRange.baseArrayLayer = 0;
-			subresourceRange.layerCount = 1; // TODO: change to texture.layers
+			subresourceRange.layerCount = texture.descriptor.arrayLayers;
 
 			imageBarrier.subresourceRange = subresourceRange;
 			imageBarrier.image = texture.image;

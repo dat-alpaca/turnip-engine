@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/texture/texture_options.hpp"
 #include "data-structures/free_list.hpp"
 #include "texture_asset.hpp"
 
@@ -9,7 +10,7 @@ namespace tur
 {
 	using texture_asset_opt = std::optional<TextureAsset>;
 
-	inline texture_asset_opt load_texture_task(const std::filesystem::path& filepath)
+	inline texture_asset_opt load_texture_task(const std::filesystem::path& filepath, const TextureOptions& options)
 	{
 		if (!std::filesystem::exists(filepath))
 		{
@@ -31,6 +32,7 @@ namespace tur
 			asset.metadata.filepath = filepath;
 			asset.metadata.uuid = UUID();
 
+			asset.options = options;
 			asset.width = static_cast<u32>(width);
 			asset.height = static_cast<u32>(height);
 			asset.channels = static_cast<u32>(channels);
@@ -39,7 +41,7 @@ namespace tur
 		return asset;
 	}
 
-	inline texture_asset_opt load_float_texture_task(const std::filesystem::path& filepath)
+	inline texture_asset_opt load_float_texture_task(const std::filesystem::path& filepath, const TextureOptions& options)
 	{
 		if (!std::filesystem::exists(filepath))
 		{
@@ -60,7 +62,8 @@ namespace tur
 			asset.data = buffer;
 			asset.metadata.filepath = filepath;
 			asset.metadata.uuid = UUID();
-
+			asset.options = options;
+				
 			asset.width = static_cast<u32>(width);
 			asset.height = static_cast<u32>(height);
 			asset.channels = static_cast<u32>(channels);

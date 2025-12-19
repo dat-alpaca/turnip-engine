@@ -16,6 +16,10 @@ namespace tur
 
 	void SceneView::on_view_added()
 	{
+		// Default assets:
+		engine->get_asset_library().create_default_texture();
+
+		// Event callbacks:
 		mSceneHolder.set_event_callback(engine->get_event_callback());
 		mTextureAgent.set_event_callback(engine->get_event_callback());
 		add_scene(true);
@@ -113,8 +117,7 @@ namespace tur
 		quadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	
 		// Tilemap:
-		// TODO: change max size:
-		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera, 320);
+		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera);
 		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	}
 }
