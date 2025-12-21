@@ -29,7 +29,7 @@ namespace tur
 
 		void set_animation_size(u8 animationSize)
 		{
-			TUR_ASSERT(animationSize > 63 || animationSize < 0, "Invalid animation size used as flag. Must be 6-bit unsigned integer");
+			TUR_ASSERT(animationSize >= 0 && animationSize <= 63, "Invalid animation size used as flag. Must be 6-bit unsigned integer");
 			data = (data & 0b00000011) | ((animationSize & 0b00111111) << 2);
 		}
 
