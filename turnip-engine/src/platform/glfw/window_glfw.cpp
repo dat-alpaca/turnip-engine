@@ -297,4 +297,9 @@ namespace tur::platform
 		glfwGetCursorPos(mWindow.get(), &xPos, &yPos);
 		return glm::vec2(xPos, yPos);
 	}
+
+	f64 WindowGLFW::get_time()
+	{
+		return glfwGetTime();
+	}
 }

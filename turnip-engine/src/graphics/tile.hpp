@@ -1,7 +1,10 @@
 #pragma once
+#include <atomic>
 #include <glm/glm.hpp>
+#include "assert/assert.hpp"
 #include "common.hpp"
 #include "glm/detail/qualifier.hpp"
+#include "logging/logging.hpp"
 
 namespace tur
 {
@@ -26,6 +29,7 @@ namespace tur
 
 		void set_animation_size(u8 animationSize)
 		{
+			TUR_ASSERT(animationSize > 63 || animationSize < 0, "Invalid animation size used as flag. Must be 6-bit unsigned integer");
 			data = (data & 0b00000011) | ((animationSize & 0b00111111) << 2);
 		}
 

@@ -50,13 +50,13 @@ namespace tur
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
 		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
 	}
-	void SceneView::on_update()
+	void SceneView::on_update(const Time& time)
 	{
 		mainCamera.update_view();
 		quadSystem.update();
-		tilemapSystem.update();
+		tilemapSystem.update(time);
 
-		scriptSystem.on_update();
+		scriptSystem.on_update(time);
 		physicsSystem.update();
 		scenegraphSystem.update();
 	}

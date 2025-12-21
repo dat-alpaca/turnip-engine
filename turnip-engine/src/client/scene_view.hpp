@@ -21,16 +21,16 @@ namespace tur
 		void wake_scene();
 
 	public:
-		virtual void on_view_added() override;
-		virtual void on_update() override;
-		virtual void on_render() override;
-		virtual void on_event(Event& event) override;
+		void on_view_added() override;
+		void on_update(const Time& time) override;
+		void on_render() override;
+		void on_event(Event& event) override;
 
 	public:
-		virtual void on_engine_startup() override {};
-		virtual void on_engine_shutdown() override {};
-		virtual void on_view_removed() override {};
-		virtual void on_render_gui() override {};
+		void on_engine_startup() override {};
+		void on_engine_shutdown() override {};
+		void on_view_removed() override {};
+		void on_render_gui() override {};
 
 	private:
 		void initialize_renderers();

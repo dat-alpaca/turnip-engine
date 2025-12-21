@@ -5,6 +5,7 @@
 #include "script/script_handler.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
+#include "time/time.hpp"
 
 #include "platform/platform.hpp"
 #include "rhi/rhi.hpp"
@@ -52,6 +53,9 @@ namespace tur
 		AssetLibrary mAssetLibrary;
 
 	private:
+		Time mTime;
+		f64 mTitleAccumulatedTime = 0.0f;
+
 		EventCallback mMainEventCallback;
 		bool mShutdownRequested = false;
 	};

@@ -4,6 +4,7 @@
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
+#include "time/time.hpp"
 
 namespace tur
 {
@@ -36,7 +37,7 @@ namespace tur
 			);
 		}
 
-		void update()
+		void update(const Time& time)
 		{
 			auto view = rScene->get_registry().view<Tilemap2DComponent>();
 			for (auto [e, tilemap] : view.each())
@@ -52,6 +53,7 @@ namespace tur
 				
 				mTilemapRenderer.set_atlas_texture(tilemap.textureHandle);
 				mTilemapRenderer.set_tile_data(flattenMap);
+				mTilemapRenderer.set_accumulated_time(time.get_accumulated_milliseconds());
 			}
 		}
 

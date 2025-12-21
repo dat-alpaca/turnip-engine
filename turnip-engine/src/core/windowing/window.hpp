@@ -53,6 +53,9 @@ namespace tur
 		{ t.get_mouse_pressed(mouseButton) }			-> std::same_as<bool>;
 		{ t.get_key_pressed(key) }						-> std::same_as<bool>;
 		{ t.get_mouse_position() }						-> std::same_as<glm::vec2>;
+	} && requires(T t)
+	{
+		{ t.get_time() }								-> std::same_as<f64>;
 	};
 
 	template <IsWindow T>

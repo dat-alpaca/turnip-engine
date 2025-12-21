@@ -4,6 +4,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "logging/logging.hpp"
 #include <iterator>
 
 namespace tur
@@ -47,6 +48,7 @@ namespace tur
 			WorldUBO ubo;
 			{
 				ubo.viewProjection = rCamera->view() * rCamera->projection();
+				ubo.accumulatedMilli = mAccumulatedMilliseconds;
 			}
 			
 			resources.update_buffer(worldUBO, &ubo, Range{ .size=sizeof(WorldUBO) });
@@ -72,6 +74,10 @@ namespace tur
 	void TilemapRenderer::set_tile_data(const std::vector<Tile>& tiles)
 	{
 		mTiles = tiles;
+	}
+	void TilemapRenderer::set_accumulated_time(u32 accumulatedMilli)
+	{
+		mAccumulatedMilliseconds = accumulatedMilli;
 	}
 
 	void TilemapRenderer::initialize_resources()

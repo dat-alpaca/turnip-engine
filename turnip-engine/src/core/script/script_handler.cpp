@@ -7,6 +7,7 @@
 #include "scene/common_components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
+#include "time/time.hpp"
 #include <sol/raii.hpp>
 
 namespace tur
@@ -206,6 +207,13 @@ namespace tur
 		entityType["find_component"] = [&](Entity* entity, const std::string& componentName) {
 			return find_component(*entity, componentName);
 		};
+
+		// Time:
+		sol::usertype<Time> timeType = mLua.new_usertype<Time>("time", sol::constructors<Time()>());
+		timeType["get_delta_time"] = &Time::get_delta_time;
+		timeType["get_fps"] = &Time::get_fps;
+		timeType["get_accumulated"] = &Time::get_accumulated_time;
+		timeType["get_accumulated_ms"] = &Time::get_accumulated_milliseconds;
 
 		// UUID:
 		sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
