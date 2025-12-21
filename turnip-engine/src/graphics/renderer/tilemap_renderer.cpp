@@ -4,6 +4,7 @@
 #include "graphics/camera.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "logging/logging.hpp"
 #include <iterator>
 
 namespace tur
@@ -74,7 +75,7 @@ namespace tur
 	{
 		mTiles = tiles;
 	}
-	void TilemapRenderer::set_accumulated_time(u64 accumulatedMilli)
+	void TilemapRenderer::set_accumulated_time(u32 accumulatedMilli)
 	{
 		mAccumulatedMilliseconds = accumulatedMilli;
 	}

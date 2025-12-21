@@ -12,7 +12,7 @@ void decode_flags(uint flags, out uint animation_size, out uint flip, out uint e
 {
     flags &= 0xFFu;
 
-    animation_size = flags & 0xFCu;
+    animation_size = (flags & 0xFCu) >> 2u;
     flip   = (flags >> 1u) & 0x01u;
     enable = (flags >> 0u) & 0x01u;
 }

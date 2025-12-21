@@ -118,8 +118,9 @@ private:
 						TileFlags flags;
 						flags.set_enable(true);
 						flags.set_flip(true);
+						flags.set_animation_size(2);
 
-						chunk.chunks.push_back(Tile{{x, y}, (u8)((x + y) % 2), flags});
+						chunk.chunks.push_back(Tile{{x, y}, 0, flags});
 					}
 				}
 			}

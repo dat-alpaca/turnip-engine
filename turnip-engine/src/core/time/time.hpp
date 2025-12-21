@@ -38,7 +38,7 @@ namespace tur
         }
         inline u32 get_accumulated_milliseconds() const
         {
-            return static_cast<u32>(mAccumulatedTime);
+            return static_cast<u32>(mAccumulatedTime * 1000.f);
         }
 
     private:
