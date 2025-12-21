@@ -22,10 +22,10 @@ namespace tur::engine
 			view->on_engine_shutdown();
 	}
 
-	static void on_update(ViewHandler& viewHandler)
+	static void on_update(ViewHandler& viewHandler, const Time& time)
 	{
 		for (const auto& view : viewHandler.get_views())
-			view->on_update();
+			view->on_update(time);
 	}
 	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{
@@ -127,25 +127,21 @@ namespace tur
 	{
 		engine::startup(mViewHandler);
 
-		float accum = 0;
-		float oldTime = glfwGetTime();
 		while (!mShutdownRequested && mWindow->is_open())
 		{
-			float newTime = glfwGetTime();
-			float dt = newTime - oldTime;
-			accum += dt;
-			oldTime = newTime;
+			mTime.cycle(mWindow->get_time());
+			mTitleAccumulatedTime += mTime.get_delta_time();
 
-			if(accum >= 1.f)
+			if(mTitleAccumulatedTime >= 1.f)
 			{
-				accum = 0;
-				glfwSetWindowTitle(mWindow->get_window(), std::to_string(1 / dt).c_str());
+				mTitleAccumulatedTime = 0.0f;
+				glfwSetWindowTitle(mWindow->get_window(), std::to_string(mTime.get_fps()).c_str());
 			}
 
 			mWindow->poll_events();
 			mWorkerPool.poll_tasks();
 
-			engine::on_update(mViewHandler);
+			engine::on_update(mViewHandler, mTime);
 
 			engine::on_render(mRenderInterface, mViewHandler);
 

@@ -35,6 +35,9 @@ namespace tur::platform
 		bool get_mouse_pressed(MouseButton mouseButton);
 		bool get_key_pressed(Key key);
 		glm::vec2 get_mouse_position();
+	
+	public:
+		f64 get_time();
 
 	public:
 		inline GLFWwindow* get_window() const { return mWindow.get(); }

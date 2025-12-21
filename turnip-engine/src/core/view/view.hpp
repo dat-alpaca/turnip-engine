@@ -2,8 +2,9 @@
 #include <vector>
 
 #include "common.hpp"
-#include "core/event/event.hpp"
-#include "core/scene/scene.hpp"
+#include "time/time.hpp"
+#include "event/event.hpp"
+#include "scene/scene.hpp"
 
 namespace tur
 {
@@ -28,7 +29,7 @@ namespace tur
 		virtual void on_render(){};
 		virtual void on_render_gui(){};
 
-		virtual void on_update(){};
+		virtual void on_update(const Time& time){};
 
 		virtual void on_event(Event& event){};
 

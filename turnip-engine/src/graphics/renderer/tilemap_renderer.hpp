@@ -19,6 +19,7 @@ namespace tur
 		struct WorldUBO
 		{
 			alignas(16) glm::mat4 viewProjection;
+			alignas(16) u64 accumulatedMilli;
 		};
 
 	public:
@@ -30,6 +31,7 @@ namespace tur
     public:
 		void set_atlas_texture(texture_handle textureHandle);
         void set_tile_data(const std::vector<Tile>& tiles);
+		void set_accumulated_time(u64 accumulatedMilli);
 
 	private:
 		void initialize_resources();
@@ -50,6 +52,8 @@ namespace tur
 		pipeline_handle pipeline;
 		buffer_handle worldUBO, ssbo;
 		texture_handle atlasHandle = invalid_handle;
+
+		u64 mAccumulatedMilliseconds = 0;
 	
 	private:
 		static inline constexpr u32 MaxTileAmountSSBO = 1024;	

@@ -2,7 +2,9 @@
 #include <sol/forward.hpp>
 #include <sol/overload.hpp>
 #include <string_view>
+#include <utility>
 
+#include "time/time.hpp"
 #include "physics/physics_components.hpp"
 #include "scene/common_components.hpp"
 #include "scene/components.hpp"
@@ -35,11 +37,11 @@ namespace tur
 				call_expected_function(script.instance, "on_wake");
 		}
 
-		void on_update()
+		void on_update(const Time& time)
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
-				call_expected_function(script.instance, "on_update");
+				call_expected_function(script.instance, "on_update", time);
 		}
 
 		sol::function get_function(sol::table& instance, std::string_view functionName)
@@ -102,13 +104,14 @@ namespace tur
 			};
 		}
 
-		void call_expected_function(sol::table& instance, std::string_view functionName)
+		template<typename... Args>
+		void call_expected_function(sol::table& instance, std::string_view functionName, Args&&... args)
 		{
 			auto function = instance[functionName];
 			if (!function.valid() || function.get_type() != sol::type::function)
 				TUR_LOG_ERROR("Failed to call function: {}", functionName);
 
-			function(instance);
+			function(instance, args...);
 		}
 		
 	public:

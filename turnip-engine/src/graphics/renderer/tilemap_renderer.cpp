@@ -47,6 +47,7 @@ namespace tur
 			WorldUBO ubo;
 			{
 				ubo.viewProjection = rCamera->view() * rCamera->projection();
+				ubo.accumulatedMilli = mAccumulatedMilliseconds;
 			}
 			
 			resources.update_buffer(worldUBO, &ubo, Range{ .size=sizeof(WorldUBO) });
@@ -72,6 +73,10 @@ namespace tur
 	void TilemapRenderer::set_tile_data(const std::vector<Tile>& tiles)
 	{
 		mTiles = tiles;
+	}
+	void TilemapRenderer::set_accumulated_time(u64 accumulatedMilli)
+	{
+		mAccumulatedMilliseconds = accumulatedMilli;
 	}
 
 	void TilemapRenderer::initialize_resources()

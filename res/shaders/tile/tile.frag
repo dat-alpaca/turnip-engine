@@ -4,6 +4,7 @@ layout(location = 0) out vec4 out_color;
 layout(location = 0) in vec2 v_uvs;
 layout(location = 1) flat in uint v_layer;
 layout(location = 2) flat in uint v_flags;
+layout(location = 3) flat in uint v_accumulated_time_ms;
 
 layout(binding = 2) uniform sampler2DArray u_texture;
 
@@ -31,5 +32,6 @@ void main()
     if(flip == 1 && enable == 0)
         uvs.y = 1.0 - v_uvs.y;
 
-    out_color = texture(u_texture, vec3(uvs.xy, float(v_layer)));
+    uint layer = (v_accumulated_time_ms / 1000) % animation_size + v_layer;
+    out_color = texture(u_texture, vec3(uvs.xy, float(layer)));
 }

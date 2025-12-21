@@ -30,11 +30,13 @@ layout(std430, binding = 0) restrict readonly buffer Tiles
 layout(std140, binding = 1) uniform World
 {
 	mat4 viewProjection;
+	uint accumulatedTimeMilli;
 } u_world;
 
 layout(location = 0) out vec2 v_uvs;
 layout(location = 1) flat out uint v_layer;
 layout(location = 2) flat out uint v_flags;
+layout(location = 3) flat out uint v_accumulated_time_ms;
 
 const vec2 c_quad_vertex[6] = vec2[](
 	vec2(0.0, 0.0),
@@ -69,5 +71,6 @@ void main()
 	gl_Position = u_world.viewProjection * vec4(worldPosition, 0.0, 1.0);
 	v_layer = get_tile_layer(currentTile);
 	v_flags = get_tile_flags(currentTile);
+	v_accumulated_time_ms = u_world.accumulatedTimeMilli;
 	v_uvs = c_quad_uvs[currentVertex];
 }
