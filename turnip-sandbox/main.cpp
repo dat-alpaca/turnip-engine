@@ -1,3 +1,4 @@
+#include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
@@ -6,6 +7,7 @@
 #include "graphics/components.hpp"
 #include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
+#include "time/time.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -29,42 +31,54 @@ private:
 	{
 		AssetLibrary& library = engine->get_asset_library();
 
-		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
-		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/faces.png", 
-			TextureOptions
-			{
-				.layerWidth = 32,
-				.layerHeight = 32,
-				.arrayLayers = 2,
-				.isTextureArray = true,
-			}
-		);
+		for(const TextureAsset& texture : mProject.assetLibraryObject["textures"])
+			library.load_texture_async(texture.metadata.filepath, texture.options);
+
+		for(const AudioAsset& audio : mProject.assetLibraryObject["audios"])
+			library.load_audio_async(audio.metadata.filepath);
+	}
+
+	void on_update(const Time& time) override
+	{
+		SceneView::on_update(time);
+		return;
+
+		AssetLibrary& library = engine->get_asset_library();
+		mProject.save_asset_library(&library);
+		mProject.save();
 	}
 
 	void initialize_entities()
 	{
+		AssetLibrary& library = engine->get_asset_library();
+		auto& scene = get_current_scene(); 
+
+		mProject;
+
 		// Entity 0:
 		auto entity = get_current_scene().add_entity("bloky");
-		auto script = entity.add_component<ScriptComponent>("res/player.lua");
-
-		entity.add_component<Sprite2DComponent>(mFaceAsset);
-		entity.add_component<AudioSourceComponent>(mSoundAsset);
-
-		auto windowSize = engine->get_window_dimensions();
-
-		// Transform:
-		TransformComponent transformComponent;
+		
 		{
-			transformComponent.transform.position = glm::vec3(3.0f, 1.0f, 0.0f);
-			transformComponent.transform.scale = glm::vec3(1.f, 1.f, 1.f);
+			auto script = entity.add_component<ScriptComponent>("res/player.lua");
+
+			entity.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
+			entity.add_component<AudioSourceComponent>(library.get_asset_handle("res/audio/sound.wav"));
+
+			auto windowSize = engine->get_window_dimensions();
+
+			// Transform:
+			TransformComponent transformComponent;
+			{
+				transformComponent.transform.position = glm::vec3(3.0f, 1.0f, 0.0f);
+				transformComponent.transform.scale = glm::vec3(1.f, 1.f, 1.f);
+			}
+			entity.add_component<TransformComponent>(transformComponent);
+
+			entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
+			entity.add_component<RectCollider2D>(1.f, 1.f);
 		}
-		entity.add_component<TransformComponent>(transformComponent);
 
-		entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
-		entity.add_component<RectCollider2D>(1.f, 1.f);
-
-		auto& scene = get_current_scene(); 
+		return;
 		
 		// Entity 1:
 		{
@@ -117,8 +131,8 @@ private:
 					{
 						TileFlags flags;
 						flags.set_enable(true);
-						flags.set_flip(true);
-						flags.set_animation_size(2);
+						flags.set_flip(false);
+						flags.set_animation_size(5);
 
 						chunk.chunks.push_back(Tile{{x, y}, 0, flags});
 					}
@@ -127,9 +141,6 @@ private:
 			
 			tilemap.worldData.push_back(chunk);
 		}
-
-		mProject.add_scene(&scene, "main_scene.json");
-		mProject.save();
 	}
 
 	void on_event(Event& event) override

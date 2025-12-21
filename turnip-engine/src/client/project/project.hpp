@@ -3,6 +3,8 @@
 #include <vector>
 #include <string>
 
+#include "assets/asset_library.hpp"
+#include "client/asset_serialization.hpp"
 #include "client/scene_serialization.hpp"
 #include "logging/logging.hpp"
 #include "memory/memory.hpp"
@@ -27,12 +29,22 @@ namespace tur
             nlohmann::json projectObject;
             projectObject["name"] = name;
             
+            // Scenes:
             projectObject["scenes"] = nlohmann::json::array();
             for(const auto& scene : mSceneFilepaths)
                 projectObject["scenes"].push_back(scene.string());
 
             std::filesystem::path filepath = folderPath / (name + Project::ProjectFileExtension);
             json_write_file(filepath, projectObject);
+
+            // Assets:
+            filepath = folderPath / std::string("asset_library.asses");
+            json_write_file(filepath, assetLibraryObject);
+        }
+
+        void save_asset_library(NON_OWNING AssetLibrary* library)
+        {
+            assetLibraryObject = serialize_asset_library(library);
         }
 
     public:
@@ -68,10 +80,11 @@ namespace tur
                 return;
             }
             
+            // Main project:
             nlohmann::json projectObject = json_parse_file(mainFilepath);
-
             name = projectObject["name"];
 
+            // Scenes:
             if(projectObject.contains("scenes") && projectObject["scenes"].is_array())
             {
                 for(const auto& object : projectObject["scenes"])
@@ -80,11 +93,16 @@ namespace tur
                         mSceneFilepaths.push_back(object);
                 }
             }
+
+            // Assets:
+            std::filesystem::path assetLibraryFilepath = folderPath / std::string("asset_library.asses");
+            assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
         }
 
     public:
         std::filesystem::path mainFilepath;
         std::filesystem::path folderPath;
+        nlohmann::json assetLibraryObject;
         std::string name;
 
     private:
