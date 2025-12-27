@@ -30,7 +30,15 @@ namespace tur::vulkan
 		initialize_vma_allocator(mState);
 
 		// Swapchain:
-		initialize_swapchain(mState, {});
+		{
+			glm::vec2 size = rWindow->get_dimensions();
+
+			SwapchainRequirements requirements = {};
+			requirements.extent = Extent2D{.width=static_cast<u32>(size.x), .height=static_cast<u32>(size.y)};
+		
+			initialize_swapchain(mState, requirements);
+		}
+		
 
 		// Command Pool:
 		initialize_command_pool(mState);
@@ -151,7 +159,7 @@ namespace tur::vulkan
 		{
 			u32 imageIndex = 0;
 			VkResult result = vkAcquireNextImageKHR(
-				device, swapchain, ImageAvailableTimeout, frameData.imageAvailableSemaphore, nullptr, &imageIndex
+				device, swapchain, ImageAvailableTimeout, frameData.imageReadySemaphore, nullptr, &imageIndex
 			);
 			mFrameDataHolder.set_image_buffer_index(imageIndex);
 
@@ -182,8 +190,8 @@ namespace tur::vulkan
 		vk::Queue queue = mState.queueList.get_queue(graphicsQueue).queue;
 		auto& frameData = mFrameDataHolder.get_current_frame_data();
 
-		vk::Semaphore waitSemaphores[] = {frameData.imageAvailableSemaphore};
-		vk::Semaphore signalSemaphores[] = {frameData.renderFinishedSemaphore};
+		vk::Semaphore waitSemaphores[] = {frameData.imageReadySemaphore};
+		vk::Semaphore signalSemaphores[] = {mFrameDataHolder.get_render_finished_semaphore()};
 		vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 		vk::SubmitInfo submitInfo = {};
 		{
@@ -211,7 +219,7 @@ namespace tur::vulkan
 		auto& frameHolder = mFrameDataHolder;
 		const auto& frameData = frameHolder.get_current_frame_data();
 
-		vk::Semaphore waitSemaphores[] = {frameData.renderFinishedSemaphore};
+		vk::Semaphore waitSemaphores[] = {mFrameDataHolder.get_render_finished_semaphore()};
 
 		u32 imageIndices[] = {frameHolder.get_image_buffer_index()};
 
@@ -316,7 +324,7 @@ namespace tur::vulkan::utils
 
 		SwapchainRequirements requirements;
 		{
-			requirements.extent = Extent2D{static_cast<u32>(size.x), static_cast<u32>(size.y)};
+			requirements.extent = Extent2D{ .width = static_cast<u32>(size.x), .height = static_cast<u32>(size.y)};
 			initialize_swapchain(state, requirements);
 		}
 

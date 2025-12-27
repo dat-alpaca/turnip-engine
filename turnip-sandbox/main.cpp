@@ -4,6 +4,7 @@
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
+#include "event/window_events/window_resize_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
@@ -19,7 +20,7 @@ public:
 	{
 		SceneView::on_view_added();
 		mProject.initialize("res/project");
-		mainCamera.set_orthogonal(0.0f, 600.0f, 0, 600.f);
+		// mainCamera.set_orthogonal(0.0f, 1.f, 0, 1.f);
 
 		initialize_resources();
 		initialize_entities();
@@ -36,13 +37,22 @@ private:
 
 		for(const AudioAsset& audio : mProject.assetLibraryObject["audios"])
 			library.load_audio_async(audio.metadata.filepath);
+
+		return;
+		library.load_texture_async("res/textures/face.png");
+		library.load_texture_async("res/textures/face_sheet.png", TextureOptions{
+			.layerWidth=32,
+			.layerHeight=32,
+			.arrayLayers=5,
+			.isTextureArray=true,
+		});
+		library.load_audio_async("res/audio/sound.wav");
 	}
 
 	void on_update(const Time& time) override
 	{
 		SceneView::on_update(time);
 		return;
-
 		AssetLibrary& library = engine->get_asset_library();
 		mProject.save_asset_library(&library);
 		mProject.save();
@@ -79,7 +89,7 @@ private:
 		}
 
 		return;
-		
+
 		// Entity 1:
 		{
 			auto entity0 = get_current_scene().add_entity("newone");
@@ -148,8 +158,8 @@ private:
 		SceneView::on_event(event);
 
 		Subscriber subscriber(event);
-		subscriber.subscribe<WindowResizeEvent>(
-			[&](const WindowResizeEvent& resizeEvent) -> bool
+		subscriber.subscribe<WindowFramebufferEvent>(
+			[&](const WindowFramebufferEvent& resizeEvent) -> bool
 			{
 				auto dimensions = engine->get_window_dimensions();
 
@@ -165,7 +175,7 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 100.f;
+	static constexpr inline float PixelPerMeter = 32.f;
 
 	asset_handle mSoundAsset;
 	asset_handle mFaceAsset;

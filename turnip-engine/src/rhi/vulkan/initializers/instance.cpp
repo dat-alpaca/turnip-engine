@@ -159,6 +159,8 @@ namespace tur::vulkan
 			return;
 		}
 
+		// TODO: gracefully exit if the instance has not been created successfully.
+		// If extensions are optional, ignore.
 		validationResults = validate_extensions(supportedExtensions, extensions);
 		if (!validationResults.success)
 		{

@@ -44,8 +44,6 @@ namespace tur::platform
 				tur::vulkan::WAYLAND_SurfaceExtensionName};
 #elif defined(TUR_PLATFORM_APPLE)
 		return {METAL_SurfaceExtensionName};
-#elif defined(TUR_PLATFORM_ANDROID)
-		return {ANDROID_SurfaceExtensionName};
 #endif
 	}
 }

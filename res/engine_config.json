@@ -32,7 +32,8 @@
             "requiredQueueOperations": [
                 "graphics",
                 "present"
-            ]
+            ],
+            "extensions": []
         },
         "physicalDeviceRequirements": {
             "extensions": [
@@ -63,7 +64,7 @@
         "title": "TurnipEngine v1.1"
     },
     "windowingCapabilities": {
-        "api": "UNKNOWN",
+        "api": "VULKAN",
         "major": 1,
         "minor": 3,
         "patch": 0,
