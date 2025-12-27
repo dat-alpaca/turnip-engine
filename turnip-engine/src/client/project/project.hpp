@@ -4,6 +4,8 @@
 #include <string>
 
 #include "assets/asset_library.hpp"
+#include "assets/audio/audio_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "client/asset_serialization.hpp"
 #include "client/scene_serialization.hpp"
 #include "logging/logging.hpp"
@@ -23,6 +25,10 @@ namespace tur
 
         Project() = default;
 
+    public:
+        std::vector<TextureAsset> get_textures() const { return assetLibraryObject["textures"]; }
+        std::vector<AudioAsset> get_audios() const { return assetLibraryObject["audios"]; }
+    
     public:
         void save()
         {
@@ -84,6 +90,10 @@ namespace tur
             nlohmann::json projectObject = json_parse_file(mainFilepath);
             name = projectObject["name"];
 
+            // Assets:
+            std::filesystem::path assetLibraryFilepath = folderPath / std::string("asset_library.asses");
+            assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
+            
             // Scenes:
             if(projectObject.contains("scenes") && projectObject["scenes"].is_array())
             {
@@ -93,10 +103,6 @@ namespace tur
                         mSceneFilepaths.push_back(object);
                 }
             }
-
-            // Assets:
-            std::filesystem::path assetLibraryFilepath = folderPath / std::string("asset_library.asses");
-            assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
         }
 
     public:

@@ -4,7 +4,6 @@
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
-#include "event/window_events/window_resize_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
@@ -20,7 +19,6 @@ public:
 	{
 		SceneView::on_view_added();
 		mProject.initialize("res/project");
-		// mainCamera.set_orthogonal(0.0f, 1.f, 0, 1.f);
 
 		initialize_resources();
 		initialize_entities();
@@ -31,31 +29,11 @@ private:
 	void initialize_resources()
 	{
 		AssetLibrary& library = engine->get_asset_library();
-
-		for(const TextureAsset& texture : mProject.assetLibraryObject["textures"])
+		for(const TextureAsset& texture : mProject.get_textures())
 			library.load_texture_async(texture.metadata.filepath, texture.options);
 
-		for(const AudioAsset& audio : mProject.assetLibraryObject["audios"])
+		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(audio.metadata.filepath);
-
-		return;
-		library.load_texture_async("res/textures/face.png");
-		library.load_texture_async("res/textures/face_sheet.png", TextureOptions{
-			.layerWidth=32,
-			.layerHeight=32,
-			.arrayLayers=5,
-			.isTextureArray=true,
-		});
-		library.load_audio_async("res/audio/sound.wav");
-	}
-
-	void on_update(const Time& time) override
-	{
-		SceneView::on_update(time);
-		return;
-		AssetLibrary& library = engine->get_asset_library();
-		mProject.save_asset_library(&library);
-		mProject.save();
 	}
 
 	void initialize_entities()
@@ -63,11 +41,11 @@ private:
 		AssetLibrary& library = engine->get_asset_library();
 		auto& scene = get_current_scene(); 
 
-		mProject;
-
+		deserialize_scene(&scene, "res/project/main_scene.scene");
+		return;
+		
 		// Entity 0:
 		auto entity = get_current_scene().add_entity("bloky");
-		
 		{
 			auto script = entity.add_component<ScriptComponent>("res/player.lua");
 
@@ -88,13 +66,11 @@ private:
 			entity.add_component<RectCollider2D>(1.f, 1.f);
 		}
 
-		return;
-
 		// Entity 1:
 		{
 			auto entity0 = get_current_scene().add_entity("newone");
 
-			entity0.add_component<Sprite2DComponent>(mFaceAsset);
+			entity0.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
 
 			auto& hierarchy = entity0.get_component<HierarchyComponent>();
 			hierarchy.level = 1;
@@ -113,7 +89,7 @@ private:
 		{
 			auto floor = get_current_scene().add_entity("floor");
 
-			floor.add_component<Sprite2DComponent>(mFloorAsset);
+			floor.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
 
 			// Transform:
 			TransformComponent transformComponent0;
@@ -131,7 +107,7 @@ private:
 		{
 			auto floor = get_current_scene().add_entity("floor");
 
-			auto& tilemap = floor.add_component<Tilemap2DComponent>(mFloorAsset, 32);
+			auto& tilemap = floor.add_component<Tilemap2DComponent>(library.get_asset_handle("res/textures/face_sheet.png"), 32);
 			
 			TilemapChunk chunk;
 			{
@@ -151,6 +127,9 @@ private:
 			
 			tilemap.worldData.push_back(chunk);
 		}
+
+		mProject.add_scene(&scene, "main_scene.scene");
+		mProject.save();
 	}
 
 	void on_event(Event& event) override
@@ -176,10 +155,6 @@ private:
 
 private:
 	static constexpr inline float PixelPerMeter = 32.f;
-
-	asset_handle mSoundAsset;
-	asset_handle mFaceAsset;
-	asset_handle mFloorAsset;
 	Project mProject;
 };
 

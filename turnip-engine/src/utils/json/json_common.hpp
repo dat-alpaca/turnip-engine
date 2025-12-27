@@ -5,6 +5,9 @@
 
 namespace glm
 {
+	void to_json(nlohmann::json& json, const glm::vec<2, u8, glm::defaultp>& vector);
+	void from_json(const nlohmann::json& json, glm::vec<2, u8, glm::defaultp>& vector);
+
 	void to_json(nlohmann::json& json, const glm::uvec2& vector);
 	void from_json(const nlohmann::json& json, glm::uvec2& vector);
 

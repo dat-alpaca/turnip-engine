@@ -25,6 +25,7 @@ namespace tur
 	struct Tilemap2DComponent
 	{
 	public:
+		Tilemap2DComponent() = default;
 		Tilemap2DComponent(asset_handle assetHandle, u32 tilePixelSize)
 			: assetHandle(assetHandle)
 			, tilePixelSize(tilePixelSize)
