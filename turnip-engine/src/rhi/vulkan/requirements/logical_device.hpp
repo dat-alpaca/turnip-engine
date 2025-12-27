@@ -1,5 +1,6 @@
 #pragma once
 #include "graphics/types/queue_operations.hpp"
+#include <vector>
 
 namespace tur::vulkan
 {
@@ -7,5 +8,6 @@ namespace tur::vulkan
 	{
 		bool customQueueRequirements = false;
 		std::vector<QueueOperation> requiredQueueOperations = {QueueOperation::GRAPHICS, QueueOperation::PRESENT};
+		std::vector<const char*> extensions;
 	};
 }
