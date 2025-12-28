@@ -1,10 +1,8 @@
 #pragma once
 #include <vector>
 
-#include "common.hpp"
-#include "time/time.hpp"
 #include "event/event.hpp"
-#include "scene/scene.hpp"
+#include "utils/time/time.hpp"
 
 namespace tur
 {

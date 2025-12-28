@@ -3,9 +3,6 @@
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
-#include "graphics/components.hpp"
-#include "graphics/tile.hpp"
-#include "physics/physics_components.hpp"
 
 #include <turnip_engine.hpp>
 

@@ -4,7 +4,7 @@
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
-#include "time/time.hpp"
+#include "utils/time/time.hpp"
 
 namespace tur
 {

@@ -1,4 +1,4 @@
-#pragma one
+#pragma once
 #include "common.hpp"
 #include "event/events.hpp"
 #include "scene.hpp"
