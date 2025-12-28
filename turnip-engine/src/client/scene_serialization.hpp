@@ -15,7 +15,7 @@
 
 namespace tur
 {
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSourceComponent, assetHandle);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSourceComponent, filepath);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HierarchyComponent, parent, level);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(UUIDComponent, uuid);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NameComponent, name);
@@ -23,12 +23,12 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position, rotation, scale);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TransformComponent, transform);
     
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Sprite2DComponent, assetHandle);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Sprite2DComponent, filepath);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TileFlags, data);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Tile, position, layer, flags);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TilemapChunk, chunks);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Tilemap2DComponent, worldData, tilesPerChunk, tilePixelSize, assetHandle);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Tilemap2DComponent, worldData, tilesPerChunk, tilePixelSize, filepath);
     
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Body2DComponent, type);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RectCollider2D, width, height);

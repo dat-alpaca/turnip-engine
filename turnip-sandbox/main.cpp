@@ -1,5 +1,4 @@
 #include "assets/texture/texture_asset.hpp"
-#include "assets/texture/texture_options.hpp"
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
@@ -7,7 +6,7 @@
 #include "graphics/components.hpp"
 #include "graphics/tile.hpp"
 #include "physics/physics_components.hpp"
-#include "time/time.hpp"
+
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -39,9 +38,11 @@ private:
 	void initialize_entities()
 	{
 		AssetLibrary& library = engine->get_asset_library();
-		auto& scene = get_current_scene(); 
 
-		deserialize_scene(&scene, "res/project/main_scene.scene");
+		deserialize_scene(&get_current_scene(), "res/project/main_scene.scene");
+
+		SceneDeserializedEvent deserializeEvent(&get_current_scene());
+		engine->get_event_callback()(deserializeEvent);
 		return;
 		
 		// Entity 0:
@@ -128,7 +129,7 @@ private:
 			tilemap.worldData.push_back(chunk);
 		}
 
-		mProject.add_scene(&scene, "main_scene.scene");
+		mProject.add_scene(&get_current_scene(), "main_scene.scene");
 		mProject.save();
 	}
 

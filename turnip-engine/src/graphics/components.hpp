@@ -20,6 +20,8 @@ namespace tur
 	public:
 		asset_handle assetHandle = invalid_handle;
 		texture_handle textureHandle = invalid_handle;
+		
+		std::filesystem::path filepath;
 	};
 
 	struct Tilemap2DComponent
@@ -39,5 +41,7 @@ namespace tur
 
 		asset_handle assetHandle = invalid_handle;
 		texture_handle textureHandle = invalid_handle;
+
+		std::filesystem::path filepath;
 	};
 }

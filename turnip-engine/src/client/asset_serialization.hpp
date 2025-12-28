@@ -23,7 +23,7 @@ namespace tur
     {
         nlohmann::json object;
 
-        object["textures"] = nlohmann::json::array(); 
+        object["textures"] = nlohmann::json::array();
         for(const auto& texture : library->get_texture_assets())
         {
             if(texture.metadata.filepath == "internal/default_texture")

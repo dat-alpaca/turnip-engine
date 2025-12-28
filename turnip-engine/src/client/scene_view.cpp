@@ -52,6 +52,9 @@ namespace tur
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
 		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
 
+		// Scene Signals:
+		signalSystem.initialize(&engine->get_asset_library());
+
 		// Windowing:
 		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
 		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
@@ -116,6 +119,7 @@ namespace tur
 			}
 		);
 
+		signalSystem.on_event(event);
 		mPhysicsScriptAgent.on_event(event);
 		mTextureAgent.on_event(event);
 		mTextureAssetBinder.on_event(event);
