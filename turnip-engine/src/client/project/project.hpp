@@ -1,90 +1,47 @@
 #pragma once
+#include <nlohmann/json.hpp>
 #include <filesystem>
 #include <vector>
 #include <string>
 
-#include "client/scene_serialization.hpp"
-#include "logging/logging.hpp"
-#include "memory/memory.hpp"
-#include "nlohmann/json_fwd.hpp"
-#include "utils/json/json_file.hpp"
+#include "scene/scene.hpp"
+#include "assets/audio/audio_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 
 namespace tur
 {
+    class AssetLibrary;
+
     struct Project
     {
     public:
-        Project(const std::filesystem::path& folderPath)
-        {
-            initialize(folderPath);
-        }
-
+        Project(const std::filesystem::path& folderPath);
         Project() = default;
 
     public:
-        void save()
-        {
-            nlohmann::json projectObject;
-            projectObject["name"] = name;
-            
-            projectObject["scenes"] = nlohmann::json::array();
-            for(const auto& scene : mSceneFilepaths)
-                projectObject["scenes"].push_back(scene.string());
-
-            std::filesystem::path filepath = folderPath / (name + Project::ProjectFileExtension);
-            json_write_file(filepath, projectObject);
-        }
-
-    public:
-        void initialize(const std::filesystem::path& folderPath)
-        {
-            if(!std::filesystem::exists(folderPath))
-                std::filesystem::create_directory(folderPath);
-
-            if(!std::filesystem::is_directory(folderPath))
-                TUR_LOG_CRITICAL("Invalid folderpath passed to Project");
+        void initialize(const std::filesystem::path& folderPath);
     
-            this->folderPath = folderPath;
-            name = folderPath.filename();
-            mainFilepath = folderPath / (name + Project::ProjectFileExtension);
-
-            read_project();
-        }
-
-        void add_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
+    public:
+        void save();
+        void save_asset_library(NON_OWNING AssetLibrary* library);
+        void add_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath);
+    
+    public:
+        std::vector<TextureAsset> get_textures() const;
+        std::vector<AudioAsset> get_audios() const;
+    
+        inline std::filesystem::path get_project_filepath(const std::filesystem::path& filepath) const
         {
-            serialize_scene(scene, folderPath / filepath);
-            mSceneFilepaths.push_back( filepath);
+            return folderPath / filepath;
         }
 
     private:
-        void read_project()
-        {
-            std::filesystem::path mainFilepath = folderPath / (folderPath.filename().string() + Project::ProjectFileExtension);
-            
-            if(!std::filesystem::exists(mainFilepath))
-            {
-                json_write_file(mainFilepath, {});
-                return;
-            }
-            
-            nlohmann::json projectObject = json_parse_file(mainFilepath);
-
-            name = projectObject["name"];
-
-            if(projectObject.contains("scenes") && projectObject["scenes"].is_array())
-            {
-                for(const auto& object : projectObject["scenes"])
-                {
-                    if(object.is_string())
-                        mSceneFilepaths.push_back(object);
-                }
-            }
-        }
+        void read_project();
 
     public:
         std::filesystem::path mainFilepath;
         std::filesystem::path folderPath;
+        nlohmann::json assetLibraryObject;
         std::string name;
 
     private:

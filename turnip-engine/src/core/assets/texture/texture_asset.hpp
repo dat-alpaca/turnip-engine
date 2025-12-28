@@ -1,6 +1,5 @@
 #pragma once
 #include "assets/asset.hpp"
-#include "graphics/objects/texture.hpp"
 #include "texture_options.hpp"
 
 namespace tur

@@ -1,23 +1,14 @@
 {
     "version": "0.2.0",
     "configurations": [
+    
         {
-            "name": "C/C++ Debug (gdb Launch)",
-            "type": "cppdbg",
+            "type": "lldb",
             "request": "launch",
+            "name": "Launch",
             "program": "${workspaceFolder}/build/turnip-sandbox/turnip-sandbox",
             "args": [],
-            "stopAtEntry": true,
-            "cwd": "${workspaceFolder}",
-            "environment": [],
-            "MIMode": "gdb",
-            "setupCommands": [
-                {
-                    "description": "Enable pretty-printing for gdb",
-                    "text": "-enable-pretty-printing",
-                    "ignoreFailures": true
-                }
-            ]
+            "cwd": "${workspaceFolder}"
         }
     ]
 }

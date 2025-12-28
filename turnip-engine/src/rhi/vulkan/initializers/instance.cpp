@@ -128,7 +128,7 @@ namespace tur::vulkan
 
 		std::vector<const char*> extensions;
 		for (const auto& extension : instanceConfig.extensions)
-			layers.push_back(extension.c_str());
+			extensions.push_back(extension.c_str());
 
 		if (state.validationEnabled)
 		{
@@ -159,6 +159,8 @@ namespace tur::vulkan
 			return;
 		}
 
+		// TODO: gracefully exit if the instance has not been created successfully.
+		// If extensions are optional, ignore.
 		validationResults = validate_extensions(supportedExtensions, extensions);
 		if (!validationResults.success)
 		{

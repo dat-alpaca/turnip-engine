@@ -1,5 +1,7 @@
 #pragma once
+#include "assets/asset.hpp"
 #include "data-structures/free_list.hpp"
+#include "defines.hpp"
 #include "event/events.hpp"
 #include "worker/worker_pool.hpp"
 
@@ -29,6 +31,14 @@ namespace tur
 		asset_handle load_audio_async(const std::filesystem::path& filepath);
 
 	public:
+		inline asset_handle get_asset_handle(const std::filesystem::path& filepath)
+		{
+			if(mFilepathCache.find(filepath) == mFilepathCache.end())
+				return invalid_handle;
+
+			return mFilepathCache.at(filepath);
+		}
+
 		inline TextureAsset& get_texture_asset(asset_handle handle)
 		{
 			if (handle == invalid_handle)
@@ -43,6 +53,10 @@ namespace tur
 
 			return mAudioAssets.get(handle);
 		}
+
+	public:
+		inline free_list<TextureAsset>& get_texture_assets() { return mTextureAssets; };
+		inline free_list<AudioAsset>& get_audio_assets() { return mAudioAssets; }
 
 	private:
 		NON_OWNING WorkerPool* rWorkerPool = nullptr;

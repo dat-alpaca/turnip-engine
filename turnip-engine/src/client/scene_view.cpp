@@ -1,10 +1,12 @@
 #include "scene_view.hpp"
 #include "client/agents/physics_script_agent.hpp"
 #include "engine/turnip_engine.hpp"
+#include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/types/clear_color.hpp"
 #include "utils/color.hpp"
 #include "vulkan/objects/vulkan_command_buffer.hpp"
 #include "vulkan/vulkan.hpp"
+#include <vector>
 
 namespace tur
 {
@@ -49,6 +51,14 @@ namespace tur
 		// Binders:
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
 		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
+
+		// Scene Signals:
+		signalSystem.initialize(&engine->get_asset_library());
+
+		// Windowing:
+		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
+		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
+		engine->get_event_callback()(initialSizeEvent);
 	}
 	void SceneView::on_update(const Time& time)
 	{
@@ -73,12 +83,19 @@ namespace tur
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
 
-			vk::CommandBuffer buffers[] = {
-				quadSystem.renderer().get_command_buffer().get_command_buffer(),
-				tilemapSystem.renderer().get_command_buffer().get_command_buffer()
-			};
+			std::vector<vk::CommandBuffer> commandBuffers;
+			{
+				commandBuffers.reserve(2);
 
-			commandBuffer.execute_secondary_buffers(std::span{buffers, 2});
+				commandBuffers.push_back(
+					quadSystem.renderer().get_command_buffer().get_command_buffer()
+				);
+
+				if(!tilemapSystem.renderer().is_empty())
+					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_command_buffer());
+			}
+
+			commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});
 		
 		commandBuffer.end_rendering();
 		commandBuffer.blit();
@@ -102,6 +119,7 @@ namespace tur
 			}
 		);
 
+		signalSystem.on_event(event);
 		mPhysicsScriptAgent.on_event(event);
 		mTextureAgent.on_event(event);
 		mTextureAssetBinder.on_event(event);

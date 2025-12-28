@@ -7,7 +7,7 @@
 #include "scene/common_components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
-#include "time/time.hpp"
+#include "utils/time/time.hpp"
 #include <sol/raii.hpp>
 
 namespace tur

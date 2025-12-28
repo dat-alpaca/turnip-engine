@@ -5,7 +5,7 @@
 #include "script/script_handler.hpp"
 #include "view/view.hpp"
 #include "worker/worker_pool.hpp"
-#include "time/time.hpp"
+#include "utils/time/time.hpp"
 
 #include "platform/platform.hpp"
 #include "rhi/rhi.hpp"

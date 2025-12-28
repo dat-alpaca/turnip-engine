@@ -24,6 +24,7 @@ namespace tur
 
 	public:
 		std::filesystem::path filepath;
-		sol::table instance;
+		sol::table instance = sol::nil;
+		bool loaded = false;
 	};
 }

@@ -4,7 +4,7 @@
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
-#include "time/time.hpp"
+#include "utils/time/time.hpp"
 
 namespace tur
 {
@@ -26,8 +26,8 @@ namespace tur
         void on_event(Event& event)
 		{
 			Subscriber subscriber(event);
-			subscriber.subscribe<WindowResizeEvent>(
-				[&](const WindowResizeEvent& resizeEvent) -> bool
+			subscriber.subscribe<WindowFramebufferEvent>(
+				[&](const WindowFramebufferEvent& resizeEvent) -> bool
 				{
 					mTilemapRenderer.set_viewport({0.f, 0.f, (f32)resizeEvent.width, (f32)resizeEvent.height});
 					mTilemapRenderer.set_scissor({0, 0, resizeEvent.width, resizeEvent.height});

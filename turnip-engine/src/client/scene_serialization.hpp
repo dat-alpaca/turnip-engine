@@ -2,19 +2,15 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
-#include "entt/entity/fwd.hpp"
-#include "logging/logging.hpp"
-#include "physics/physics_components.hpp"
-#include "scene/common_components.hpp"
-#include "scene/scene.hpp"
-#include "scene/entity.hpp"
+#include "project/project.hpp"
 #include "scene/components.hpp"
-
+#include "scene/scene.hpp"
 #include "utils/json/json_file.hpp"
+#include "utils/json/json_common.hpp"
 
 namespace tur
 {
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSourceComponent, assetHandle);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSourceComponent, filepath);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HierarchyComponent, parent, level);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(UUIDComponent, uuid);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NameComponent, name);
@@ -22,11 +18,17 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position, rotation, scale);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TransformComponent, transform);
     
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Sprite2DComponent, textureHandle, assetHandle);
-    
-    // TODO: NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Body2DComponent, bodyID);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Sprite2DComponent, filepath);
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(ScriptComponent, filepath, instance);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TileFlags, data);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Tile, position, layer, flags);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TilemapChunk, chunks);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Tilemap2DComponent, worldData, tilesPerChunk, tilePixelSize, filepath);
+    
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Body2DComponent, type);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RectCollider2D, width, height);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ScriptComponent, filepath);
 
     class JsonOutputArchive
     {
@@ -92,20 +94,15 @@ namespace tur
 
         void operator()(entt::entity& entity)
         {
-            uint32_t entityID = mCurrent[mCurrentIndex].get<uint32_t>();
-            entity = entt::entity(entityID);
+            entity = entt::entity(mCurrent[mCurrentIndex].get<uint32_t>());
             ++mCurrentIndex;
         }
 
         template<typename T>
         void operator()(T& component)
         {
-            nlohmann::json componentData = mCurrent[mCurrentIndex * 2];
-
-            auto componentFetched = componentData.get<T>();
-            component = componentFetched;
-
-            uint32_t entityID = mCurrent[mCurrentIndex * 2 - 1];
+            nlohmann::json componentData = mCurrent[mCurrentIndex];
+            component = componentData.get<T>();
             ++mCurrentIndex;
         }
 
@@ -134,7 +131,6 @@ namespace tur
 
     inline void serialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
     {
-        // TODO: serialize body2d
         JsonOutputArchive archive;
         entt::snapshot{scene->get_registry()}
             .get<entt::entity>(archive)
@@ -144,17 +140,18 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
-            // .get<Body2DComponent>(archive)
+            .get<Tilemap2DComponent>(archive)
+            .get<Body2DComponent>(archive)
+            .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive);
 
         archive.save(filepath);
     }
 
-    inline void deserialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
+    inline void deserialize_scene(NON_OWNING Scene* scene, const Project& project, const std::filesystem::path& sceneFilename)
     {
-        // TODO: serialize body2d
-
-        JSONInputArchive archive(json_parse_file(filepath));
+        JSONInputArchive archive(json_parse_file(project.get_project_filepath(sceneFilename)));
+        
         entt::snapshot_loader{scene->get_registry()}
             .get<entt::entity>(archive)
             .get<AudioSourceComponent>(archive)
@@ -163,7 +160,9 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
-            // .get<Body2DComponent>(archive)
+            .get<Tilemap2DComponent>(archive)
+            .get<Body2DComponent>(archive)
+            .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive)
             .orphans();
     }

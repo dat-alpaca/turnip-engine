@@ -32,6 +32,6 @@ void main()
     if(flip == 1 && enable == 0)
         uvs.y = 1.0 - v_uvs.y;
 
-    uint layer = (v_accumulated_time_ms / 1000) % animation_size + v_layer;
+    uint layer = (v_accumulated_time_ms / 100) % animation_size + v_layer;
     out_color = texture(u_texture, vec3(uvs.xy, float(layer)));
 }

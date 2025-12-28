@@ -3,6 +3,16 @@
 
 namespace glm
 {
+	void to_json(nlohmann::json& json, const glm::vec<2, u8, glm::defaultp>& vector)
+	{
+		json = {{"x", vector.x}, {"y", vector.y}};
+	}
+	void from_json(const nlohmann::json& json, glm::vec<2, u8, glm::defaultp>& vector)
+	{
+		vector.x = json.at("x").get<u32>();
+		vector.y = json.at("y").get<u32>();
+	}
+
 	void to_json(nlohmann::json& json, const glm::uvec2& vector)
 	{
 		json = {{"x", vector.x}, {"y", vector.y}};

@@ -1,5 +1,6 @@
 #include "window_glfw.hpp"
 #include "core/event/events.hpp"
+#include "event/window_events/window_framebuffer_event.hpp"
 #include "events_glfw.hpp"
 
 namespace tur::platform
@@ -213,7 +214,6 @@ namespace tur::platform
 		}
 
 		set_properties(properties);
-		set_window_events(mWindow.get());
 
 		if (properties.startsMaximized)
 			maximize();
@@ -227,6 +227,7 @@ namespace tur::platform
 	{
 		mData.eventCallback = callback;
 		glfwSetWindowUserPointer(mWindow.get(), &mData);
+		set_window_events(mWindow.get());
 	}
 	void WindowGLFW::set_properties(const WindowProperties& properties)
 	{
@@ -234,7 +235,7 @@ namespace tur::platform
 
 		// Current Size:
 		glfwSetWindowSize(mWindow.get(), (int)properties.dimensions.x, (int)properties.dimensions.y);
-
+		
 		// Size Limits:
 		glfwSetWindowSizeLimits(
 			mWindow.get(), (int)properties.minSize.x, (int)properties.minSize.y, (int)properties.maxSize.x,

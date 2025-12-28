@@ -39,6 +39,9 @@ namespace tur
 		void initialize_descriptors();
 		void initialize_pipeline();
 
+	public:
+		bool is_empty() const { return mTiles.empty(); }
+
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
 		NON_OWNING Camera* rCamera = nullptr;

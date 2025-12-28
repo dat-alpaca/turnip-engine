@@ -40,6 +40,7 @@ namespace tur
 		loadingAsset.options = options;
 
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
+		mFilepathCache[filepath] = assetHandle;
 
 		rWorkerPool->submit<texture_asset_opt>(
 			[filepath, options]()
@@ -64,8 +65,6 @@ namespace tur
 
 				if(loadedTextureAsset.options.isTextureArray)
 					type = AssetType::TEXTURE_ARRAY;
-
-				mFilepathCache[filepath] = assetHandle;
 
 				AssetLoadedEvent assetLoadedEvent(assetHandle, type);
 				mEventCallback(assetLoadedEvent);
@@ -126,5 +125,6 @@ namespace tur
 		}
 
 		DefaultTextureHandle = mTextureAssets.add(asset);
+		mFilepathCache["internal/default_texture"] = DefaultTextureHandle;
 	}
 }

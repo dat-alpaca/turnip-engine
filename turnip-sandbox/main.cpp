@@ -1,11 +1,9 @@
-#include "assets/texture/texture_options.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "client/project/project.hpp"
 #include "client/scene_serialization.hpp"
 #include "client/scene_view.hpp"
 #include "event/subscriber.hpp"
-#include "graphics/components.hpp"
-#include "graphics/tile.hpp"
-#include "physics/physics_components.hpp"
+
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -16,8 +14,7 @@ public:
 	void on_view_added() final
 	{
 		SceneView::on_view_added();
-		mProject.initialize("res/project");
-		mainCamera.set_orthogonal(0.0f, 600.0f, 0, 600.f);
+		mProject.initialize("project");
 
 		initialize_resources();
 		initialize_entities();
@@ -28,108 +25,19 @@ private:
 	void initialize_resources()
 	{
 		AssetLibrary& library = engine->get_asset_library();
+		for(const TextureAsset& texture : mProject.get_textures())
+			library.load_texture_async(mProject.get_project_filepath(texture.metadata.filepath), texture.options);
 
-		mFaceAsset = library.load_texture_async("res/textures/face.png", TextureOptions{.isTextureArray=false});
-		mSoundAsset = library.load_audio_async("res/audio/sound.wav");
-		mFloorAsset = library.load_texture_async("res/textures/faces.png", 
-			TextureOptions
-			{
-				.layerWidth = 32,
-				.layerHeight = 32,
-				.arrayLayers = 2,
-				.isTextureArray = true,
-			}
-		);
+		for(const AudioAsset& audio : mProject.get_audios())
+			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
 	}
 
 	void initialize_entities()
 	{
-		// Entity 0:
-		auto entity = get_current_scene().add_entity("bloky");
-		auto script = entity.add_component<ScriptComponent>("res/player.lua");
+		deserialize_scene(&get_current_scene(), mProject, "main_scene.scene");
 
-		entity.add_component<Sprite2DComponent>(mFaceAsset);
-		entity.add_component<AudioSourceComponent>(mSoundAsset);
-
-		auto windowSize = engine->get_window_dimensions();
-
-		// Transform:
-		TransformComponent transformComponent;
-		{
-			transformComponent.transform.position = glm::vec3(3.0f, 1.0f, 0.0f);
-			transformComponent.transform.scale = glm::vec3(1.f, 1.f, 1.f);
-		}
-		entity.add_component<TransformComponent>(transformComponent);
-
-		entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
-		entity.add_component<RectCollider2D>(1.f, 1.f);
-
-		auto& scene = get_current_scene(); 
-		
-		// Entity 1:
-		{
-			auto entity0 = get_current_scene().add_entity("newone");
-
-			entity0.add_component<Sprite2DComponent>(mFaceAsset);
-
-			auto& hierarchy = entity0.get_component<HierarchyComponent>();
-			hierarchy.level = 1;
-			hierarchy.parent = entity.get_handle();
-
-			// Transform:
-			TransformComponent transformComponent0;
-			{
-				transformComponent0.transform.position = glm::vec3(0.5f, 0.5f, -0.1f);
-				transformComponent0.transform.scale = glm::vec3(0.5f, 0.5f, 1.f);
-			}
-			entity0.add_component<TransformComponent>(transformComponent0);
-		}
-
-		// Floor:
-		{
-			auto floor = get_current_scene().add_entity("floor");
-
-			floor.add_component<Sprite2DComponent>(mFloorAsset);
-
-			// Transform:
-			TransformComponent transformComponent0;
-			{
-				transformComponent0.transform.position = glm::vec3(3.0, 5.f, 0.0f);
-				transformComponent0.transform.scale = glm::vec3(1.f, 1.0f, 1.f);
-			}
-			floor.add_component<TransformComponent>(transformComponent0);
-
-			floor.add_component<Body2DComponent>();
-			floor.add_component<RectCollider2D>(1.f, 1.f);
-		}
-
-		// Big Floor:
-		{
-			auto floor = get_current_scene().add_entity("floor");
-
-			auto& tilemap = floor.add_component<Tilemap2DComponent>(mFloorAsset, 32);
-			
-			TilemapChunk chunk;
-			{
-				for(u8 x = 0; x < 3; ++x)
-				{
-					for(u8 y = 0; y < 3; ++y)
-					{
-						TileFlags flags;
-						flags.set_enable(true);
-						flags.set_flip(true);
-						flags.set_animation_size(2);
-
-						chunk.chunks.push_back(Tile{{x, y}, 0, flags});
-					}
-				}
-			}
-			
-			tilemap.worldData.push_back(chunk);
-		}
-
-		mProject.add_scene(&scene, "main_scene.json");
-		mProject.save();
+		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
+		engine->get_event_callback()(deserializeEvent);
 	}
 
 	void on_event(Event& event) override
@@ -137,8 +45,8 @@ private:
 		SceneView::on_event(event);
 
 		Subscriber subscriber(event);
-		subscriber.subscribe<WindowResizeEvent>(
-			[&](const WindowResizeEvent& resizeEvent) -> bool
+		subscriber.subscribe<WindowFramebufferEvent>(
+			[&](const WindowFramebufferEvent& resizeEvent) -> bool
 			{
 				auto dimensions = engine->get_window_dimensions();
 
@@ -154,11 +62,7 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 100.f;
-
-	asset_handle mSoundAsset;
-	asset_handle mFaceAsset;
-	asset_handle mFloorAsset;
+	static constexpr inline float PixelPerMeter = 64.f;
 	Project mProject;
 };
 

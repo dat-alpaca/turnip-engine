@@ -1,0 +1,103 @@
+{
+    "audios": [
+        {
+            "metadata": {
+                "filepath": "audio/sound.wav",
+                "type": 3,
+                "uuid": 16292462592774848465
+            }
+        }
+    ],
+    "textures": [
+        {
+            "channels": 4,
+            "height": 144,
+            "metadata": {
+                "filepath": "textures/face.png",
+                "type": 1,
+                "uuid": 444101566143258990
+            },
+            "options": {
+                "arrayLayers": 1,
+                "dataFormat": 3,
+                "depth": 1,
+                "floatTexture": false,
+                "format": 3,
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": 3,
+                "wrapS": 3,
+                "wrapT": 3
+            },
+            "width": 144
+        },
+        {
+            "channels": 4,
+            "height": 16,
+            "metadata": {
+                "filepath": "textures/floor0.png",
+                "type": 1,
+                "uuid": 444101512133258990
+            },
+            "options": {
+                "arrayLayers": 1,
+                "dataFormat": 3,
+                "depth": 1,
+                "floatTexture": false,
+                "format": 3,
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": 3,
+                "wrapS": 3,
+                "wrapT": 3
+            },
+            "width": 16
+        },
+        {
+            "channels": 4,
+            "height": 32,
+            "metadata": {
+                "filepath": "textures/face_sheet.png",
+                "type": 1,
+                "uuid": 3047054274889524964
+            },
+            "options": {
+                "arrayLayers": 5,
+                "dataFormat": 3,
+                "depth": 1,
+                "floatTexture": false,
+                "format": 3,
+                "generateMipmaps": false,
+                "isTextureArray": true,
+                "layerHeight": 32,
+                "layerWidth": 32,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": 3,
+                "wrapS": 3,
+                "wrapT": 3
+            },
+            "width": 160
+        }
+    ]
+}

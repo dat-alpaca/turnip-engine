@@ -25,6 +25,7 @@ if(${TUR_USE_GLFW})
 
     add_library("imgui" STATIC ${IMGUI_SOURCES})
     target_include_directories("imgui" PUBLIC ${IMGUI_SOURCE_DIR})
+    target_link_libraries("imgui" PUBLIC "glfw")
 
     add_library("imgui::imgui" ALIAS "imgui")
 endif()
