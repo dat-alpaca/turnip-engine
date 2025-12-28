@@ -2,8 +2,6 @@
 #include "graphics/objects/descriptor.hpp"
 #include <vulkan/vulkan.hpp>
 
-// TODO:
-
 namespace tur::vulkan
 {
 	constexpr inline vk::DescriptorType get_descriptor_type(DescriptorType type)
@@ -18,9 +16,12 @@ namespace tur::vulkan
 			
 			case DescriptorType::UNIFORM_BUFFER:
 				return vk::DescriptorType::eUniformBuffer;
+
+			default:
+				TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
+				break;
 		}
 
-		TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
 		return {};
 	}
 }

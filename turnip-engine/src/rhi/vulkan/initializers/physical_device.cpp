@@ -2,7 +2,6 @@
 
 #include "rhi/vulkan/types/queue_family.hpp"
 #include "rhi/vulkan/utils/extension_utils.hpp"
-#include "rhi/vulkan/utils/layer_utils.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/utils/swapchain_features.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"

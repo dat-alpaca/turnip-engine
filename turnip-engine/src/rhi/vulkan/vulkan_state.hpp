@@ -2,7 +2,7 @@
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 
-#include "common.hpp"
+#include "objects/texture.hpp"
 #include "objects/render_target.hpp"
 #include "types/queue_list.hpp"
 

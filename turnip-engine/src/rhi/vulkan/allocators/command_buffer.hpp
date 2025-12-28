@@ -1,5 +1,4 @@
 #pragma once
-#include "common.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
 #include <vulkan/vulkan.hpp>
 
@@ -7,6 +6,9 @@ namespace tur::vulkan
 {
 	inline vk::CommandBuffer allocate_single_primary_command_buffer(vk::Device device, vk::CommandPool commandPool)
 	{
+		TUR_ASS(device);
+		TUR_ASS(commandPool);
+
 		vk::CommandBufferAllocateInfo allocateInfo = {};
 		{
 			allocateInfo.commandPool = commandPool;
@@ -19,6 +21,9 @@ namespace tur::vulkan
 
 	inline vk::CommandBuffer allocate_single_secondary_command_buffer(vk::Device device, vk::CommandPool commandPool)
 	{
+		TUR_ASS(device);
+		TUR_ASS(commandPool);
+
 		vk::CommandBufferAllocateInfo allocateInfo = {};
 		{
 			allocateInfo.commandPool = commandPool;

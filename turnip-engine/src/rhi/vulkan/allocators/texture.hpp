@@ -1,15 +1,25 @@
 #pragma once
-#include "rhi/vulkan/objects/buffer.hpp"
-#include "rhi/vulkan/objects/texture.hpp"
-
-#include "rhi/vulkan/utils/logger.hpp"
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
+
+#include "assert/assert.hpp"
+#include "rhi/vulkan/objects/texture.hpp"
+#include "rhi/vulkan/utils/logger.hpp"
 
 namespace tur::vulkan
 {
 	inline Texture allocate_texture(vk::Device device, VmaAllocator allocator, const TextureDescriptor& descriptor)
 	{
+		TUR_ASS(device);
+		TUR_ASS(allocator);
+
+		TUR_ASS(descriptor.width > 0);
+		TUR_ASS(descriptor.height > 0);
+		TUR_ASS(descriptor.depth >= 1);
+		TUR_ASS(descriptor.mipLevels >= 1);
+		TUR_ASS(descriptor.samples >= 1);
+		TUR_ASS(descriptor.arrayLayers >= 1);
+
 		Texture texture = {};
 		texture.format = get_texture_format(descriptor.format);
 

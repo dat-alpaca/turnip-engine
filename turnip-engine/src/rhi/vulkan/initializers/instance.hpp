@@ -1,7 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
-#include "common.hpp"
 #include "core/config/config_data.hpp"
 #include "rhi/vulkan/vulkan_state.hpp"
 

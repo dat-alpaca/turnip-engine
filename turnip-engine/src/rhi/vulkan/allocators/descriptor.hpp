@@ -2,16 +2,20 @@
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 
+#include "assert/assert.hpp"
 #include "graphics/objects/descriptor.hpp"
+
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
 
 namespace tur::vulkan
 {
-	inline vk::DescriptorPool
-	allocate_descriptor_pool(vk::Device device, const DescriptorSetLayoutDescriptor& layout, u32 maxSets)
+	inline vk::DescriptorPool allocate_descriptor_pool(vk::Device device, const DescriptorSetLayoutDescriptor& layout, u32 maxSets)
 	{
+		TUR_ASS(device);
+		TUR_ASS(maxSets > 0);
+
 		std::vector<vk::DescriptorPoolSize> poolSizes;
 		for (const auto& entry : layout.entries)
 		{
@@ -33,6 +37,8 @@ namespace tur::vulkan
 
 	inline vk::DescriptorSetLayout allocate_set_layout(vk::Device device, const DescriptorSetLayoutDescriptor& layout)
 	{
+		TUR_ASS(device);
+
 		std::vector<vk::DescriptorSetLayoutBinding> bindings;
 		for (const auto& entry : layout.entries)
 		{

@@ -6,6 +6,8 @@ namespace tur::vulkan
 {
 	inline vk::Fence allocate_signaled_fence(vk::Device device)
 	{
+		TUR_ASS(device);
+		
 		vk::FenceCreateInfo createInfo = {};
 		createInfo.flags = vk::FenceCreateFlagBits::eSignaled;
 

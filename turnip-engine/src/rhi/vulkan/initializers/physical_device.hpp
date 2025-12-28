@@ -1,5 +1,4 @@
 #pragma once
-#include <optional>
 #include <vulkan/vulkan.hpp>
 
 #include "rhi/vulkan/requirements/physical_device.hpp"

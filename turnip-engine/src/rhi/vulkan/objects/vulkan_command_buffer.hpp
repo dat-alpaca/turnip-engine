@@ -1,12 +1,8 @@
 #pragma once
-#include "graphics/objects/command_buffer.hpp"
-#include "rhi/vulkan/objects/buffer.hpp"
-#include "rhi/vulkan/objects/render_target.hpp"
-#include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "common.hpp"
-#include "vulkan/vulkan.hpp"
+#include "graphics/objects/command_buffer.hpp"
+#include "rhi/vulkan/objects/render_target.hpp"
 
 namespace tur::vulkan
 {

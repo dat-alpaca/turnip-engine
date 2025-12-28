@@ -14,7 +14,6 @@
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 
-#include <span>
 #include <unordered_map>
 #include <vulkan/vulkan.hpp>
 

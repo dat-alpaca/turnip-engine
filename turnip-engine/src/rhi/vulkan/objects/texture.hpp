@@ -1,4 +1,3 @@
-
 #pragma once
 #include "graphics/objects/texture.hpp"
 #include <vk_mem_alloc.h>

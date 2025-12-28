@@ -1,5 +1,4 @@
 #include "pipeline.hpp"
-#include "rhi/vulkan/allocators/descriptor_set.hpp"
 #include "rhi/vulkan/objects/vulkan_resource_handler.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 
@@ -91,8 +90,7 @@ namespace tur::vulkan
 {
 	using dynamic_states = std::vector<vk::DynamicState>;
 
-	static vk::PipelineDynamicStateCreateInfo
-	create_dynamic_states(const PipelineDescriptor& descriptor, dynamic_states& states)
+	static vk::PipelineDynamicStateCreateInfo create_dynamic_states(const PipelineDescriptor& descriptor, dynamic_states& states)
 	{
 		states.reserve(descriptor.dynamicStates.size());
 
@@ -360,6 +358,8 @@ namespace tur::vulkan
 {
 	Pipeline allocate_graphics_pipeline(RenderInterfaceVulkan* rhi, const PipelineDescriptor& descriptor)
 	{
+		TUR_ASS(rhi);
+
 		auto setLayout = rhi->get_resource_handler().get_set_layouts().get(descriptor.setLayout);
 		auto& device = rhi->get_state().logicalDevice;
 		auto& swapchainFormat = rhi->get_state().swapchainFormat;

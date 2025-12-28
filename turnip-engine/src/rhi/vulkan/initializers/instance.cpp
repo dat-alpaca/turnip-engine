@@ -1,11 +1,11 @@
 #include "instance.hpp"
 
-#include "common.hpp"
-#include "platform/platform.hpp"
 #include "rhi/vulkan/utils/extension_utils.hpp"
 #include "rhi/vulkan/utils/layer_utils.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
+
+#include "platform/platform.hpp"
 
 namespace tur::vulkan
 {
@@ -81,6 +81,9 @@ namespace tur::vulkan
 			case VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT:
 				TUR_LOG_ERROR("[Vulkan: {}] [{}]: {}", severity, type, pCallbackData->pMessage);
 				break;
+
+			default:
+				return VK_FALSE;
 		}
 
 		return VK_FALSE;
@@ -142,7 +145,7 @@ namespace tur::vulkan
 		{
 			extensions.push_back(SurfaceExtensionName);
 
-			auto& binder = platform::WindowingSystem::get_binder();
+			auto& binder = tur::platform::WindowingSystem::get_binder();
 			auto availableExtensionNames = binder.get_vulkan_extension_platform_surface_names();
 			for (const char* extensionName : availableExtensionNames)
 				extensions.push_back(extensionName);
@@ -156,11 +159,9 @@ namespace tur::vulkan
 			for (const auto& layer : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", layer);
 
-			return;
+			TUR_LOG_CRITICAL("Gracefully handling unsupported layers.");
 		}
 
-		// TODO: gracefully exit if the instance has not been created successfully.
-		// If extensions are optional, ignore.
 		validationResults = validate_extensions(supportedExtensions, extensions);
 		if (!validationResults.success)
 		{
@@ -168,7 +169,7 @@ namespace tur::vulkan
 			for (const auto& extension : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", extension);
 
-			return;
+			TUR_LOG_CRITICAL("Gracefully handling unsupported extensions.");
 		}
 
 		// Instance:
@@ -190,13 +191,6 @@ namespace tur::vulkan
 			debugCreateInfo.setMessageType(DefaultDebugMessageType);
 			debugCreateInfo.setPfnUserCallback(default_debug_callback);
 		};
-
-		/*vk::DispatchLoaderDynamic DLDI(state.instance, vkGetInstanceProcAddr);
-
-		vk::detail::DispatchLoaderDynamic vk::detail::defaultDispatchLoaderDynamic;
-		state.debugMessenger = check_vk_object(
-			state.instance.createDebugUtilsMessengerEXT(debugCreateInfo, nullptr, DLDI), "DebugMessenger"
-		);*/
 	}
 
 	void destroy_instance_messenger(VulkanState& state)

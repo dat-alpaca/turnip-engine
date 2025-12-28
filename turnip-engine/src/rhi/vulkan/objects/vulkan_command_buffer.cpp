@@ -1,16 +1,18 @@
-#include "vulkan_command_buffer.hpp"
-#include "defines.hpp"
+#include "assert/assert.hpp"
 #include "rhi/vulkan/allocators/command_buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
-#include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+
+#include "vulkan_command_buffer.hpp"
 #include "vulkan/vulkan.hpp"
+#include "defines.hpp"
 
 namespace tur::vulkan
 {
 	CommandBufferVulkan::CommandBufferVulkan(NON_OWNING RenderInterfaceVulkan* rhi)
 		: rRHI(rhi)
 	{
+		TUR_ASS(rRHI);
 	}
 
 	void CommandBufferVulkan::initialize_secondary()
@@ -20,6 +22,8 @@ namespace tur::vulkan
 	}
 	void CommandBufferVulkan::reset(vk::CommandBuffer commandBuffer)
 	{
+		TUR_ASS(commandBuffer);
+
 		mCommandBuffer = commandBuffer;
 		mIsSecondary = false;
 	}
@@ -204,7 +208,6 @@ namespace tur::vulkan
 	}
 	void CommandBufferVulkan::draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
-		// TODO: allow first index
 		mCommandBuffer.drawIndexed(indexCount, instanceCount, 0, firstVertex, firstInstance);
 	}
 }

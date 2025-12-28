@@ -9,6 +9,11 @@ namespace tur::vulkan
 {
 	inline Buffer allocate_buffer(VmaAllocator allocator, const BufferDescriptor& descriptor, u32 size)
 	{
+		TUR_ASS(allocator);
+		TUR_ASS(size > 0);
+
+		TUR_ASS(descriptor.type != BufferType::NONE);
+
 		vk::BufferCreateInfo createInfo = {};
 		{
 			createInfo.size = size;

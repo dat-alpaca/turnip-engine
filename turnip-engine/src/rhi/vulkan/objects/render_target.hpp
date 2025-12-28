@@ -1,6 +1,5 @@
 #pragma once
 #include "graphics/objects/render_target.hpp"
-#include "rhi/vulkan/objects/texture.hpp"
 
 namespace tur::vulkan
 {

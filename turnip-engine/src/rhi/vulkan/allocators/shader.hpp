@@ -1,5 +1,4 @@
 #pragma once
-#include "common.hpp"
 #include "graphics/objects/shader.hpp"
 #include "utils/file.hpp"
 
@@ -10,8 +9,10 @@ namespace tur::vulkan
 {
 	inline vk::ShaderModule allocate_shader_module(vk::Device device, const ShaderDescriptor& descriptor)
 	{
-		std::vector<u8> shaderData = read_file_binary(descriptor.filepath);
+		TUR_ASS(device);
+		TUR_ASS(descriptor.type != ShaderType::UNKNOWN);
 
+		std::vector<u8> shaderData = read_file_binary(descriptor.filepath);
 		vk::ShaderModuleCreateInfo createInfo;
 		{
 			createInfo.codeSize = shaderData.size();

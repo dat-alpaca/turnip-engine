@@ -1,10 +1,11 @@
+#pragma once
 #include "rhi/vulkan/vulkan_state.hpp"
 #include <vk_mem_alloc.h>
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
 {
-	void initialize_vma_allocator(VulkanState& state)
+	inline void initialize_vma_allocator(VulkanState& state)
 	{
 		VmaVulkanFunctions vulkanFunctions = {};
 		vulkanFunctions.vkAllocateMemory = vkAllocateMemory;
@@ -38,7 +39,7 @@ namespace tur::vulkan
 			TUR_LOG_CRITICAL("Failed to initialize VMA");
 	}
 
-	void destroy_vma_allocator(VmaAllocator vmaAllocator)
+	inline void destroy_vma_allocator(VmaAllocator vmaAllocator)
 	{
 		vmaDestroyAllocator(vmaAllocator);
 	}

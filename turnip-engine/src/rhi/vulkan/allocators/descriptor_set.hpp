@@ -1,16 +1,18 @@
 #pragma once
 #include "graphics/objects/descriptor.hpp"
+#include <vulkan/vulkan.hpp>
+
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
 
-#include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
 {
-	inline vk::DescriptorSetLayout
-	allocate_descriptor_set_layout(vk::Device device, const DescriptorSetLayoutDescriptor& layout)
+	inline vk::DescriptorSetLayout allocate_descriptor_set_layout(vk::Device device, const DescriptorSetLayoutDescriptor& layout)
 	{
+		TUR_ASS(device);
+
 		std::vector<vk::DescriptorSetLayoutBinding> descriptorBindings;
 		for (const auto& [binding, amount, type, stages] : layout.entries)
 		{

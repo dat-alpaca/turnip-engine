@@ -76,7 +76,6 @@ namespace tur::vulkan
 		state.logicalDevice = check_vk_result(state.physicalDevice.createDevice(deviceInfo));
 
 		// Queue Creation:
-		// TODO: improve this mess
 		queue_family_index graphicsIndex, presentIndex;
 		bool graphicsSet = false, presentSet = false;
 		for (const auto& [queueFamilyIndex, operation] : queueFamilies)

@@ -3,7 +3,6 @@
 #include <vector>
 #include <vulkan/vulkan.hpp>
 
-#include "common.hpp"
 #include "core/data-structures/free_list.hpp"
 #include "rhi/vulkan/objects/buffer.hpp"
 #include "rhi/vulkan/objects/descriptor.hpp"
