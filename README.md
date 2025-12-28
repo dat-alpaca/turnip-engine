@@ -5,28 +5,29 @@
 
 # Getting Started
 Turnip doesn't have prebuilt binaries yet, so if you want to use it, you'll need to build it yourself (sorry).
-Apart from the requirements listed below, keep in mind that this project has been only tested on [Pop!_OS 22.04 LTS](https://system76.com/pop/), using a [GeForce RTX™ 3050](https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3050/), and [driver version 580.82.09](https://www.nvidia.com/en-us/drivers/details/254126/).
+Keep in mind that the latest version of this project has been only tested on [Pop!_OS 22.04 LTS](https://system76.com/pop/) and [Fedora Linux 43 (KDE Plasma Edition)](https://www.fedoraproject.org/). Both `X11` and `Wayland` display server protocols have been tested using a [GeForce RTX™ 3050](https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3050/), and [driver version 580.119.02](https://www.nvidia.com/en-us/drivers/details/259145/). The latest version of the engine only supports `Vulkan 1.3` and above, and `OpenGL 4.6` and above. The OpenGL implementation is more likely than not, not fully implemented at any given moment, as I prioritize making sure the Vulkan RHI implementation is up to date first. Plans for supporting `OpenGL 3.3` exist, but are not a guarantee. 
 
-Which means, your system must support: 
+You can check whether or not your graphics card supports the Vulkan features this engine uses [here](http://www.vulkan.gpuinfo.org/displayreport.php?id=39663#extensions).
 
+Mainly, you it requires:
+* VK_KHR_swapchain
 * VK_KHR_synchronization2
 * VK_KHR_dynamic_rendering
-* OpenGL 4.5: Direct Access Memory, Clip Control, and other features have been used.
 
-You can check whether or not your graphics card supports these features [here](http://www.vulkan.gpuinfo.org/displayreport.php?id=39663#extensions).
 
 ## Prerequisites
 Building this project requires the following:
 
-* [Vulkan](https://vulkan.lunarg.com/#new_tab)
 * [Lua](https://www.lua.org/download.html)
 * [CMake](https://cmake.org/download/)
+* [Vulkan SDK](https://vulkan.lunarg.com/#new_tab) (If using the Vulkan build)
 
-You may need to set these environment variables if they aren't automatically detected:
-1. **Vulkan**:
-    Set `VULKAN_SDK` to point to your Vulkan SDK installation (e.g., C:/Vulkan/<version>).
 
-If the SDK fails to include it automatically, you must provide an environment variable named VULKAN_SDK under `VulkanSDK/<version>`.
+#### VulkanSDK environment variables:
+
+In Windows, you may need to set the environment variable `VULKAN_SDK` to your Vulkan SDK installation (e.g., `C:/Vulkan/<version>`).
+
+In Linux distributions, I suggest reading [this](https://vulkan.lunarg.com/doc/sdk/latest/linux/getting_started.html). A similar guide is available for Windows, but major modifications are probably not needed. 
 
 ## Installation
 
@@ -36,6 +37,7 @@ If the SDK fails to include it automatically, you must provide an environment va
     ```
 
     In case you forget the `--recurse-submodules` option, just run `git submodule update --init --recursive`.
+    <br>
 
 2. **Generate the project**
     ```bash
@@ -50,29 +52,32 @@ If the SDK fails to include it automatically, you must provide an environment va
     | -DTUR_USE_OPENGL        | Uses the OpenGL backend                  | ON      |
     | -DTUR_USE_VULKAN        | Uses the Vulkan backend                  | OFF     |
 
-   \* _This option is a lie. Turnip doesn't support other platforms yet._
+    \*_This option is a lie. Turnip doesn't support other platforms yet._
+    <br>
 
 4. **Compile the project**
-   Use the generated project files to build the project.
-   This repository uses the `cmake --build build/turnip --parallel 12` command officially.  
-   However, if you're using a linux distribution, you can run `make` directly.
-   For Windows users, use the `Build All` option upon opening the Visual Studio solution project, or run `msbuild`.
-   
-   After that, you should have a working copy under `turnip-engine/build/turnip/`.
+    Use the generated project files to build the project. You may use any combination of build arguments, but the only tested environment can be found under [CMakePresets.json](https://github.com/dat-alpaca/turnip-engine/blob/main/CMakePresets.json).
 
+    If you intend to use it, first adjust the `CMAKE_C_COMPILER` and `CMAKE_CXX_COMPILER` according to your system filepaths. Then, run the `cmake --build build/turnip --parallel 12` command.
+
+    For Visual Studio (the purple one) users, use the `Build All` option after opening the Visual Studio solution project, or run `msbuild` directly if you have the appropriate environment variables for that.
+   
+    After that, you should have a working copy under `build/turnip-sandbox/` and `build/turnip-engine`.
 
 ## Configuration
 The engine requires a location file specified as its main constructor argument. A default file can be located under [`res/engine_config.json`](https://github.com/dat-alpaca/turnip-engine/blob/main/res/engine_config.json).
 
 > [!WARNING]
 > Changing the graphics API string (`windowingCapabilities/api`) will not change the actual graphics API used.
-As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments.
+As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments in order to change its underlying RHI.
 Check the options listed [here](#installation) for more information. 
 
 # Using
-Currently, there are no available examples nor documentation. The best you can do (which is highly discouraged) is to follow the `turnip-sandbox` project code source.
-The engine does not provide a single entry point to the user, so you must declare an instance of the engine, and a conscrete implementation of a `tur::View`. However, the View is designed
-to be as bare-bones as possible. It does not provide a renderer system nor scenes, albeit those are available to use.
+Currently, there are no available examples nor documentation. The best you can do (which is highly discouraged) is to follow the `turnip-sandbox` project code source, and check the `project` folder.
+
+The engine does not provide a single entry point to the user, so you must declare an instance of the engine, and a conscrete implementation of a `tur::View`. 
+
+However, the View is designed to be as bare-bones as possible. It does not provide a renderer system nor scenes, albeit those are readily available for use.
 
 With all being said, I would highly advise against using the engine for the moment. I will provide code examples and (probably) a proper documentation in the future.
 
