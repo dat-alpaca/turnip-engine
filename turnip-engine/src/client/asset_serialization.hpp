@@ -3,7 +3,7 @@
 #include "assets/asset_library.hpp"
 #include "assets/audio/audio_asset.hpp"
 #include "assets/texture/texture_options.hpp"
-#include "common.hpp"
+
 #include "nlohmann/json_fwd.hpp"
 #include "utils/json/json_file.hpp"
 #include <filesystem>

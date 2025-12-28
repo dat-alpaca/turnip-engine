@@ -8,6 +8,8 @@
 #include "graphics/components.hpp"
 #include "memory/memory.hpp"
 #include "scene/scene.hpp"
+#include "script/script_components.hpp"
+#include <sol/types.hpp>
 
 namespace tur
 {
@@ -25,15 +27,16 @@ namespace tur
 			subscriber.subscribe<SceneDeserializedEvent>(
 				[&](const SceneDeserializedEvent& deserializedEvent) -> bool
 				{
-                    handle_textures(deserializedEvent.scene);
-                    handle_audio(deserializedEvent.scene);
+                    handle_textures(deserializedEvent.scene, deserializedEvent.project);
+                    handle_audio(deserializedEvent.scene, deserializedEvent.project);
+                    handle_script(deserializedEvent.scene, deserializedEvent.project);
                     return false;
 				}
 			);
 		}
 
     private:
-        void handle_textures(NON_OWNING Scene* scene)
+        void handle_textures(NON_OWNING Scene* scene, const Project& project)
         {
             TUR_ASS(rLibrary);
             TUR_ASS(scene);
@@ -44,7 +47,7 @@ namespace tur
                 if(sprite.assetHandle != invalid_handle)
                     continue;
 
-                sprite.assetHandle = rLibrary->get_asset_handle(sprite.filepath);
+                sprite.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(sprite.filepath));
             }
 
             auto viewTilemap = scene->get_registry().view<Tilemap2DComponent>();
@@ -53,11 +56,11 @@ namespace tur
                 if(tilemap.assetHandle != invalid_handle)
                     continue;
 
-                tilemap.assetHandle = rLibrary->get_asset_handle(tilemap.filepath);
+                tilemap.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(tilemap.filepath));
             }
         }
 
-        void handle_audio(NON_OWNING Scene* scene)
+        void handle_audio(NON_OWNING Scene* scene, const Project& project)
         {
             TUR_ASS(rLibrary);
             TUR_ASS(scene);
@@ -68,7 +71,22 @@ namespace tur
                 if(audio.assetHandle != invalid_handle)
                     continue;
 
-                audio.assetHandle = rLibrary->get_asset_handle(audio.filepath);
+                audio.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(audio.filepath));
+            }
+        }
+
+        void handle_script(NON_OWNING Scene* scene, const Project& project)
+        {
+            TUR_ASS(rLibrary);
+            TUR_ASS(scene);
+
+            auto view = scene->get_registry().view<ScriptComponent>();
+            for (auto [e, script] : view.each())
+            {
+                if(script.loaded)
+                    continue;
+
+                script.filepath = project.get_project_filepath(script.filepath);
             }
         }
 

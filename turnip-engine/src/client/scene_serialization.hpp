@@ -2,16 +2,11 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
-#include "entt/entity/fwd.hpp"
-#include "graphics/components.hpp"
-#include "logging/logging.hpp"
-#include "physics/physics_components.hpp"
-#include "scene/common_components.hpp"
-#include "scene/scene.hpp"
-#include "scene/entity.hpp"
+#include "project/project.hpp"
 #include "scene/components.hpp"
-
+#include "scene/scene.hpp"
 #include "utils/json/json_file.hpp"
+#include "utils/json/json_common.hpp"
 
 namespace tur
 {
@@ -153,9 +148,10 @@ namespace tur
         archive.save(filepath);
     }
 
-    inline void deserialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
+    inline void deserialize_scene(NON_OWNING Scene* scene, const Project& project, const std::filesystem::path& sceneFilename)
     {
-        JSONInputArchive archive(json_parse_file(filepath));
+        JSONInputArchive archive(json_parse_file(project.get_project_filepath(sceneFilename)));
+        
         entt::snapshot_loader{scene->get_registry()}
             .get<entt::entity>(archive)
             .get<AudioSourceComponent>(archive)

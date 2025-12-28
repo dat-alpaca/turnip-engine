@@ -2,7 +2,7 @@
     "audios": [
         {
             "metadata": {
-                "filepath": "res/audio/sound.wav",
+                "filepath": "audio/sound.wav",
                 "type": 3,
                 "uuid": 16292462592774848465
             }
@@ -13,7 +13,7 @@
             "channels": 4,
             "height": 144,
             "metadata": {
-                "filepath": "res/textures/face.png",
+                "filepath": "textures/face.png",
                 "type": 1,
                 "uuid": 444101566143258990
             },
@@ -43,7 +43,7 @@
             "channels": 4,
             "height": 16,
             "metadata": {
-                "filepath": "res/textures/floor0.png",
+                "filepath": "textures/floor0.png",
                 "type": 1,
                 "uuid": 444101512133258990
             },
@@ -73,7 +73,7 @@
             "channels": 4,
             "height": 32,
             "metadata": {
-                "filepath": "res/textures/face_sheet.png",
+                "filepath": "textures/face_sheet.png",
                 "type": 1,
                 "uuid": 3047054274889524964
             },
