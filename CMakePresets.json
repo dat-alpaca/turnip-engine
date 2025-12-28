@@ -8,7 +8,7 @@
             "cacheVariables": {
                 "CMAKE_C_COMPILER": "/usr/bin/gcc",
                 "CMAKE_CXX_COMPILER": "/usr/bin/g++",
-                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_BUILD_TYPE": "Release",
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "GCC_INSTALL_PREFIX": ""

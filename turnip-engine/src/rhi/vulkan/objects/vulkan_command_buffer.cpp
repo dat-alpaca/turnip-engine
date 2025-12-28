@@ -79,18 +79,16 @@ namespace tur::vulkan
 		RenderTarget target = get_render_target();
 		auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
 
-		{
-			utils::transition_texture_layout(
-				*rRHI, colorTexture,
-				{
-					.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
-				 	.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
-				 	.srcAccessMask = vk::AccessFlagBits2::eNone,
-				 	.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
-				 	.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite
-				}
-			);
-		}
+		utils::transition_texture_layout(
+			*rRHI, colorTexture,
+			{
+				.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
+				.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+				.srcAccessMask = vk::AccessFlagBits2::eNone,
+				.dstStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
+				.dstAccessMask = vk::AccessFlagBits2::eColorAttachmentWrite
+			}
+		);
 
 		if (target.depthAttachment.textureHandle != invalid_handle)
 		{
@@ -101,29 +99,24 @@ namespace tur::vulkan
 
 		// 3. create rendering info
 		vk::RenderingInfo renderInfo = {};
+		vk::RenderingAttachmentInfo colorAttachmentInfo = {}, depthAttachmentInfo = {};
 		{
-			vk::RenderingAttachmentInfo colorAttachmentInfo = {};
-			{
-				colorAttachmentInfo.imageView = colorTexture.imageView;
-				colorAttachmentInfo.imageLayout = vk::ImageLayout::eAttachmentOptimal;
-				colorAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
-				colorAttachmentInfo.loadOp = vk::AttachmentLoadOp::eClear;
-				colorAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
-				colorAttachmentInfo.clearValue =
-					vk::ClearValue({mClearColor.color.r, mClearColor.color.g, mClearColor.color.b, mClearColor.color.a}
-				);
-			}
+			colorAttachmentInfo.imageView = colorTexture.imageView;
+			colorAttachmentInfo.imageLayout = vk::ImageLayout::eAttachmentOptimal;
+			colorAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
+			colorAttachmentInfo.loadOp = vk::AttachmentLoadOp::eClear;
+			colorAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
+			colorAttachmentInfo.clearValue =
+				vk::ClearValue({mClearColor.color.r, mClearColor.color.g, mClearColor.color.b, mClearColor.color.a}
+			);
 
-			vk::RenderingAttachmentInfo depthAttachmentInfo = {};
-			{
-				depthAttachmentInfo.imageView = nullptr;
-				depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-				depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
-				depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eLoad;
-				depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
-				depthAttachmentInfo.clearValue =
-					vk::ClearValue(vk::ClearDepthStencilValue(mClearColor.depth, mClearColor.stencil));
-			}
+			depthAttachmentInfo.imageView = nullptr;
+			depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+			depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
+			depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eLoad;
+			depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
+			depthAttachmentInfo.clearValue =
+				vk::ClearValue(vk::ClearDepthStencilValue(mClearColor.depth, mClearColor.stencil));
 
 			// TODO: use the 	rendertarget
 			renderInfo.flags |= vk::RenderingFlagBits::eContentsSecondaryCommandBuffers;

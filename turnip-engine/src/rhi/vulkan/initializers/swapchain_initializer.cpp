@@ -150,9 +150,9 @@ namespace tur::vulkan
 					imageCreateInfo.subresourceRange.layerCount = 1;
 				}
 
+				vk::ImageViewUsageCreateInfo usageCreateInfo;
 				if (state.apiVersion > VK_API_VERSION_1_1)
 				{
-					vk::ImageViewUsageCreateInfo usageCreateInfo;
 					usageCreateInfo.usage =
 						vk::ImageUsageFlagBits::eTransferDst | vk::ImageUsageFlagBits::eColorAttachment;
 					imageCreateInfo.pNext = &usageCreateInfo;
