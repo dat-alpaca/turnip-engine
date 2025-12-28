@@ -37,100 +37,10 @@ private:
 
 	void initialize_entities()
 	{
-		AssetLibrary& library = engine->get_asset_library();
-
 		deserialize_scene(&get_current_scene(), mProject, "main_scene.scene");
 
 		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
 		engine->get_event_callback()(deserializeEvent);
-		return;
-		
-		// Entity 0:
-		auto entity = get_current_scene().add_entity("bloky");
-		{
-			auto script = entity.add_component<ScriptComponent>("res/player.lua");
-
-			entity.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
-			entity.add_component<AudioSourceComponent>(library.get_asset_handle("res/audio/sound.wav"));
-
-			auto windowSize = engine->get_window_dimensions();
-
-			// Transform:
-			TransformComponent transformComponent;
-			{
-				transformComponent.transform.position = glm::vec3(3.0f, 1.0f, 0.0f);
-				transformComponent.transform.scale = glm::vec3(1.f, 1.f, 1.f);
-			}
-			entity.add_component<TransformComponent>(transformComponent);
-
-			entity.add_component<Body2DComponent>(BodyType::DYNAMIC);
-			entity.add_component<RectCollider2D>(1.f, 1.f);
-		}
-
-		// Entity 1:
-		{
-			auto entity0 = get_current_scene().add_entity("newone");
-
-			entity0.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
-
-			auto& hierarchy = entity0.get_component<HierarchyComponent>();
-			hierarchy.level = 1;
-			hierarchy.parent = entity.get_handle();
-
-			// Transform:
-			TransformComponent transformComponent0;
-			{
-				transformComponent0.transform.position = glm::vec3(0.5f, 0.5f, -0.1f);
-				transformComponent0.transform.scale = glm::vec3(0.5f, 0.5f, 1.f);
-			}
-			entity0.add_component<TransformComponent>(transformComponent0);
-		}
-
-		// Floor:
-		{
-			auto floor = get_current_scene().add_entity("floor");
-
-			floor.add_component<Sprite2DComponent>(library.get_asset_handle("res/textures/face.png"));
-
-			// Transform:
-			TransformComponent transformComponent0;
-			{
-				transformComponent0.transform.position = glm::vec3(3.0, 5.f, 0.0f);
-				transformComponent0.transform.scale = glm::vec3(1.f, 1.0f, 1.f);
-			}
-			floor.add_component<TransformComponent>(transformComponent0);
-
-			floor.add_component<Body2DComponent>();
-			floor.add_component<RectCollider2D>(1.f, 1.f);
-		}
-
-		// Big Floor:
-		{
-			auto floor = get_current_scene().add_entity("floor");
-
-			auto& tilemap = floor.add_component<Tilemap2DComponent>(library.get_asset_handle("res/textures/face_sheet.png"), 32);
-			
-			TilemapChunk chunk;
-			{
-				for(u8 x = 0; x < 3; ++x)
-				{
-					for(u8 y = 0; y < 3; ++y)
-					{
-						TileFlags flags;
-						flags.set_enable(true);
-						flags.set_flip(false);
-						flags.set_animation_size(5);
-
-						chunk.chunks.push_back(Tile{{x, y}, 0, flags});
-					}
-				}
-			}
-			
-			tilemap.worldData.push_back(chunk);
-		}
-
-		mProject.add_scene(&get_current_scene(), "main_scene.scene");
-		mProject.save();
 	}
 
 	void on_event(Event& event) override
@@ -155,7 +65,7 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 32.f;
+	static constexpr inline float PixelPerMeter = 64.f;
 	Project mProject;
 };
 
