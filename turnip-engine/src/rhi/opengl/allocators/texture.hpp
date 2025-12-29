@@ -1,5 +1,5 @@
 #pragma once
-#include "assets/texture_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "common.hpp"
 
 #include "rhi/opengl/objects/texture.hpp"
@@ -21,6 +21,7 @@ namespace tur::gl
 		{
 			bool generateMipmaps = descriptor.generateMipmaps;
 
+			glTextureParameteri(textureID, GL_TEXTURE_MAX_LEVEL, descriptor.arrayLayers);
 			glTextureParameteri(textureID, GL_TEXTURE_WRAP_S, get_wrap_mode(descriptor.wrapS));
 			glTextureParameteri(textureID, GL_TEXTURE_WRAP_T, get_wrap_mode(descriptor.wrapT));
 			if (descriptor.type == TextureType::TEXTURE_3D)
@@ -38,13 +39,16 @@ namespace tur::gl
 		switch (descriptor.type)
 		{
 			case TextureType::TEXTURE_2D:
-				glTextureStorage2D(textureID, 1, textureFormat, descriptor.width, descriptor.height);
+				glTextureStorage2D(textureID, descriptor.mipLevels, textureFormat, descriptor.width, descriptor.height);
+				break;
+
+			case TextureType::ARRAY_TEXTURE_2D:
+				glTextureStorage3D(textureID, descriptor.mipLevels, textureFormat, descriptor.layerWidth, descriptor.layerHeight, descriptor.arrayLayers);
 				break;
 
 			case TextureType::CUBE_MAP:
-			case TextureType::ARRAY_TEXTURE_2D:
 			case TextureType::TEXTURE_3D:
-				glTextureStorage3D(textureID, 1, textureFormat, descriptor.width, descriptor.height, descriptor.depth);
+				glTextureStorage3D(textureID, descriptor.mipLevels, textureFormat, descriptor.width, descriptor.height, descriptor.arrayLayers);
 				break;
 		}
 

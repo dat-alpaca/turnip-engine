@@ -1,7 +1,6 @@
 #pragma once
 #include "utils/color.hpp"
 #include <glm/glm.hpp>
-#include <numeric>
 
 namespace tur
 {
@@ -9,7 +8,7 @@ namespace tur
 	{
 		COLOR = 1 << 0,
 		DEPTH = 1 << 1,
-		STENCIL = 1 << 1,
+		STENCIL = 1 << 2,
 		ALL = COLOR | DEPTH | STENCIL
 	};
 

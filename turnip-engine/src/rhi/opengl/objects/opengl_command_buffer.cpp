@@ -1,4 +1,5 @@
 #include "opengl_command_buffer.hpp"
+#include "logging/logging.hpp"
 #include "rhi/opengl/gl_render_interface.hpp"
 #include <glad/gl.h>
 
@@ -18,6 +19,14 @@ namespace tur::gl
 	{
 		/* Blank */
 	}
+	void CommandBufferGL::execute_secondary_buffers(std::span<EmptyCommandBuffer>)
+	{
+		/* Blank */
+	}
+	void CommandBufferGL::initialize_secondary()
+	{
+		/* Blank */
+	}
 
 	void CommandBufferGL::begin(render_target_handle renderTarget)
 	{
@@ -30,11 +39,22 @@ namespace tur::gl
 			glBindFramebuffer(GL_FRAMEBUFFER, resources.get_render_targets().get(renderTarget).handle);
 
 		glDepthRange(0.0, 1.0);
+	}
+	void CommandBufferGL::begin_rendering()
+	{
 		clear();
 	}
+	void CommandBufferGL::end_rendering()
+	{
+		/* Blank */
+	}	
 	void CommandBufferGL::end()
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+	void CommandBufferGL::blit()
+	{
+		/* Blank */
 	}
 
 	void CommandBufferGL::clear()
@@ -161,6 +181,9 @@ namespace tur::gl
 					glBindTextureUnit(binding, descriptor.resourceHandle);
 				}
 				break;
+
+				default:
+					TUR_LOG_CRITICAL("Invalid descriptor type passed.");
 			}
 		}
 	}

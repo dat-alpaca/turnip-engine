@@ -56,11 +56,18 @@ namespace tur
 	{
         { t.draw(vertexCount, instanceCount, firstVertex, firstInstance) };
         { t.draw_indexed(indexCount, instanceCount, firstVertex, firstInstance) };
+	} &&
+	
+	requires(T t)
+	{
+        { t.get_buffer() } -> std::same_as<CommandBufferType>;
 	};
-
+	
 	template <typename T, typename CommandBufferType>
 	requires IsCommandBuffer<T, CommandBufferType>
 	class BaseCommandBuffer : public T
 	{
+	public:
+		using BufferType = CommandBufferType;
 	};
 }

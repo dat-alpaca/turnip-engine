@@ -3,6 +3,7 @@
 
 #include "graphics/objects/command_buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -47,7 +48,7 @@ namespace tur::vulkan
 		void blit_onto_swapchain();
 
 	public:
-		vk::CommandBuffer get_command_buffer() { return mCommandBuffer; }
+		vk::CommandBuffer get_buffer() const { return mCommandBuffer; }
 
 	private:
 		NON_OWNING RenderInterfaceVulkan* rRHI = nullptr;

@@ -4,8 +4,6 @@
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/types/clear_color.hpp"
 #include "utils/color.hpp"
-#include "vulkan/objects/vulkan_command_buffer.hpp"
-#include "vulkan/vulkan.hpp"
 #include <vector>
 
 namespace tur
@@ -76,23 +74,24 @@ namespace tur
 
 		CommandBuffer commandBuffer = rhi.create_command_buffer();
 		commandBuffer.reset(rhi.get_current_command_buffer());
-
-		tilemapSystem.render();
-		quadSystem.render();
+		commandBuffer.set_clear_color({}, ClearFlags::COLOR);
 
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
 
-			std::vector<vk::CommandBuffer> commandBuffers;
+			tilemapSystem.render();
+			quadSystem.render();
+
+			std::vector<CommandBuffer::BufferType> commandBuffers;
 			{
 				commandBuffers.reserve(2);
 
 				commandBuffers.push_back(
-					quadSystem.renderer().get_command_buffer().get_command_buffer()
+					quadSystem.renderer().get_command_buffer().get_buffer()
 				);
 
 				if(!tilemapSystem.renderer().is_empty())
-					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_command_buffer());
+					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_buffer());
 			}
 
 			commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});

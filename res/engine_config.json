@@ -64,9 +64,9 @@
         "title": "TurnipEngine v1.1"
     },
     "windowingCapabilities": {
-        "api": "VULKAN",
-        "major": 1,
-        "minor": 3,
+        "api": "OPENGL",
+        "major": 4,
+        "minor": 5,
         "patch": 0,
         "variant": 0
     },

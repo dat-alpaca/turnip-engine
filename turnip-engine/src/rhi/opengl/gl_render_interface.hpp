@@ -1,5 +1,4 @@
 #pragma once
-#include "common.hpp"
 #include "objects/opengl_command_buffer.hpp"
 #include "objects/opengl_resource_handler.hpp"
 
@@ -40,7 +39,6 @@ namespace tur::gl
 		ResourceHandler mResources;
 		ConfigData mConfigData;
 	};
-
 }
 
 namespace tur

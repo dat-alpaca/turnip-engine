@@ -1,5 +1,5 @@
 #pragma once
-#include "assets/texture_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "common.hpp"
 
 #include "rhi/opengl/objects/render_target.hpp"

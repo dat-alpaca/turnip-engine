@@ -1,6 +1,5 @@
 #include "imm_quad_renderer.hpp"
 #include "graphics/constants.hpp"
-#include "vulkan/objects/vulkan_command_buffer.hpp"
 
 namespace tur
 {

@@ -19,15 +19,20 @@ namespace tur::gl
 
 	public:
 		void reset(EmptyCommandBuffer commandBuffer);
+		void execute_secondary_buffers(std::span<EmptyCommandBuffer>);
+		void initialize_secondary();
 
 	public:
 		void begin(render_target_handle renderTarget = invalid_handle);
+		void begin_rendering();
+		void end_rendering();
 		void end();
+		void blit();
 
 	public:
+		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
 		void set_viewport(const Viewport& viewport);
 		void set_scissor(const Extent2D& scissor);
-		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
 
 	public:
 		void bind_vertex_buffer(buffer_handle bufferHandle, u32 binding);
@@ -38,6 +43,9 @@ namespace tur::gl
 	public:
 		void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
+
+	public:
+		EmptyCommandBuffer get_buffer() const { return {}; }
 
 	private:
 		void clear();

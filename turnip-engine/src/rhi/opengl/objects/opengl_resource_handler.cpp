@@ -252,8 +252,12 @@ namespace tur::gl
 	{
 		Texture& texture = mTextures.get(textureHandle);
 
-		gl_handle dataFormat = get_texture_data_format(asset.dataFormat);
-		gl_handle dataType = !asset.floatTexture ? GL_UNSIGNED_BYTE : GL_FLOAT;
+		gl_handle dataFormat = get_texture_data_format(asset.options.dataFormat);
+		gl_handle dataType = !asset.options.floatTexture ? GL_UNSIGNED_BYTE : GL_FLOAT;
+		
+		auto formatSize = get_texture_format_byte_size(texture.descriptor.format);
+
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
 
 		switch (texture.descriptor.type)
 		{
@@ -263,8 +267,25 @@ namespace tur::gl
 				);
 				break;
 
-			case TextureType::CUBE_MAP:
 			case TextureType::ARRAY_TEXTURE_2D:
+			{
+				glPixelStorei(GL_UNPACK_ROW_LENGTH, asset.width);
+
+				for(u32 i = 0; i < asset.options.arrayLayers; ++i)
+				{
+					glTextureSubImage3D(
+						texture.handle,
+						0,
+						0, 0, i,
+						asset.options.layerWidth, asset.options.layerHeight, 1,
+						dataFormat,
+						dataType,
+						asset.data.data() + i * (asset.options.layerWidth * formatSize)
+					);
+				}
+			} break;
+			
+			case TextureType::CUBE_MAP:
 			case TextureType::TEXTURE_3D:
 				glTextureSubImage3D(
 					texture.handle, 0, 0, 0, 0, asset.width, asset.height, 1, dataFormat, dataType, asset.data.data()
@@ -274,6 +295,9 @@ namespace tur::gl
 			default:
 				TUR_LOG_ERROR("Invalid texture descriptor type on update");
 		}
+
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	}
 	void ResourceHandler::destroy_texture(texture_handle textureHandle)
 	{
