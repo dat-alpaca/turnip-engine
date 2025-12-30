@@ -20,8 +20,24 @@ Building this project requires the following:
 
 * [Lua](https://www.lua.org/download.html)
 * [CMake](https://cmake.org/download/)
-* [Vulkan SDK](https://vulkan.lunarg.com/#new_tab) (If using the Vulkan build)
+* [Vulkan SDK](https://vulkan.lunarg.com/) (If you are using the Vulkan build)
 
+If you are in a Linux desktop distribution, you must install the following dependencies to build the project, as stated in the [GLFW documentation](https://www.glfw.org/docs/latest/compile.html#compile_deps_wayland):
+
+* Debian-based:
+```bash
+sudo apt install libwayland-dev libxkbcommon-dev xorg-dev 
+``` 
+
+* Fedora-based:
+```bash
+sudo dnf install wayland-devel libxkbcommon-devel libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
+```
+
+Additionally, you may need to install the Mesa drivers:
+```bash
+sudo dnf mesa-libGL mesa-libGL-devel
+```
 
 #### VulkanSDK environment variables:
 
