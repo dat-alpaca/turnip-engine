@@ -41,13 +41,39 @@ namespace tur
 				call_expected_function(script.instance, "on_wake");
 		}
 
+		void on_fixed_update()
+		{
+			auto view = rScene->get_registry().view<ScriptComponent>();
+			for (auto [e, script] : view.each())
+			{
+				if(!has_function(script.instance, "on_fixed_update"))
+					continue;
+
+				call_expected_function(script.instance, "on_fixed_update", time);
+			}
+		}
+
 		void on_update(const Time& time)
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{
+				if(!has_function(script.instance, "on_update"))
+					continue;
 
 				call_expected_function(script.instance, "on_update", time);
+			}
+		}
+
+		void on_post_update(const Time& time)
+		{
+			auto view = rScene->get_registry().view<ScriptComponent>();
+			for (auto [e, script] : view.each())
+			{
+				if(!has_function(script.instance, "on_post_update"))
+					continue;
+				
+				call_expected_function(script.instance, "on_post_update", time);
 			}
 		}
 
