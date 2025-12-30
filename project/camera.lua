@@ -1,7 +1,7 @@
 local camera = {
     _description = "Default camera",
     camera_c = nil,
-    _pixel_per_meter = 64
+    _pixel_per_meter = 50
 }
 
 _G["pixel_per_meter"] = camera._pixel_per_meter

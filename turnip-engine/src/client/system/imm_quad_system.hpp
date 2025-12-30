@@ -38,7 +38,7 @@ namespace tur
 			);
 		}
 
-		void update()
+		void on_update()
 		{
 			auto view = rScene->get_registry().view<TransformComponent, Sprite2DComponent>();
 			for (auto [e, transform, sprite] : view.each())

@@ -1,6 +1,7 @@
 #pragma once
 #include "assets/asset_library.hpp"
 #include "audio/audio_handler.hpp"
+#include "config/config_data.hpp"
 #include "physics/physics_handler.hpp"
 #include "script/script_handler.hpp"
 #include "view/view.hpp"
@@ -53,7 +54,9 @@ namespace tur
 		AssetLibrary mAssetLibrary;
 
 	private:
+		ConfigData mConfigData;
 		Time mTime;
+		
 		f64 mTitleAccumulatedTime = 0.0f;
 
 		EventCallback mMainEventCallback;

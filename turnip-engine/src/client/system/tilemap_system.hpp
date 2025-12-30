@@ -38,7 +38,7 @@ namespace tur
 			);
 		}
 
-		void update(const Time& time)
+		void on_update(const Time& time)
 		{
 			auto view = rScene->get_registry().view<Tilemap2DComponent>();
 			for (auto [e, tilemap] : view.each())

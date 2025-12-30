@@ -27,7 +27,9 @@ namespace tur
 		virtual void on_render(){};
 		virtual void on_render_gui(){};
 
+		virtual void on_fixed_update(){};
 		virtual void on_update(const Time& time){};
+		virtual void on_late_update(const Time& time){};
 
 		virtual void on_event(Event& event){};
 

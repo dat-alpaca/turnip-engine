@@ -17,7 +17,7 @@ namespace tur
 		void set_scene(Scene* scene) { rScene = scene; }
 	
     public:
-        void update()
+        void on_update()
 		{
             rCurrentCamera->update_view();
 		}

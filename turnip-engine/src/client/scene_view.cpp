@@ -60,18 +60,21 @@ namespace tur
 		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent);
 	}
+	void SceneView::on_fixed_update()
+	{
+		physicsSystem.on_fixed_update();
+	}
 	void SceneView::on_update(const Time& time)
 	{
-		cameraSystem.update();
+		cameraSystem.on_update();
 		quadSystem.set_camera(cameraSystem.get_main_camera());
 		tilemapSystem.set_camera(cameraSystem.get_main_camera());
 
-		quadSystem.update();
-		tilemapSystem.update(time);
+		quadSystem.on_update();
+		tilemapSystem.on_update(time);
 
 		scriptSystem.on_update(time);
-		physicsSystem.update();
-		scenegraphSystem.update();
+		scenegraphSystem.on_update();
 	}
 	void SceneView::on_render()
 	{

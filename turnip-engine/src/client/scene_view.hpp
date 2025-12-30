@@ -25,6 +25,7 @@ namespace tur
 
 	public:
 		void on_view_added() override;
+		void on_fixed_update() override;
 		void on_update(const Time& time) override;
 		void on_render() override;
 		void on_event(Event& event) override;

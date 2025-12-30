@@ -13,8 +13,8 @@
         "variant": 0
     },
     "physicsConfig": {
-        "fixedTimeStep": 0.016666667,
-        "gravityAcceleration": 0.9806699752807617,
+        "fixedTimeStep": 0.0166666666667,
+        "gravityAcceleration": 9.806699752807617,
         "substepCount": 4
     },
     "scriptingInfo": {

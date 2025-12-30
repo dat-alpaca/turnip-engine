@@ -20,10 +20,18 @@ namespace tur::engine
 			view->on_engine_shutdown();
 	}
 
+	static void on_fixed_update(ViewHandler& viewHandler)
+	{
+		for (const auto& view : viewHandler.get_views())
+			view->on_fixed_update();
+	}
 	static void on_update(ViewHandler& viewHandler, const Time& time)
 	{
 		for (const auto& view : viewHandler.get_views())
 			view->on_update(time);
+
+		for (const auto& view : viewHandler.get_views())
+			view->on_late_update(time);
 	}
 	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{
@@ -76,17 +84,17 @@ namespace tur
 				return;
 			}
 		}
-		ConfigData configData = configDataResult.value();
+		mConfigData = configDataResult.value();
 
 		// Event Callback:
 		mMainEventCallback = [&](Event& event) { engine::on_event(event, *this); };
 
 		// Windowing:
-		mWindow = WindowingSystem::initialize(configData.windowingCapabilities, configData.windowProperties);
+		mWindow = WindowingSystem::initialize(mConfigData.windowingCapabilities, mConfigData.windowProperties);
 		mWindow->set_event_callback(mMainEventCallback);
 
 		// Render Interface:
-		mRenderInterface.initialize(configData, *mWindow);
+		mRenderInterface.initialize(mConfigData, *mWindow);
 
 		// Script:
 		mScriptHandler.initialize();
@@ -94,7 +102,7 @@ namespace tur
 		mScriptHandler.initialize_audio(&mAudioHandler);
 
 		// Worker Pool:
-		mWorkerPool.initialize(configData.workerConfig);
+		mWorkerPool.initialize(mConfigData.workerConfig);
 
 		// Audio:
 		mAudioHandler.initialize(&mAssetLibrary);
@@ -118,7 +126,7 @@ namespace tur
 		}
 
 		// Physics:
-		mPhysicsHandler.initialize(configData.physicsConfig);
+		mPhysicsHandler.initialize(mConfigData.physicsConfig);
 	}
 
 	void TurnipEngine::start()
@@ -127,18 +135,24 @@ namespace tur
 
 		while (!mShutdownRequested && mWindow->is_open())
 		{
+			mWindow->poll_events();
+			mWorkerPool.poll_tasks();
+
 			mTime.cycle(mWindow->get_time());
 			mTitleAccumulatedTime += mTime.get_delta_time();
 
 			if(mTitleAccumulatedTime >= 1.f)
 			{
-				mTitleAccumulatedTime = 0.0f;
-				glfwSetWindowTitle(mWindow->get_window(), std::to_string(mTime.get_fps()).c_str());
+				// mTitleAccumulatedTime = 0.0f;
+				// glfwSetWindowTitle(mWindow->get_window(), std::to_string(mTime.get_fps()).c_str());
 			}
 
-			mWindow->poll_events();
-			mWorkerPool.poll_tasks();
-
+			if(mTitleAccumulatedTime >= mConfigData.physicsConfig.fixedTimeStep)
+			{
+				engine::on_fixed_update(mViewHandler);
+				mTitleAccumulatedTime = 0.0f;
+			}
+			
 			engine::on_update(mViewHandler, mTime);
 
 			engine::on_render(mRenderInterface, mViewHandler);

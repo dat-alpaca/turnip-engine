@@ -44,7 +44,7 @@ namespace tur
 		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
-		void update()
+		void on_fixed_update()
 		{
 			if (mEnableTransformSync)
 				synchronize_physics_world();
@@ -142,8 +142,13 @@ namespace tur
 		{
 			Entity sceneEntity { entity, rScene };
 			auto& body = sceneEntity.get_component<Body2DComponent>();
-			const auto& transform = sceneEntity.get_component<TransformComponent>().transform;
 
+			const auto& transform = sceneEntity.get_component<TransformComponent>().transform;
+			
+			// Create body:
+			body.bodyDef = b2DefaultBodyDef();
+
+			// Set position:
 			const auto& worldPos = transform.position;
 			body.bodyDef.position = {worldPos.x, worldPos.y};
 
@@ -155,6 +160,16 @@ namespace tur
 			Entity sceneEntity { entity, rScene };
 			const auto& body = sceneEntity.get_component<Body2DComponent>();
 			auto& rectCollider = sceneEntity.get_component<RectCollider2D>();
+
+			// Create polygon:
+			rectCollider.polygon = b2MakeBox(rectCollider.width / 2.f, rectCollider.height / 2.f);
+			rectCollider.shapeDef = b2DefaultShapeDef();
+			rectCollider.shapeDef.density = 1.0f;
+			rectCollider.shapeDef.material.friction = 0.3f;
+
+			rectCollider.shapeDef.enableContactEvents = true;
+			rectCollider.shapeDef.filter.categoryBits = 0x0001;
+			rectCollider.shapeDef.filter.maskBits = 0xFFFF;
 
 			rectCollider.shapeID = b2CreatePolygonShape(body.bodyID, &rectCollider.shapeDef, &rectCollider.polygon);
 			mShapeMap[rectCollider.shapeID] = entity;

@@ -1,6 +1,4 @@
 #pragma once
-#include "common.hpp"
-#include "scene/components.hpp"
 #include "scene/scene.hpp"
 
 namespace tur
@@ -12,7 +10,7 @@ namespace tur
 		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
-		void update()
+		void on_update()
 		{
 			auto& registry = rScene->get_registry();
 			auto view = registry.view<TransformComponent, const HierarchyComponent>();
