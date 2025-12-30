@@ -1,9 +1,3 @@
-#include "assets/texture/texture_asset.hpp"
-#include "client/project/project.hpp"
-#include "client/scene_serialization.hpp"
-#include "client/scene_view.hpp"
-#include "event/subscriber.hpp"
-
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -42,7 +36,6 @@ private:
 	}
 
 private:
-	static constexpr inline float PixelPerMeter = 64.f;
 	Project mProject;
 };
 
