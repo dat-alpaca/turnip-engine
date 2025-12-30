@@ -164,8 +164,10 @@ namespace tur
 			// Create polygon:
 			rectCollider.polygon = b2MakeBox(rectCollider.width / 2.f, rectCollider.height / 2.f);
 			rectCollider.shapeDef = b2DefaultShapeDef();
-			rectCollider.shapeDef.density = 1.0f;
-			rectCollider.shapeDef.material.friction = 0.3f;
+			rectCollider.shapeDef.density = rectCollider.density;
+			rectCollider.shapeDef.material.restitution = rectCollider.restitution;
+			rectCollider.shapeDef.material.rollingResistance = rectCollider.rollingResistance;
+			rectCollider.shapeDef.material.friction = rectCollider.friction;
 
 			rectCollider.shapeDef.enableContactEvents = true;
 			rectCollider.shapeDef.filter.categoryBits = 0x0001;

@@ -31,6 +31,10 @@ namespace tur
 
 	public:
 		float width = 1.0f, height = 1.0f;
+		float density = 1.0f;
+		float friction = 1.0f;
+		float restitution = 1.0f;
+		float rollingResistance = 1.0f;
 
 		b2Polygon polygon;
 		b2ShapeDef shapeDef;

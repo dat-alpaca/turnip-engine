@@ -350,18 +350,30 @@
         3,
         0,
         {
+            "width": 1.0,
             "height": 1.0,
-            "width": 1.0
+    		"density": 1.0,
+	    	"friction": 1.0,
+		    "restitution": 0.0,
+		    "rollingResistance": 1.0
         },
         2,
-        {
+        {        
+            "width": 1.0,
             "height": 1.0,
-            "width": 1.0
+    		"density": 1.0,
+	    	"friction": 1.0,
+		    "restitution": 0.0,
+		    "rollingResistance": 1.0
         },
         5,
         {
+            "width": 1.0,
             "height": 1.0,
-            "width": 1.0
+    		"density": 1.0,
+	    	"friction": 1.0,
+		    "restitution": 0.0,
+		    "rollingResistance": 0.0
         }
     ],
     [
