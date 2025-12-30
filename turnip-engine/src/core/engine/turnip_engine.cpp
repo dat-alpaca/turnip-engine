@@ -31,7 +31,7 @@ namespace tur::engine
 			view->on_update(time);
 
 		for (const auto& view : viewHandler.get_views())
-			view->on_late_update(time);
+			view->on_post_update(time);
 	}
 	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{

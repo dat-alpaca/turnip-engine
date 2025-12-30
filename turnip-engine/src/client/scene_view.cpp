@@ -76,6 +76,10 @@ namespace tur
 		scriptSystem.on_update(time);
 		scenegraphSystem.on_update();
 	}
+	void SceneView::on_post_update(const Time& time)
+	{
+		scriptSystem.on_post_update(time);
+	}
 	void SceneView::on_render()
 	{
 		auto& rhi = engine->get_render_interface();
