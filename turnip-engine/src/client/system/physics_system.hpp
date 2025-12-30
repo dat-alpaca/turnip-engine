@@ -4,11 +4,9 @@
 #include "entt/entity/fwd.hpp"
 
 #include "event/physics_events/contact_event.hpp"
-#include "logging/logging.hpp"
 #include "physics/physics_components.hpp"
 #include "physics/physics_handler.hpp"
 
-#include "scene/components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
 

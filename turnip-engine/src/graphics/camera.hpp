@@ -16,22 +16,18 @@ namespace tur
 			mProjection = glm::perspective(fov, aspectRatio, zNear, zFar);
 		}
 
-		void set_position(const glm::vec3& position) { mPosition = position; }
-		void set_target(const glm::vec3& target) { mTarget = target; }
-
-		void update_view() { mView = glm::lookAt(mPosition, mTarget, Camera::Up); }
+		void update_view() { mView = glm::lookAt(position, target, Camera::Up); }
 
 	public:
 		glm::mat4 view() { return mView; }
 		glm::mat4 projection() { return mProjection; }
 
-		glm::vec3 position() const { return mPosition; }
-		glm::vec3 target() const { return mTarget; }
-
+	public:
+		glm::vec3 position = glm::vec3(0.0f);
+		glm::vec3 target = glm::vec3(0.0f);
+		
 	private:
 		static inline const glm::vec3 Up = glm::vec3(0.0f, 1.0f, 0.f);
-		glm::vec3 mPosition = glm::vec3(0.0f);
-		glm::vec3 mTarget = glm::vec3(0.0f);
 
 	private:
 		glm::mat4 mProjection = glm::mat4(1.f);

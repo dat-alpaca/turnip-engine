@@ -11,6 +11,7 @@
 #include "system/texture_asset_binder_system.hpp"
 #include "system/tilemap_system.hpp"
 #include "system/scene_signal_system.hpp"
+#include "system/camera_system.hpp"
 
 #include "agents/physics_script_agent.hpp"
 #include "agents/texture_asset_agent.hpp"
@@ -53,7 +54,7 @@ namespace tur
 		ScriptSystem scriptSystem;
 		ImmQuadSystem quadSystem;
 		TilemapSystem tilemapSystem;
-		Camera mainCamera;
+		CameraSystem cameraSystem;
 		PhysicsSystem physicsSystem;
 		SceneSignalSystem signalSystem;
 

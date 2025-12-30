@@ -6,6 +6,7 @@
 
 #include "client/project/project.hpp"
 
+#include "client/system/camera_system.hpp"
 #include "client/system/imm_quad_system.hpp"
 #include "client/system/physics_system.hpp"
 #include "client/system/scene_signal_system.hpp"

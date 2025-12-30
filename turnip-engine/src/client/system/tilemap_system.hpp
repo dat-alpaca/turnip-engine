@@ -19,6 +19,7 @@ namespace tur
 			set_scene(scene);
 		}
 		void set_scene(Scene* scene) { rScene = scene; }
+		void set_camera(Camera* camera) { mTilemapRenderer.set_camera(camera); }
     
     public:
 		void render() { mTilemapRenderer.render(); }

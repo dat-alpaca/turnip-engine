@@ -31,6 +31,9 @@ namespace tur
 		auto& rhi = *rRHI;
 		auto& resources = rhi.get_resource_handler();
 		
+		if(!rCamera)
+			return;
+
 		if(mTiles.empty())
 			return;
 

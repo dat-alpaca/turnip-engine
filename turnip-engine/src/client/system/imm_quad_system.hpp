@@ -20,6 +20,7 @@ namespace tur
 			set_scene(scene);
 		}
 		void set_scene(Scene* scene) { rScene = scene; }
+		void set_camera(Camera* camera) { mQuadRenderer.set_camera(camera); }
 
 		void render() { mQuadRenderer.render(); }
 

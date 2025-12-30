@@ -2,12 +2,31 @@
 #include <vector>
 
 #include "assets/asset.hpp"
+#include "graphics/camera.hpp"
 #include "graphics/tile.hpp"
 #include "defines.hpp"
 #include "graphics/objects/texture.hpp"
 
 namespace tur
 {
+	struct CameraComponent
+	{
+	public:
+		CameraComponent()
+		{
+			camera.position = glm::vec3(0.0f);
+			camera.target = glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+		CameraComponent(const Camera& camera)
+			: camera(camera)
+		{
+		}
+
+	public:
+		bool mainCamera = false;
+		Camera camera;
+	};
+
 	struct Sprite2DComponent
 	{
 	public:

@@ -2,6 +2,7 @@
 #include <filesystem>
 #include <nlohmann/json.hpp>
 
+#include "graphics/components.hpp"
 #include "project/project.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -29,6 +30,9 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RectCollider2D, width, height);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ScriptComponent, filepath);
+    
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Camera, position, target);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraComponent, mainCamera, camera);
 
     class JsonOutputArchive
     {
@@ -135,6 +139,7 @@ namespace tur
         entt::snapshot{scene->get_registry()}
             .get<entt::entity>(archive)
             .get<AudioSourceComponent>(archive)
+            .get<CameraComponent>(archive)
             .get<HierarchyComponent>(archive)
             .get<UUIDComponent>(archive)
             .get<NameComponent>(archive)
@@ -155,6 +160,7 @@ namespace tur
         entt::snapshot_loader{scene->get_registry()}
             .get<entt::entity>(archive)
             .get<AudioSourceComponent>(archive)
+            .get<CameraComponent>(archive)
             .get<HierarchyComponent>(archive)
             .get<UUIDComponent>(archive)
             .get<NameComponent>(archive)

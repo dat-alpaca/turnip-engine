@@ -24,12 +24,6 @@ namespace tur
 		mTextureAgent.set_event_callback(engine->get_event_callback());
 		add_scene(true);
 
-		// Camera:
-		{
-			mainCamera.set_position(glm::vec3(0.0f));
-			mainCamera.set_target(glm::vec3(0.0f, 0.0f, -1.0f));
-		}
-
 		// Renderers:
 		initialize_renderers();
 
@@ -46,21 +40,22 @@ namespace tur
 		// Physics-Script Agent:
 		mPhysicsScriptAgent.initialize(mSceneHolder.get_current_scene(), &physicsSystem, &scriptSystem);
 
+		// Camera System:
+		cameraSystem.initialize(mSceneHolder.get_current_scene());
+
 		// Binders:
 		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
 		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
 
 		// Scene Signals:
 		signalSystem.initialize(&engine->get_asset_library());
-
-		// Windowing:
-		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
-		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
-		engine->get_event_callback()(initialSizeEvent);
 	}
 	void SceneView::on_update(const Time& time)
 	{
-		mainCamera.update_view();
+		cameraSystem.update();
+		quadSystem.set_camera(cameraSystem.get_main_camera());
+		tilemapSystem.set_camera(cameraSystem.get_main_camera());
+
 		quadSystem.update();
 		tilemapSystem.update(time);
 
@@ -130,11 +125,11 @@ namespace tur
 	{
 		// Renderer Systems:
 		auto& rhi = engine->get_render_interface();
-		quadSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera);
+		quadSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
 		quadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	
 		// Tilemap:
-		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), &mainCamera);
+		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
 		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	}
 }
