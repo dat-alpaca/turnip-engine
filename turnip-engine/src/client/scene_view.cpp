@@ -12,6 +12,11 @@ namespace tur
 	{
 		scriptSystem.wake_up();
 		mPhysicsScriptAgent.on_wake();
+
+		// Windowing:
+		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
+		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
+		engine->get_event_callback()(initialSizeEvent);
 	}
 
 	void SceneView::on_view_added()
@@ -49,6 +54,11 @@ namespace tur
 
 		// Scene Signals:
 		signalSystem.initialize(&engine->get_asset_library());
+
+		// Windowing:
+		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
+		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
+		engine->get_event_callback()(initialSizeEvent);
 	}
 	void SceneView::on_update(const Time& time)
 	{
@@ -119,6 +129,7 @@ namespace tur
 		mTextureAssetBinder.on_event(event);
 		quadSystem.on_event(event);
 		tilemapSystem.on_event(event);
+		scriptSystem.on_event(event);
 	}
 
 	void SceneView::initialize_renderers()

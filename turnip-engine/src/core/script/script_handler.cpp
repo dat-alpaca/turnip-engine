@@ -3,6 +3,7 @@
 #include "box2d/box2d.h"
 #include "box2d/math_functions.h"
 #include "entt/entity/fwd.hpp"
+#include "graphics/components.hpp"
 #include "physics/physics_types.hpp"
 #include "scene/common_components.hpp"
 #include "scene/entity.hpp"
@@ -323,6 +324,43 @@ namespace tur
 			};
 		}
 
+		// camera:
+		{
+			sol::usertype<CameraComponent> cameraType = mLua.new_usertype<CameraComponent>("camera");
+			cameraType["get_position"] = [&](CameraComponent& component) 
+			{
+				return component.camera.position;
+			};
+			cameraType["get_target"] = [&](CameraComponent& component) 
+			{
+				return component.camera.target;
+			};
+			cameraType["set_position"] = [&](CameraComponent& component, const glm::vec3& position) 
+			{
+				component.camera.position = position;
+			};
+			cameraType["set_target"] = [&](CameraComponent& component, const glm::vec3& target) 
+			{
+				component.camera.target = target;
+			};
+			cameraType["set_ortho"] = [&](CameraComponent& component, float left, float right, float bottom, float top, float zNear, float zFar) 
+			{
+				component.camera.set_orthogonal(left, right, bottom, top, zNear, zFar);
+			};
+			cameraType["set_perspective"] = [&](CameraComponent& component, float fov, float aspectRatio, float zNear, float zFar) 
+			{
+				component.camera.set_orthogonal(fov, aspectRatio, zNear, zFar);
+			};
+			cameraType["set_main"] = [&](CameraComponent& component, bool value) 
+			{
+				component.mainCamera = value;
+			};
+			cameraType["get_main"] = [&](CameraComponent& component) 
+			{
+				return component.mainCamera;
+			};
+		}
+
 		// physics:
 		{
 			// Body type:
@@ -370,6 +408,9 @@ namespace tur
 
 		if (componentName == "body2d" && entity.has_component<Body2DComponent>())
 			return sol::make_object(lua, &entity.get_component<Body2DComponent>());
+
+		if (componentName == "camera" && entity.has_component<CameraComponent>())
+			return sol::make_object(lua, &entity.get_component<CameraComponent>());
 
 		return sol::nil;
 	}

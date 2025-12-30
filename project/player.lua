@@ -27,8 +27,8 @@ end
 function player:on_update()
     local mouse_pos = Input.get_mouse_position()
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
-        self.transform_c.position.x = mouse_pos.x / 64 -- get_mouse_world()
-        self.transform_c.position.y = mouse_pos.y / 64
+        self.transform_c.position.x = mouse_pos.x / _G["pixel_per_meter"]
+        self.transform_c.position.y = mouse_pos.y / _G["pixel_per_meter"]
     end
 
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_RIGHT) then

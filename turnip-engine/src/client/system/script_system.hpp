@@ -1,8 +1,12 @@
 #pragma once
 #include <sol/forward.hpp>
 #include <sol/overload.hpp>
+#include <sol/types.hpp>
 #include <string_view>
 
+#include "client/system/camera_system.hpp"
+#include "event/window_events/window_framebuffer_event.hpp"
+#include "graphics/components.hpp"
 #include "physics/physics_components.hpp"
 #include "scene/common_components.hpp"
 #include "scene/components.hpp"
@@ -41,7 +45,10 @@ namespace tur
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
+			{
+
 				call_expected_function(script.instance, "on_update", time);
+			}
 		}
 
 		sol::function get_function(sol::table& instance, std::string_view functionName)
@@ -51,6 +58,19 @@ namespace tur
 				return {};
 
 			return function;
+		}
+
+	public:
+		void on_event(Event& event)
+		{
+			Subscriber subscriber(event);
+			subscriber.subscribe<WindowFramebufferEvent>(
+				[&](const WindowFramebufferEvent& resizeEvent) -> bool
+				{
+					on_resize_event(resizeEvent.width, resizeEvent.height);
+					return false;
+				}
+			);
 		}
 
 	private:
@@ -108,10 +128,31 @@ namespace tur
 		void call_expected_function(sol::table& instance, std::string_view functionName, Args&&... args)
 		{
 			auto function = instance[functionName];
+
 			if (!function.valid() || function.get_type() != sol::type::function)
 				TUR_LOG_ERROR("Failed to call function: {}", functionName);
 
 			function(instance, args...);
+		}
+
+		bool has_function(sol::table& instance, std::string_view functionName)
+		{
+			if(instance == sol::nil)
+				return false;
+
+			return instance[functionName].valid();
+		}
+
+	private:
+		void on_resize_event(float width, float height)
+		{
+			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
+			{
+				if(!has_function(script.instance, "on_window_resize"))
+					continue;
+
+				call_expected_function(script.instance, "on_window_resize", width, height);
+			}
 		}
 		
 	public:

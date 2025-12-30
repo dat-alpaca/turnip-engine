@@ -305,10 +305,14 @@
         }
     ],
     [
-        1,
+        2,
         0,
         {
             "filepath": "player.lua"
+        },
+        4,
+        {
+            "filepath": "camera.lua"
         }
     ]
 ]

@@ -19,11 +19,6 @@ public:
 		initialize_resources();
 		initialize_entities();
 
-		// Windowing:
-		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
-		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
-		engine->get_event_callback()(initialSizeEvent);
-
 		wake_scene();
 	}
 
@@ -44,31 +39,6 @@ private:
 
 		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
 		engine->get_event_callback()(deserializeEvent);
-	}
-
-	void on_event(Event& event) override
-	{
-		SceneView::on_event(event);
-
-		Subscriber subscriber(event);
-		subscriber.subscribe<WindowFramebufferEvent>(
-			[&](const WindowFramebufferEvent& resizeEvent) -> bool
-			{
-				auto dimensions = engine->get_window_dimensions();
-
-				auto* mainCamera = cameraSystem.get_main_camera();
-				if(!mainCamera)
-					return false;
-
-				mainCamera->set_orthogonal(
-					0.0f, 
-					static_cast<f32>(dimensions.x / PixelPerMeter), 
-					0.0f, 
-					static_cast<f32>(dimensions.y / PixelPerMeter)
-				);
-				return false;
-			}
-		);
 	}
 
 private:
