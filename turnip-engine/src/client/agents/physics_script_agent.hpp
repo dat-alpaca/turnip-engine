@@ -6,15 +6,11 @@
 #include "entt/entity/fwd.hpp"
 #include "event/physics_events/contact_event.hpp"
 #include "event/subscriber.hpp"
-#include "physics/physics_components.hpp"
-#include "physics/physics_handler.hpp"
 #include "event/event.hpp"
 
-#include "scene/components.hpp"
 #include "scene/scene.hpp"
 
 #include "script/script_components.hpp"
-#include "script/script_handler.hpp"
 
 namespace tur
 {
