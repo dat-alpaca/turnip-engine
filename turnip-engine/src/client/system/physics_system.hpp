@@ -1,4 +1,5 @@
 #pragma once
+#include "box2d/box2d.h"
 #include "box2d/id.h"
 #include "box2d/types.h"
 #include "entt/entity/fwd.hpp"
@@ -147,6 +148,10 @@ namespace tur
 			
 			// Create body:
 			body.bodyDef = b2DefaultBodyDef();
+
+			// Set properties:
+			body.bodyDef.type = static_cast<b2BodyType>(body.type);
+			body.bodyDef.isBullet = body.isBullet;
 
 			// Set position:
 			const auto& worldPos = transform.position;

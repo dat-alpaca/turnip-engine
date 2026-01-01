@@ -375,14 +375,50 @@ namespace tur
 			sol::usertype<Body2DComponent> body2dType = mLua.new_usertype<Body2DComponent>("body2d");
 			body2dType["id"] = &Body2DComponent::bodyID;
 
+			body2dType["get_type"] = [&](Body2DComponent* component, BodyType type) {
+				return static_cast<BodyType>(b2Body_GetType(component->bodyID));
+			};
 			body2dType["set_type"] = [&](Body2DComponent* component, BodyType type) {
-				component->set_type(type);
+				component->type = type;
+				b2Body_SetType(component->bodyID, static_cast<b2BodyType>(component->type));
+			};
+			body2dType["set_bullet"] = [&](Body2DComponent* component, BodyType type, bool isBullet) {
+				component->isBullet = isBullet;
+				b2Body_SetBullet(component->bodyID, isBullet);
+			};
+			body2dType["is_bullet"] = [&](Body2DComponent* component) {
+				return b2Body_IsBullet(component->bodyID);
+			};
+			body2dType["get_mass"] = [&](Body2DComponent* component, BodyType type) {
+				return b2Body_GetMass(component->bodyID);
 			};
 
-			body2dType["add_force"] = [&](Body2DComponent* component, glm::vec2 force) {
-				b2Vec2 forceVector = {force.x, force.y};
-				b2Body_ApplyForceToCenter(component->bodyID, forceVector, true);
+			body2dType["add_force"] = [&](Body2DComponent* component, const glm::vec2& force) {
+				b2Body_ApplyForceToCenter(component->bodyID, {force.x, force.y}, true);
 			};
+			body2dType["add_force_at"] = [&](Body2DComponent* component, const glm::vec2& force, const glm::vec2& point) {
+				b2Body_ApplyForce(component->bodyID, {force.x, force.y}, { point.x, point.y }, true);
+			};
+			body2dType["add_impulse"] = [&](Body2DComponent* component, const glm::vec2& impulse) {
+				b2Body_ApplyLinearImpulseToCenter(component->bodyID, {impulse.x, impulse.y}, true);
+			};
+			body2dType["add_impulse_at"] = [&](Body2DComponent* component, const glm::vec2& impulse, const glm::vec2& point) {
+				b2Body_ApplyLinearImpulse(component->bodyID, {impulse.x, impulse.y}, { point.x, point.y }, true);
+			};
+
+			body2dType["get_position"] = [&](Body2DComponent* component) {
+				b2Vec2 position = b2Body_GetPosition(component->bodyID);
+				return glm::vec2(position.x, position.y);
+			};
+			
+			body2dType["get_linear_velocity"] = [&](Body2DComponent* component) {
+				b2Vec2 linearVelocity = b2Body_GetLinearVelocity(component->bodyID);
+				return glm::vec2(linearVelocity.x, linearVelocity.y);
+			};
+			body2dType["set_linear_velocity"] = [&](Body2DComponent* component, const glm::vec2& velocity ) {
+				b2Body_SetLinearVelocity(component->bodyID, b2Vec2(velocity.x, velocity.y));
+			};
+			
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.
 		}

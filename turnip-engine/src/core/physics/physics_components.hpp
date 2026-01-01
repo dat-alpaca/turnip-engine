@@ -12,16 +12,10 @@ namespace tur
 		Body2DComponent() = default;
 
 	public:
-		void set_type(BodyType type)
-		{
-			bodyDef.type = static_cast<b2BodyType>(type);
-			this->type = type;
-		}
-
-	public:
 		BodyType type = BodyType::STATIC;
 		b2BodyDef bodyDef;
 		b2BodyId bodyID;
+		bool isBullet = false;
 	};
 
 	struct RectCollider2D

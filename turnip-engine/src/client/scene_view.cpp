@@ -11,7 +11,6 @@ namespace tur
 	void SceneView::wake_scene()
 	{
 		scriptSystem.wake_up();
-		mPhysicsScriptAgent.on_wake();
 
 		// Windowing:
 		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
@@ -63,6 +62,7 @@ namespace tur
 	void SceneView::on_fixed_update()
 	{
 		physicsSystem.on_fixed_update();
+		scriptSystem.on_fixed_update();
 	}
 	void SceneView::on_update(const Time& time)
 	{
