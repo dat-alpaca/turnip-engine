@@ -3,6 +3,7 @@
 #include "box2d/box2d.h"
 #include "box2d/math_functions.h"
 #include "entt/entity/fwd.hpp"
+#include "glm/matrix.hpp"
 #include "graphics/components.hpp"
 #include "physics/physics_types.hpp"
 #include "scene/common_components.hpp"
@@ -13,19 +14,27 @@
 
 namespace tur
 {
-	void ScriptHandler::initialize()
+	void ScriptHandler::initialize(NON_OWNING Window* window)
 	{
 		mLua.open_libraries(sol::lib::base, sol::lib::string, sol::lib::math, sol::lib::table);
 		initialize_logging();
 		initialize_usertypes();
+
+		rWindow = window;
 	}
-	void ScriptHandler::initialize_input(Window& window)
+	void ScriptHandler::initialize_input()
 	{
 		mLua["Input"] = mLua.create_table();
-		mLua["Input"]["get_mouse_position"] = [&]() -> glm::vec2 { return window.get_mouse_position(); };
+		mLua["Input"]["get_mouse_position"] = [&]() -> glm::vec2 { return rWindow->get_mouse_position(); };
 		mLua["Input"]["get_mouse_pressed"] = [&](MouseButton mouseButton) -> bool
-		{ return window.get_mouse_pressed(mouseButton); };
-		mLua["Input"]["get_key_pressed"] = [&](Key keyButton) -> bool { return window.get_key_pressed(keyButton); };
+		{ return rWindow->get_mouse_pressed(mouseButton); };
+		mLua["Input"]["get_key_pressed"] = [&](Key keyButton) -> bool { return rWindow->get_key_pressed(keyButton); };
+
+		// Dimensions:
+		mLua["Window"] = mLua.create_table();
+		mLua["Window"]["get_dimensions"] = [&]() -> glm::vec2 {
+			return rWindow->get_dimensions();
+		};
 
 		// Mouse:
 		{
@@ -209,6 +218,8 @@ namespace tur
 			return find_component(*entity, componentName);
 		};
 
+		sol::usertype<entt::entity> entityHandleType = mLua.new_usertype<entt::entity>("entity_handle");
+
 		// Time:
 		sol::usertype<Time> timeType = mLua.new_usertype<Time>("time", sol::constructors<Time()>());
 		timeType["get_delta_time"] = &Time::get_delta_time;
@@ -327,6 +338,19 @@ namespace tur
 		// camera:
 		{
 			sol::usertype<CameraComponent> cameraType = mLua.new_usertype<CameraComponent>("camera");
+			cameraType["get_world_position"] = [&](CameraComponent& component, const glm::vec3& position) 
+			{
+				auto& camera = component.camera;
+				glm::vec2 dimensions = rWindow->get_dimensions();
+				glm::vec2 inverseDimensions = glm::vec2(1.0f / dimensions.x, 1.0f / dimensions.y);
+
+				float x = 2.0f * position.x * inverseDimensions.x - 1.0f;
+				float y = 2.0f * position.y * inverseDimensions.y - 1.0f;
+
+				glm::mat4 inverted = glm::inverse(camera.projection() * camera.view());
+				glm::vec4 worldPosition = inverted * glm::vec4(x, y, 0.0, 1.0f);
+				return glm::vec2(worldPosition);
+			};
 			cameraType["get_position"] = [&](CameraComponent& component) 
 			{
 				return component.camera.position;

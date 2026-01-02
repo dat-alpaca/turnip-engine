@@ -18,8 +18,8 @@ namespace tur
 	class ScriptHandler
 	{
 	public:
-		void initialize();
-		void initialize_input(Window& window);
+		void initialize(NON_OWNING Window* window);
+		void initialize_input();
 		void initialize_physics(NON_OWNING PhysicsHandler* physicsHandler);
 		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
 
@@ -36,6 +36,7 @@ namespace tur
 
 	private:
 		NON_OWNING AudioHandler* rAudioHandler = nullptr;
+		NON_OWNING Window* rWindow = nullptr;
 		sol::state mLua;
 	};
 }

@@ -8,6 +8,8 @@ local player = {
     _direction = vec2(0.0, 0.0)
 }
 
+camera = nil
+
 function player:new(object)
     object = object or {}
     setmetatable(object, self)
@@ -21,14 +23,17 @@ function player:on_wake()
     self.body2d_c = self.find_component("body2d") 
 
     self.body2d_c:set_type(Physics.BodyType.DYNAMIC)
+
+    camera = self.get_entity(4):find_component("camera")
 end
 
 function player:on_update(time)
     local mouse_pos = Input.get_mouse_position()
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
-        self.transform_c.position.x = mouse_pos.x / _G["pixel_per_meter"]
-        self.transform_c.position.y = mouse_pos.y / _G["pixel_per_meter"]
-        
+        local world_position = camera:get_world_position(vec3(mouse_pos.x, mouse_pos.y, 1))
+        self.transform_c.position.x = world_position.x
+        self.transform_c.position.y = world_position.y
+
         local zero = vec2(0, 0)
         self.body2d_c:set_linear_velocity(zero)
     end

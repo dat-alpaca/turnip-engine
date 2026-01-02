@@ -97,8 +97,8 @@ namespace tur
 		mRenderInterface.initialize(mConfigData, *mWindow);
 
 		// Script:
-		mScriptHandler.initialize();
-		mScriptHandler.initialize_input(*mWindow);
+		mScriptHandler.initialize(mWindow.get());
+		mScriptHandler.initialize_input();
 		mScriptHandler.initialize_audio(&mAudioHandler);
 
 		// Worker Pool:

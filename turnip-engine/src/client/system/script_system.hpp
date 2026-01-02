@@ -5,6 +5,7 @@
 #include <string_view>
 
 #include "client/system/camera_system.hpp"
+#include "entt/entity/fwd.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/components.hpp"
 #include "physics/physics_components.hpp"
@@ -132,6 +133,11 @@ namespace tur
 
 			instance["add_entity"] = [&]() { return rScene->add_entity(); };
 			
+			instance["get_entity"] = [&](entt::entity entity)
+			{
+				return Entity{static_cast<entt::entity>(entity), rScene};
+			};
+
 			// Aliases:
 			instance["add_component"] = [&, entity](const std::string& componentName)
 			{ 
