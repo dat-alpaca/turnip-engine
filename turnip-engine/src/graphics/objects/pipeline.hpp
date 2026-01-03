@@ -7,7 +7,7 @@
 #include "graphics/types/pipeline_stage.hpp"
 #include "graphics/types/pipeline_type.hpp"
 
-#include "graphics/types/extent.hpp"
+#include "utils/extent.hpp"
 #include "graphics/types/viewport.hpp"
 
 #include "graphics/objects/shader.hpp"

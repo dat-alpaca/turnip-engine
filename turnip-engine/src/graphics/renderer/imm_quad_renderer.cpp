@@ -31,6 +31,9 @@ namespace tur
 		// Update Quads:
 		for (auto& quad : mQuads)
 		{
+			if(!quad.drawQuad)
+				continue;
+			
 			UBO uboData;
 			{
 				uboData.model = quad.transform.transform();

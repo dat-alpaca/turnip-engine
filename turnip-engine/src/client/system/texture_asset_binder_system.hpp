@@ -1,19 +1,16 @@
 #pragma once
 #include "assets/asset.hpp"
-#include "event/asset_events/asset_loaded_event.hpp"
+#include "client/system/system.hpp"
 #include "event/events.hpp"
-#include "graphics/components.hpp"
-#include "logging/logging.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 
 namespace tur
 {
-	class TextureAssetBinderSystem
+	class TextureAssetBinderSystem : public System
 	{
 	public:
 		void initialize(NON_OWNING Scene* scene) { set_scene(scene); }
-		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
 		void on_event(Event& event)
@@ -64,8 +61,5 @@ namespace tur
 					tilemap.textureHandle = textureUploaded.textureHandle;
 			}
 		}
-
-	private:
-		NON_OWNING Scene* rScene = nullptr;
 	};
 }

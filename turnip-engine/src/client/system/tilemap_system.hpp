@@ -1,4 +1,5 @@
 #pragma once
+#include "client/system/system.hpp"
 #include "graphics/components.hpp"
 #include "graphics/renderer/tilemap_renderer.hpp"
 #include "rhi/rhi.hpp"
@@ -8,7 +9,7 @@
 
 namespace tur
 {
-	class TilemapSystem
+	class TilemapSystem : public System
 	{
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
@@ -17,8 +18,9 @@ namespace tur
 			mTilemapRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mTilemapRenderer.set_camera(camera);
 			set_scene(scene);
+
+			setup_registry_events();
 		}
-		void set_scene(Scene* scene) { rScene = scene; }
 		void set_camera(Camera* camera) { mTilemapRenderer.set_camera(camera); }
     
     public:
@@ -40,9 +42,12 @@ namespace tur
 
 		void on_update(const Time& time)
 		{
-			auto view = rScene->get_registry().view<Tilemap2DComponent>();
-			for (auto [e, tilemap] : view.each())
+			auto view = rScene->get_registry().view<Tilemap2DComponent, const CullingComponent>();
+			for (auto [e, tilemap, culling] : view.each())
 			{
+				if(!culling.visible)
+					continue;
+
 				std::vector<Tile> flattenMap;
 
 				// TODO: camera culling
@@ -58,11 +63,24 @@ namespace tur
 			}
 		}
 
+	private:
+		void setup_registry_events()
+		{
+			auto& registry = rScene->get_registry();
+			registry.on_construct<Tilemap2DComponent>().connect<&TilemapSystem::on_tilemap_component_added>(this);
+		}
+
+		void on_tilemap_component_added(entt::registry& registry, entt::entity entity)
+		{
+			Entity sceneEntity { entity, rScene };
+			sceneEntity.add_component<CullingComponent>();
+			sceneEntity.add_component<TransformComponent>();
+		}
+
 	public:
 		TilemapRenderer& renderer() { return mTilemapRenderer; }
 
 	private:
-		NON_OWNING Scene* rScene = nullptr;
 		TilemapRenderer mTilemapRenderer;
 	};
 }

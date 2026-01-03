@@ -3,6 +3,8 @@
 #include <glm/glm.hpp>
 #include <nlohmann/json.hpp>
 
+#define NLOHMANN_MARK_AS_NON_SERIALIZABLE(placeholder)
+
 namespace glm
 {
 	void to_json(nlohmann::json& json, const glm::vec<2, u8, glm::defaultp>& vector);

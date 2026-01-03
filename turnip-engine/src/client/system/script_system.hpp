@@ -1,24 +1,17 @@
 #pragma once
-#include <sol/forward.hpp>
-#include <sol/overload.hpp>
-#include <sol/types.hpp>
-#include <string_view>
-
-#include "client/system/camera_system.hpp"
+#include "client/system/system.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
-#include "graphics/components.hpp"
-#include "physics/physics_components.hpp"
-#include "scene/common_components.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "script/script_handler.hpp"
 
+#include "utils/script_utils.hpp"
 #include "utils/time/time.hpp"
 
 namespace tur
 {
-	class ScriptSystem
+	class ScriptSystem : public System
 	{
 	public:
 		void initialize(NON_OWNING Scene* scene, NON_OWNING ScriptHandler* scriptHandler)
@@ -26,7 +19,6 @@ namespace tur
 			rScriptHandler = scriptHandler;
 			set_scene(scene);
 		}
-		void set_scene(Scene* scene) { rScene = scene; }
 
 	public:
 		void wake_up()
@@ -76,15 +68,6 @@ namespace tur
 				
 				call_expected_function(script.instance, "on_post_update", time);
 			}
-		}
-
-		sol::function get_function(sol::table& instance, std::string_view functionName)
-		{
-			auto function = instance[functionName];
-			if (!function.valid() || function.get_type() != sol::type::function)
-				return {};
-
-			return function;
 		}
 
 	public:
@@ -156,25 +139,6 @@ namespace tur
 			};
 		}
 
-		template<typename... Args>
-		void call_expected_function(sol::table& instance, std::string_view functionName, Args&&... args)
-		{
-			auto function = instance[functionName];
-
-			if (!function.valid() || function.get_type() != sol::type::function)
-				TUR_LOG_ERROR("Failed to call function: {}", functionName);
-
-			function(instance, args...);
-		}
-
-		bool has_function(sol::table& instance, std::string_view functionName)
-		{
-			if(instance == sol::nil)
-				return false;
-
-			return instance[functionName].valid();
-		}
-
 	private:
 		void on_resize_event(float width, float height)
 		{
@@ -187,11 +151,7 @@ namespace tur
 			}
 		}
 		
-	public:
-		Scene* get_scene() const { return rScene; }
-
 	private:
 		NON_OWNING ScriptHandler* rScriptHandler = nullptr;
-		NON_OWNING Scene* rScene = nullptr;
 	};
 }

@@ -33,6 +33,8 @@ namespace tur
     
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Camera, position, target);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraComponent, mainCamera, camera);
+    
+    NLOHMANN_MARK_AS_NON_SERIALIZABLE(CullingComponent);
 
     class JsonOutputArchive
     {

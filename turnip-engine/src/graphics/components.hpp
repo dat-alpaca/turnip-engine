@@ -27,6 +27,15 @@ namespace tur
 		Camera camera;
 	};
 
+	struct CullingComponent
+	{
+	public:
+		CullingComponent() = default;
+		
+	public:
+		bool visible = false;
+	};
+
 	struct Sprite2DComponent
 	{
 	public:

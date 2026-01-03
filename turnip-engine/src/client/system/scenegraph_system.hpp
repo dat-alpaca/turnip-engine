@@ -1,13 +1,14 @@
 #pragma once
 #include "scene/scene.hpp"
+#include "scene/components.hpp"
+#include "client/system/system.hpp"
 
 namespace tur
 {
-	class ScenegraphSystem
+	class ScenegraphSystem : public System
 	{
 	public:
 		void initialize(NON_OWNING Scene* scene) { set_scene(scene); }
-		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
 		void on_update()
@@ -29,8 +30,5 @@ namespace tur
 					transform.worldTransform = transform.transform;
 			}
 		}
-
-	private:
-		NON_OWNING Scene* rScene = nullptr;
 	};
 }

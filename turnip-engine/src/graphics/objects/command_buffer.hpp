@@ -5,7 +5,7 @@
 #include "graphics/objects/render_target.hpp"
 
 #include "graphics/types/clear_color.hpp"
-#include "graphics/types/extent.hpp"
+#include "utils/extent.hpp"
 #include "graphics/types/viewport.hpp"
 
 namespace tur
