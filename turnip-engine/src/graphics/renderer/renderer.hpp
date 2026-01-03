@@ -3,7 +3,7 @@
 #include "graphics/objects/render_target.hpp"
 #include "rhi/rhi.hpp"
 #include "graphics/types/viewport.hpp"
-#include "graphics/types/extent.hpp"
+#include "utils/extent.hpp"
 
 namespace tur
 {    

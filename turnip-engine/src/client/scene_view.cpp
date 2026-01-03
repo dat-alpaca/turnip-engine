@@ -66,15 +66,15 @@ namespace tur
 	}
 	void SceneView::on_update(const Time& time)
 	{
-		cameraSystem.on_update();
-		quadSystem.set_camera(cameraSystem.get_main_camera());
-		tilemapSystem.set_camera(cameraSystem.get_main_camera());
-
 		quadSystem.on_update();
 		tilemapSystem.on_update(time);
 
 		scriptSystem.on_update(time);
 		scenegraphSystem.on_update();
+
+		cameraSystem.on_update();
+		quadSystem.set_camera(cameraSystem.get_main_camera());
+		tilemapSystem.set_camera(cameraSystem.get_main_camera());
 	}
 	void SceneView::on_post_update(const Time& time)
 	{

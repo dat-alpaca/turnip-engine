@@ -1,17 +1,15 @@
 #pragma once
+#include "client/system/system.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/renderer/imm_quad_renderer.hpp"
-#include "logging/logging.hpp"
-#include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "utils/color.hpp"
 
 namespace tur
 {
-	// TODO: config renderers
-	class ImmQuadSystem
+	class ImmQuadSystem : public System
 	{
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
@@ -23,7 +21,6 @@ namespace tur
 
 			setup_registry_events();
 		}
-		void set_scene(Scene* scene) { rScene = scene; }
 		void set_camera(Camera* camera) { mQuadRenderer.set_camera(camera); }
 
 	public:
@@ -45,8 +42,8 @@ namespace tur
 
 		void on_update()
 		{
-			auto view = rScene->get_registry().view<TransformComponent, Sprite2DComponent>();
-			for (auto [e, transform, sprite] : view.each())
+			auto view = rScene->get_registry().view<TransformComponent, Sprite2DComponent, const CullingComponent>();
+			for (auto [e, transform, sprite, culling] : view.each())
 			{
 				if (mHandleCache.find(e) == mHandleCache.end())
 				{
@@ -57,6 +54,8 @@ namespace tur
 				auto& quad = mQuadRenderer.get_quad(mHandleCache[e]);
 				quad.transform = transform.worldTransform;
 				quad.textureHandle = sprite.textureHandle;
+
+				quad.drawQuad = culling.visible;
 			}
 		}
 
@@ -77,7 +76,6 @@ namespace tur
 		ImmQuadRenderer& renderer() { return mQuadRenderer; }
 
 	private:
-		NON_OWNING Scene* rScene = nullptr;
 		ImmQuadRenderer mQuadRenderer;
 		std::unordered_map<entt::entity, ImmQuadRenderer::quad_handle> mHandleCache;
 	};

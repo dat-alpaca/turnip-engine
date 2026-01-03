@@ -9,6 +9,7 @@
 #include "event/event.hpp"
 
 #include "scene/scene.hpp"
+#include "utils/script_utils.hpp"
 
 #include "script/script_components.hpp"
 
@@ -62,7 +63,7 @@ namespace tur
             if(A.has_component<ScriptComponent>())
             {
                 auto& instance = A.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_begin");
+                auto function = get_function(instance, "on_contact_begin");
                 if (function.valid())
                     function(instance, B);
             }
@@ -70,7 +71,7 @@ namespace tur
             if(B.has_component<ScriptComponent>())
             {
                 auto& instance = B.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_begin");
+                auto function = get_function(instance, "on_contact_begin");
                 if (function.valid())
                     function(instance, A);
             }
@@ -84,7 +85,7 @@ namespace tur
             if(A.has_component<ScriptComponent>())
             {
                 auto& instance = A.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_end");
+                auto function = get_function(instance, "on_contact_end");
                 if (function.valid())
                     function(instance, B);
             }
@@ -92,7 +93,7 @@ namespace tur
             if(B.has_component<ScriptComponent>())
             {
                 auto& instance = B.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_end");
+                auto function = get_function(instance, "on_contact_end");
                 if (function.valid())
                     function(instance, A);
             }
@@ -106,7 +107,7 @@ namespace tur
             if(A.has_component<ScriptComponent>())
             {
                 auto& instance = A.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_hit");
+                auto function = get_function(instance, "on_contact_hit");
                 if(function.valid())
                     function(instance, B, approachSpeed);
             }
@@ -114,7 +115,7 @@ namespace tur
             if(B.has_component<ScriptComponent>())
             {
                 auto& instance = B.get_component<ScriptComponent>().instance;
-                auto function = rScriptSystem->get_function(instance, "on_contact_hit");
+                auto function = get_function(instance, "on_contact_hit");
                 if(function.valid())
                     function(instance, A, approachSpeed);
             }

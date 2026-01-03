@@ -2,6 +2,7 @@
 #include "box2d/box2d.h"
 #include "box2d/id.h"
 #include "box2d/types.h"
+#include "client/system/system.hpp"
 #include "entt/entity/fwd.hpp"
 
 #include "event/physics_events/contact_event.hpp"
@@ -33,7 +34,7 @@ namespace tur
 
 namespace tur
 {
-	class PhysicsSystem : public IEventEmitter
+	class PhysicsSystem : public IEventEmitter, public System
 	{
 	public:
 		void initialize(NON_OWNING Scene* scene, NON_OWNING PhysicsHandler* physicsHandler)
@@ -42,7 +43,6 @@ namespace tur
 			set_scene(scene);
 			setup_registry_events();
 		}
-		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
 	public:
 		void on_fixed_update()
@@ -182,12 +182,8 @@ namespace tur
 			mShapeMap[rectCollider.shapeID] = entity;
 		}
 
-	public:
-		Scene* get_scene() const { return rScene; }
-
 	private:
 		NON_OWNING PhysicsHandler* rPhysicsHandler = nullptr;
-		NON_OWNING Scene* rScene = nullptr;
 
 	private:
 		std::unordered_map<b2ShapeId, entt::entity, ShapeIdHash> mShapeMap;

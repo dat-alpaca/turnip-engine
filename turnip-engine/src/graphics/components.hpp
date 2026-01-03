@@ -33,7 +33,7 @@ namespace tur
 		CullingComponent() = default;
 		
 	public:
-		bool culled = false;
+		bool visible = false;
 	};
 
 	struct Sprite2DComponent

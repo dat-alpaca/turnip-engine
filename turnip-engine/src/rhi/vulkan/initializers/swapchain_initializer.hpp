@@ -1,7 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
-#include "graphics/types/extent.hpp"
+#include "utils/extent.hpp"
 #include "rhi/vulkan/vulkan_state.hpp"
 
 namespace tur::vulkan

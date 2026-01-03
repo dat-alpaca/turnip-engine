@@ -34,6 +34,8 @@ namespace tur
 			descriptor_set_handle setHandle = invalid_handle;
 			texture_handle textureHandle = invalid_handle;
 			buffer_handle uboHandle = invalid_handle;
+
+			bool drawQuad = true;
 		};
 
 	public:
