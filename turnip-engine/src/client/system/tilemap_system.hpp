@@ -17,6 +17,8 @@ namespace tur
 			mTilemapRenderer.set_clear_color({}, ClearFlags::COLOR);
 			mTilemapRenderer.set_camera(camera);
 			set_scene(scene);
+
+			setup_registry_events();
 		}
 		void set_scene(Scene* scene) { rScene = scene; }
 		void set_camera(Camera* camera) { mTilemapRenderer.set_camera(camera); }
@@ -56,6 +58,19 @@ namespace tur
 				mTilemapRenderer.set_tile_data(flattenMap);
 				mTilemapRenderer.set_accumulated_time(time.get_accumulated_milliseconds());
 			}
+		}
+
+	private:
+		void setup_registry_events()
+		{
+			auto& registry = rScene->get_registry();
+			registry.on_construct<Tilemap2DComponent>().connect<&TilemapSystem::on_tilemap_component_added>(this);
+		}
+
+		void on_tilemap_component_added(entt::registry& registry, entt::entity entity)
+		{
+			Entity sceneEntity { entity, rScene };
+			sceneEntity.add_component<CullingComponent>();
 		}
 
 	public:

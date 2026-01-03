@@ -1,6 +1,8 @@
 #pragma once
 #include "event/window_events/window_framebuffer_event.hpp"
+#include "graphics/components.hpp"
 #include "graphics/renderer/imm_quad_renderer.hpp"
+#include "logging/logging.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -18,10 +20,13 @@ namespace tur
 			mQuadRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
 			mQuadRenderer.set_camera(camera);
 			set_scene(scene);
+
+			setup_registry_events();
 		}
 		void set_scene(Scene* scene) { rScene = scene; }
 		void set_camera(Camera* camera) { mQuadRenderer.set_camera(camera); }
 
+	public:
 		void render() { mQuadRenderer.render(); }
 
 		void on_event(Event& event)
@@ -53,6 +58,19 @@ namespace tur
 				quad.transform = transform.worldTransform;
 				quad.textureHandle = sprite.textureHandle;
 			}
+		}
+
+	private:
+		void setup_registry_events()
+		{
+			auto& registry = rScene->get_registry();
+			registry.on_construct<Sprite2DComponent>().connect<&ImmQuadSystem::on_imm_component_added>(this);
+		}
+
+		void on_imm_component_added(entt::registry& registry, entt::entity entity)
+		{
+			Entity sceneEntity { entity, rScene };
+			sceneEntity.add_component<CullingComponent>();
 		}
 
 	public:
