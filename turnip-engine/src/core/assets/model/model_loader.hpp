@@ -3,6 +3,7 @@
 #include <optional>
 #include <tiny_gltf.h>
 #include "logging/logging.hpp"
+#include "model/model.hpp"
 
 namespace tur 
 {
@@ -39,4 +40,11 @@ namespace tur
         return model;
     }
     
+    inline std::vector<std::string> extract_model_textures_task(const tinygltf::Model& model)
+    {
+        MaterialInfo materialInfo = extract_texture_data(model);
+
+        // TODO: get other textures
+        return { materialInfo.albedoFilepath };
+    }
 }

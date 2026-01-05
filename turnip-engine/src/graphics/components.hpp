@@ -92,6 +92,7 @@ namespace tur
 	public:
 		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
 		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;
+		FIELD_SET_INTERNALLY texture_handle albedo = invalid_handle;
 		FIELD_SET_INTERNALLY u64 indexCount = 0;
 	};
 }

@@ -53,6 +53,8 @@ namespace tur
 				model.setHandle = resources.create_descriptor_set(setLayout);
 			}
 
+			resources.write_texture_to_set(model.setHandle, rRHI->DefaultTextureHandle, 1);
+
 			resources.update_buffer(model.ubo, &ubo, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(model.setHandle, model.ubo, {.size = sizeof(UBO)}, 0);
 		}
@@ -68,7 +70,7 @@ namespace tur
 					continue;
 
                 commandBuffer.bind_pipeline(pipeline);
-                commandBuffer.bind_index_buffer(data.ebo, BufferIndexType::UNSIGNED_BYTE);
+                commandBuffer.bind_index_buffer(data.ebo, BufferIndexType::UNSIGNED_SHORT);
                 commandBuffer.bind_vertex_buffer(data.vbo, 0);
 
                 commandBuffer.bind_descriptor_set(data.setHandle);
@@ -95,13 +97,13 @@ namespace tur
 			  	.amount = 1,
 			  	.type = DescriptorType::UNIFORM_BUFFER,
 			  	.stage = PipelineStage::VERTEX_STAGE
+			},
+			{
+				.binding = 1,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
 			}
-			// {
-			// 	.binding = 1,
-			//   	.amount = 1,
-			//   	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
-			//   	.stage = PipelineStage::FRAGMENT_STAGE
-			// }
 		});
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
 	}

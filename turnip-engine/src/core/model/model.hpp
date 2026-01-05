@@ -1,95 +1,150 @@
 #pragma once
+#include <string>
 #include <tiny_gltf.h>
 #include <vector>
-#include "core/defines.hpp"
+#include <glm/glm.hpp>
+#include "common.hpp"
+
+namespace
+{
+    inline tur::u64 get_component_size(int componentType)
+    {
+        switch (componentType) {
+            case TINYGLTF_COMPONENT_TYPE_BYTE:
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+                return 1;
+
+            case TINYGLTF_COMPONENT_TYPE_SHORT:
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+                return 2;
+
+            case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            case TINYGLTF_COMPONENT_TYPE_FLOAT:
+                return 4;
+
+            default:
+                TUR_LOG_CRITICAL("Invalid tinygltf component type");
+        }
+    }
+
+    inline tur::u64 get_component_count(int type)
+    {
+        if(type == TINYGLTF_TYPE_VEC2)
+            return 2;
+
+        if(type == TINYGLTF_TYPE_VEC3)
+            return 3;
+
+        if(type == TINYGLTF_TYPE_VEC4)
+            return 4;
+
+        if(type == TINYGLTF_TYPE_SCALAR)
+            return 1;
+
+        TUR_LOG_CRITICAL("Unsupported tinygltf type");
+        return 1;
+    }
+}
 
 namespace tur
 {
-    struct ModelData
+    struct MeshData
     {
-        std::vector<unsigned char> vertices;
-        std::vector<unsigned char> indices;
+        std::vector<byte> vertices;
+        std::vector<byte> indices;
     };
 
-    inline ModelData extract_model_data(const tinygltf::Model& model)
+    inline MeshData extract_mesh_data(const tinygltf::Model& model)
     {
-        ModelData modelData;
+        using namespace tinygltf;
+        MeshData modelData;
 
-        for (const auto& mesh : model.meshes)
+        const auto& mesh = model.meshes.front();
+
+        auto get_data = [](const Model& model, const Primitive& primitive, int attributeIndex) -> std::vector<byte> {
+            const auto& accessor = model.accessors[attributeIndex];
+            const auto& bufferView = model.bufferViews[accessor.bufferView];
+            const auto& buffer  = model.buffers[bufferView.buffer];
+
+            u64 componentSize = get_component_size(accessor.componentType); // sizeof(float) for VEC3f
+            u64 componentCount = get_component_count(accessor.type); // 3 for VEC3f
+
+            size_t elementSize = componentSize * componentCount;
+            size_t stride = bufferView.byteStride ? bufferView.byteStride : elementSize;
+
+            std::vector<byte> result(accessor.count * elementSize);
+            const byte* data = buffer.data.data() + bufferView.byteOffset + accessor.byteOffset;
+
+            for (size_t i = 0; i < accessor.count; ++i)
+                std::memcpy(result.data() + i * elementSize, data + i * stride, elementSize);
+
+            return result;
+        };
+
+        for (const auto& primitive : mesh.primitives)
         {
-            for (const auto& primitive : mesh.primitives)
+            // Indices:
+            auto indicesData = get_data(model, primitive, primitive.indices);
+
+            // Data:
+            auto positionData = get_data(model, primitive, primitive.attributes.at("POSITION"));
+            auto normalData = get_data(model, primitive, primitive.attributes.at("NORMAL"));
+            auto uvData = get_data(model, primitive, primitive.attributes.at("TEXCOORD_0"));
+
+            // Interleaving:
+            u64 vertexCount = model.accessors[primitive.attributes.at("POSITION")].count;
+            u64 stride = 8 * sizeof(float);
+            
+            std::vector<byte> vertices(stride * vertexCount);
+            byte* destination = vertices.data();
+
+            for (size_t i = 0; i < vertexCount; ++i)
             {
-                int positionAccessorIndex = primitive.attributes.at("POSITION");
-                int normalAccessorIndex = primitive.attributes.at("NORMAL");
-                int uvAccessorIndex  = primitive.attributes.at("TEXCOORD_0");
-                int indicesAccessorIndex = primitive.indices;
+                std::memcpy(destination, positionData.data() + i * sizeof(glm::vec3), sizeof(glm::vec3)); 
+                destination += sizeof(glm::vec3);
 
-                const auto& positionAccessor = model.accessors[positionAccessorIndex];
-                const auto& normalAccessor = model.accessors[normalAccessorIndex];
-                const auto& uvAccessor  = model.accessors[uvAccessorIndex];
-                const auto& indicesAccessor = model.accessors[indicesAccessorIndex];
+                std::memcpy(destination, normalData.data() + i * sizeof(glm::vec3), sizeof(glm::vec3)); 
+                destination += sizeof(glm::vec3);
 
-                const auto& positionBufferView = model.bufferViews[positionAccessor.bufferView];
-                const auto& normalBufferView = model.bufferViews[normalAccessor.bufferView];
-                const auto& uvBufferView  = model.bufferViews[uvAccessor.bufferView];
-                const auto& indicesBufferView = model.bufferViews[indicesAccessor.bufferView];
-
-                const unsigned char* positionData =
-                    model.buffers[positionBufferView.buffer].data.data() +
-                    positionBufferView.byteOffset + positionAccessor.byteOffset;
-
-                const unsigned char* normalData =
-                    model.buffers[normalBufferView.buffer].data.data() +
-                    normalBufferView.byteOffset + normalAccessor.byteOffset;
-
-                const unsigned char* uvData =
-                    model.buffers[uvBufferView.buffer].data.data() +
-                    uvBufferView.byteOffset + uvAccessor.byteOffset;
-
-                const unsigned char* indicesData =
-                    model.buffers[indicesBufferView.buffer].data.data() +
-                    indicesBufferView.byteOffset + indicesAccessor.byteOffset;
-
-                auto readIndex = [&](u32 index) -> u32
-                {
-                    if (indicesAccessor.componentType == TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT)
-                        return reinterpret_cast<const u16*>(indicesData)[index];
-
-                    return reinterpret_cast<const u32*>(indicesData)[index];
-                };
-
-                u32 indexCount = indicesAccessor.count;
-                u32 vertexStride = sizeof(glm::vec3) + sizeof(glm::vec3) + sizeof(glm::vec2);
-
-                modelData.vertices.reserve(modelData.vertices.size() + indexCount * vertexStride);
-                modelData.indices.reserve(modelData.indices.size() + indexCount);
-
-                u32 baseIndex = static_cast<u32>(modelData.indices.size());
-
-                for (u32 i = 0; i < indexCount; ++i)
-                {
-                    u32 idx = readIndex(i);
-
-                    modelData.vertices.insert(
-                        modelData.vertices.end(),
-                        positionData + idx * sizeof(glm::vec3),
-                        positionData + (idx + 1) * sizeof(glm::vec3));
-
-                    modelData.vertices.insert(
-                        modelData.vertices.end(),
-                        normalData + idx * sizeof(glm::vec3),
-                        normalData + (idx + 1) * sizeof(glm::vec3));
-
-                    modelData.vertices.insert(
-                        modelData.vertices.end(),
-                        uvData + idx * sizeof(glm::vec2),
-                        uvData + (idx + 1) * sizeof(glm::vec2));
-
-                    modelData.indices.push_back(baseIndex + i);
-                }
+                std::memcpy(destination, uvData.data() + i * sizeof(glm::vec2), sizeof(glm::vec2)); 
+                destination += sizeof(glm::vec2);
             }
+
+            modelData.vertices = vertices;
+            modelData.indices = indicesData;
         }
 
         return modelData;
+    }
+
+    struct MaterialInfo
+    {
+        std::string albedoFilepath;
+        int magFilter, minFilter, wrapS, wrapT;
+    };
+
+    inline MaterialInfo extract_texture_data(const tinygltf::Model& model)
+    {
+        MaterialInfo materialInfo;
+
+        const auto& mesh = model.meshes.front();
+
+        for (const auto& primitive : mesh.primitives)
+        {
+            const auto& material = model.materials[primitive.material];
+            
+            auto albedoTextureIndex = material.pbrMetallicRoughness.baseColorTexture.index;
+            int albedoSourceIndex = model.textures[albedoTextureIndex].source;
+            auto albedoTextureFilepath = model.images[albedoSourceIndex].uri;
+            materialInfo.albedoFilepath = albedoTextureFilepath; 
+            
+            int albedoSamplerIndex = model.textures[albedoTextureIndex].sampler;
+            materialInfo.magFilter = model.samplers[albedoSamplerIndex].magFilter;
+            materialInfo.minFilter =model.samplers[albedoSamplerIndex].minFilter;
+            materialInfo.wrapS =model.samplers[albedoSamplerIndex].wrapS;
+            materialInfo.wrapT =model.samplers[albedoSamplerIndex].wrapT;
+        }
+
+        return materialInfo;
     }
 }

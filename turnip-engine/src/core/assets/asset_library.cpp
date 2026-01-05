@@ -1,11 +1,13 @@
 #include "asset_library.hpp"
 #include <miniaudio.h>
+#include <optional>
 #include <stb_image.h>
 
 #include "assets/model/model_asset.hpp"
 #include "graphics/constants.hpp"
 #include "assets/asset.hpp"
 
+#include "graphics/objects/texture.hpp"
 #include "logging/logging.hpp"
 #include "texture/texture_loader.hpp"
 #include "model/model_loader.hpp"
@@ -116,6 +118,11 @@ namespace tur
 		return assetHandle;
 	}
 
+	struct InternalData
+	{
+		tinygltf::Model model;
+	};
+
 	asset_handle AssetLibrary::load_model_async(const std::filesystem::path& filepath)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
@@ -126,18 +133,26 @@ namespace tur
 		loadingAsset.metadata.uuid = UUID();
 		loadingAsset.state = AssetState::LOADING;
 
+		auto parentPath = filepath.parent_path();
+
 		asset_handle assetHandle = mModelAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
 
-		rWorkerPool->submit<std::optional<tinygltf::Model>>([filepath]() {
-			return load_model_task(filepath);
+		rWorkerPool->submit<std::optional<InternalData>>([&, filepath, parentPath]() -> std::optional<InternalData> {
+			auto model = load_model_task(filepath);
+			if(!model.has_value())
+				return std::nullopt;
+
+			InternalData data;
+			data.model = model.value();
+			return data;
 		},
-		[&, assetHandle](const std::optional<tinygltf::Model>& model) {
-			if (!model.has_value())
+		[&, assetHandle](const std::optional<InternalData>& data) {
+			if (!data.has_value())
 				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
 
 			ModelAsset& loadedModelAsset = mModelAssets.get(assetHandle);
-			loadedModelAsset.model = model.value();
+			loadedModelAsset.model = data.value().model;
 			loadedModelAsset.state = AssetState::READY;
 
 			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MODEL);

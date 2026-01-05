@@ -1,5 +1,6 @@
 #pragma once
 #include "assets/model/model_asset.hpp"
+#include "assets/texture/texture_options.hpp"
 #include "defines.hpp"
 #include "event/asset_events/model_uploaded_event.hpp"
 #include "graphics/components.hpp"
@@ -147,7 +148,8 @@ namespace tur
 			auto& resources = rRHI->get_resource_handler();
 			const ModelAsset& modelAsset = rLibrary->get_model_asset(assetHandle);
 
-			ModelData modelData = extract_model_data(modelAsset.model);
+			// TODO: move to asset library
+			MeshData modelData = extract_mesh_data(modelAsset.model);
 			
 			// VBO:
 			BufferDescriptor bufferDescriptor;

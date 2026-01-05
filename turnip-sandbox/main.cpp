@@ -29,7 +29,8 @@ private:
 		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
 
-		modelHandle = library.load_model_async("project/models/crate/wooden crate.gltf");
+		modelHandle = library.load_model_async("project/models/beretta_m9/beretta.gltf");
+		//modelHandle = library.load_model_async("project/models/crate/wooden crate.gltf");
 	}
 
 	void initialize_entities()
