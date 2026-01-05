@@ -118,11 +118,6 @@ namespace tur
 		return assetHandle;
 	}
 
-	struct InternalData
-	{
-		tinygltf::Model model;
-	};
-
 	asset_handle AssetLibrary::load_model_async(const std::filesystem::path& filepath)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
@@ -138,21 +133,24 @@ namespace tur
 		asset_handle assetHandle = mModelAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
 
-		rWorkerPool->submit<std::optional<InternalData>>([&, filepath, parentPath]() -> std::optional<InternalData> {
+		rWorkerPool->submit<std::optional<ModelAsset>>([&, filepath, parentPath]() -> std::optional<ModelAsset> {
 			auto model = load_model_task(filepath);
 			if(!model.has_value())
 				return std::nullopt;
 
-			InternalData data;
-			data.model = model.value();
-			return data;
+			ModelAsset asset;
+			asset.model = model.value();
+			asset.meshData = extract_mesh_data(model.value());
+
+			return asset;
 		},
-		[&, assetHandle](const std::optional<InternalData>& data) {
-			if (!data.has_value())
+		[&, assetHandle](const std::optional<ModelAsset>& asset) {
+			if (!asset.has_value())
 				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
 
 			ModelAsset& loadedModelAsset = mModelAssets.get(assetHandle);
-			loadedModelAsset.model = data.value().model;
+			loadedModelAsset.model = asset.value().model;
+			loadedModelAsset.meshData = asset.value().meshData;
 			loadedModelAsset.state = AssetState::READY;
 
 			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MODEL);

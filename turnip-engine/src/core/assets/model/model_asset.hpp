@@ -1,6 +1,7 @@
 #pragma once
-#include "assets/asset.hpp"
 #include <tiny_gltf.h>
+#include "model/model.hpp"
+#include "assets/asset.hpp"
 
 namespace tur
 {
@@ -11,5 +12,7 @@ namespace tur
 
 	public:
 		tinygltf::Model model;
+		MeshData meshData; // todo: one per mesh
+		// TODO: material data
 	};
 }

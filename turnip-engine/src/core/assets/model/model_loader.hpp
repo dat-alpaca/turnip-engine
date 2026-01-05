@@ -2,8 +2,7 @@
 #include <filesystem>
 #include <optional>
 #include <tiny_gltf.h>
-#include "logging/logging.hpp"
-#include "model/model.hpp"
+#include "assets/model/model_asset.hpp"
 
 namespace tur 
 {
@@ -36,7 +35,7 @@ namespace tur
             TUR_LOG_ERROR("Failed to parse: {}", filepath.string());   
             return std::nullopt;
         }
-
+        
         return model;
     }
     

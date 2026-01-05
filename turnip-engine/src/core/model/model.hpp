@@ -53,7 +53,10 @@ namespace tur
         std::vector<byte> vertices;
         std::vector<byte> indices;
     };
+}
 
+namespace tur
+{
     inline MeshData extract_mesh_data(const tinygltf::Model& model)
     {
         using namespace tinygltf;

@@ -147,27 +147,24 @@ namespace tur
 		{
 			auto& resources = rRHI->get_resource_handler();
 			const ModelAsset& modelAsset = rLibrary->get_model_asset(assetHandle);
-
-			// TODO: move to asset library
-			MeshData modelData = extract_mesh_data(modelAsset.model);
 			
 			// VBO:
 			BufferDescriptor bufferDescriptor;
 			bufferDescriptor.type = BufferType::VERTEX_BUFFER;
 			
 			buffer_handle vbo = resources.create_buffer(
-				bufferDescriptor, modelData.vertices.data(), 
-				{ .size = modelData.vertices.size() }
+				bufferDescriptor, modelAsset.meshData.vertices.data(), 
+				{ .size = modelAsset.meshData.vertices.size() }
 			);
 
 			// EBO:
 			bufferDescriptor.type = BufferType::INDEX_BUFFER;
 			buffer_handle ebo = resources.create_buffer(
-				bufferDescriptor, modelData.indices.data(), 
-				{ .size = modelData.indices.size() }
+				bufferDescriptor, modelAsset.meshData.indices.data(), 
+				{ .size = modelAsset.meshData.indices.size() }
 			);
 
-			return { vbo, ebo, modelData.indices.size() }; 
+			return { vbo, ebo, modelAsset.meshData.indices.size() };
 		}
 
 	private:
