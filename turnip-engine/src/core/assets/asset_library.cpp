@@ -2,10 +2,15 @@
 #include <miniaudio.h>
 #include <stb_image.h>
 
+#include "assets/model/model_asset.hpp"
 #include "graphics/constants.hpp"
 #include "assets/asset.hpp"
-#include "audio/audio_asset.hpp"
+
+#include "logging/logging.hpp"
 #include "texture/texture_loader.hpp"
+#include "model/model_loader.hpp"
+#include "audio/audio_loader.hpp"
+#include "utils/uuid/uuid.hpp"
 
 namespace tur
 {
@@ -36,8 +41,10 @@ namespace tur
 			return mFilepathCache[filepath];
 
 		TextureAsset loadingAsset = {};
-		loadingAsset.state = AssetState::LOADING;
 		loadingAsset.options = options;
+		loadingAsset.metadata.uuid = UUID();
+		loadingAsset.metadata.filepath = filepath;
+		loadingAsset.state = AssetState::LOADING;
 
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
@@ -46,9 +53,9 @@ namespace tur
 			[filepath, options]()
 			{
 				if (!options.floatTexture)
-					return load_texture_task(filepath, options);
+					return load_texture_task(filepath);
 				else
-					return load_float_texture_task(filepath, options);
+					return load_float_texture_task(filepath);
 			},
 			[&, filepath, assetHandle](const texture_asset_opt& textureAsset)
 			{
@@ -56,8 +63,13 @@ namespace tur
 					return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
 
 				TextureAsset& loadedTextureAsset = mTextureAssets.get(assetHandle);
-				loadedTextureAsset = textureAsset.value();
-				loadedTextureAsset.state = AssetState::READY;
+				{
+					loadedTextureAsset.data = textureAsset->data;
+					loadedTextureAsset.width = textureAsset->width;
+					loadedTextureAsset.height = textureAsset->height;
+					loadedTextureAsset.channels = textureAsset->channels;
+					loadedTextureAsset.state = AssetState::READY;
+				}
 
 				AssetType type = AssetType::TEXTURE;
 				if(loadedTextureAsset.options.arrayLayers > 1)
@@ -83,15 +95,13 @@ namespace tur
 
 		asset_handle assetHandle = mAudioAssets.add({});
 		AudioAsset& audioAsset = mAudioAssets.get(assetHandle);
+
 		audioAsset.metadata.filepath = filepath;
 		audioAsset.state = AssetState::READY;
 
-		ma_result result = ma_sound_init_from_file(
-			&rAudioHandler->mEngine, filepath.string().c_str(), MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_NO_SPATIALIZATION,
-			nullptr, nullptr, &audioAsset.sound
-		);
+		auto audioResult = load_audio_task(filepath, &audioAsset.sound, rAudioHandler->mEngine);
 
-		if (result != MA_SUCCESS)
+		if (audioResult != MA_SUCCESS)
 		{
 			TUR_LOG_ERROR("Failed to load audio: {}", filepath.string());
 			mAudioAssets.remove(assetHandle);
@@ -102,6 +112,37 @@ namespace tur
 
 		AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::AUDIO);
 		mEventCallback(assetLoadedEvent);
+
+		return assetHandle;
+	}
+
+	asset_handle AssetLibrary::load_model_async(const std::filesystem::path& filepath)
+	{
+		if (mFilepathCache.find(filepath) != mFilepathCache.end())
+			return mFilepathCache[filepath];
+
+		ModelAsset loadingAsset = {};
+		loadingAsset.metadata.filepath = filepath;
+		loadingAsset.metadata.uuid = UUID();
+		loadingAsset.state = AssetState::LOADING;
+
+		asset_handle assetHandle = mModelAssets.add(loadingAsset);
+		mFilepathCache[filepath] = assetHandle;
+
+		rWorkerPool->submit<std::optional<tinygltf::Model>>([filepath]() {
+			return load_model_task(filepath);
+		},
+		[&, assetHandle](const std::optional<tinygltf::Model>& model) {
+			if (!model.has_value())
+				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
+
+			ModelAsset& loadedModelAsset = mModelAssets.get(assetHandle);
+			loadedModelAsset.model = model.value();
+			loadedModelAsset.state = AssetState::READY;
+
+			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MODEL);
+			mEventCallback(assetLoadedEvent);
+		});
 
 		return assetHandle;
 	}

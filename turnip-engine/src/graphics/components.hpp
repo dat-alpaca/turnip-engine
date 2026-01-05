@@ -6,6 +6,9 @@
 #include "graphics/tile.hpp"
 #include "defines.hpp"
 #include "graphics/objects/texture.hpp"
+#include "graphics/objects/buffer.hpp"
+
+#define FIELD_SET_INTERNALLY
 
 namespace tur
 {
@@ -33,7 +36,7 @@ namespace tur
 		CullingComponent() = default;
 		
 	public:
-		bool visible = false;
+		bool visible = true;
 	};
 
 	struct Sprite2DComponent
@@ -71,5 +74,24 @@ namespace tur
 		texture_handle textureHandle = invalid_handle;
 
 		std::filesystem::path filepath;
+	};
+
+	struct MeshComponent
+	{
+	public:
+		MeshComponent() = default;
+		MeshComponent(asset_handle assetHandle)
+			: assetHandle(assetHandle)
+		{
+		}
+
+	public:
+		asset_handle assetHandle = invalid_handle;
+		std::filesystem::path filepath;
+
+	public:
+		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
+		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;
+		FIELD_SET_INTERNALLY u64 indexCount = 0;
 	};
 }

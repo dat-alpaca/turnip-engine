@@ -33,6 +33,7 @@ target_link_libraries(turnip-core PUBLIC
     miniaudio
     box2d::box2d
     box2dinclude
+    tinygltf
 )
 
 # Platform & Graphics specific:

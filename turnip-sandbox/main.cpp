@@ -1,3 +1,6 @@
+#include "assets/asset.hpp"
+#include "graphics/components.hpp"
+#include "scene/common_components.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -25,6 +28,8 @@ private:
 
 		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
+
+		modelHandle = library.load_model_async("project/models/crate/wooden crate.gltf");
 	}
 
 	void initialize_entities()
@@ -33,9 +38,13 @@ private:
 
 		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
 		engine->get_event_callback()(deserializeEvent);
+
+		auto e = get_current_scene().add_entity();
+		e.add_component<MeshComponent>(modelHandle);
 	}
 
 private:
+	asset_handle modelHandle;
 	Project mProject;
 };
 

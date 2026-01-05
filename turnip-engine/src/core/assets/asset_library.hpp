@@ -1,14 +1,13 @@
 #pragma once
-#include "assets/asset.hpp"
-#include "data-structures/free_list.hpp"
 #include "defines.hpp"
 #include "event/events.hpp"
 #include "worker/worker_pool.hpp"
+#include "data-structures/free_list.hpp"
 
+#include "assets/asset.hpp"
 #include "audio/audio_handler.hpp"
-#include "audio/audio_loader.hpp"
-#include "texture/texture_loader.hpp"
 #include "texture/texture_options.hpp"
+#include "assets/model/model_asset.hpp"
 
 #include <filesystem>
 
@@ -29,6 +28,7 @@ namespace tur
 	public:
 		asset_handle load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options = {});
 		asset_handle load_audio_async(const std::filesystem::path& filepath);
+		asset_handle load_model_async(const std::filesystem::path& filepath);
 
 	public:
 		inline asset_handle get_asset_handle(const std::filesystem::path& filepath)
@@ -53,10 +53,18 @@ namespace tur
 
 			return mAudioAssets.get(handle);
 		}
+		inline ModelAsset& get_model_asset(asset_handle handle)
+		{
+			if (handle == invalid_handle)
+				TUR_LOG_CRITICAL("Invalid asset handle passed to get_model_asset()");
+
+			return mModelAssets.get(handle);
+		}
 
 	public:
 		inline free_list<TextureAsset>& get_texture_assets() { return mTextureAssets; };
 		inline free_list<AudioAsset>& get_audio_assets() { return mAudioAssets; }
+		inline free_list<ModelAsset>& get_model_assets() { return mModelAssets; }
 
 	private:
 		NON_OWNING WorkerPool* rWorkerPool = nullptr;
@@ -67,5 +75,6 @@ namespace tur
 		std::unordered_map<std::filesystem::path, asset_handle> mFilepathCache;
 		free_list<TextureAsset> mTextureAssets;
 		free_list<AudioAsset> mAudioAssets;
+		free_list<ModelAsset> mModelAssets;
 	};
 }

@@ -26,6 +26,7 @@ add_subdirectory(extern/box2d)
 add_subdirectory(extern/spdlog)
 add_subdirectory(extern/SPIRV-Cross)
 add_subdirectory(extern/miniaudio)
+add_subdirectory(extern/tinygltf)
 add_compile_definitions(MA_NO_PULSEAUDIO)
 
 add_library(box2dinclude INTERFACE)

@@ -107,7 +107,7 @@ namespace tur::gl
 	{
 		auto& resources = rRHI->get_resource_handler();
 		const Buffer& buffer = resources.get_buffers().get(bufferHandle);
-		glVertexArrayVertexBuffer(mVAO, binding, buffer.handle, 0, sizeof(float) * 5);
+		glVertexArrayVertexBuffer(mVAO, binding, buffer.handle, 0, mCurrentStride);
 	}
 	void CommandBufferGL::bind_index_buffer(buffer_handle bufferHandle, BufferIndexType indexType)
 	{
@@ -131,6 +131,8 @@ namespace tur::gl
 		// Setup vertex input bindings & attributes:
 		for (const auto& binding : mPipeline.vertexInputStage.vertexBindings)
 		{
+			mCurrentStride = binding.stride;
+
 			for (const auto& attribute : mPipeline.vertexInputStage.attributes)
 			{
 				if (attribute.binding != binding.binding)
@@ -144,13 +146,11 @@ namespace tur::gl
 				);
 
 				glVertexArrayAttribBinding(mVAO, attribute.location, binding.binding);
-
-				u32 divisor = binding.inputRate == InputRate::VERTEX ? 0 : 1;
-				glVertexArrayBindingDivisor(mVAO, binding.binding, divisor);
 			}
-		}
 
-		// Setup descriptors:
+			u32 divisor = binding.inputRate == InputRate::VERTEX ? 0 : 1;
+			glVertexArrayBindingDivisor(mVAO, binding.binding, divisor);
+		}
 	}
 	void CommandBufferGL::bind_descriptor_set(descriptor_set_handle setHandle)
 	{

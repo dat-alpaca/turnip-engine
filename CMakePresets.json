@@ -14,8 +14,8 @@
                 "TUR_BUILD_SANDBOX": "ON",
                 "TUR_BUILD_ENGINE": "ON",
                 "TUR_USE_GLFW": "ON",
-                "TUR_USE_VULKAN": "ON",
-                "TUR_USE_OPENGL": "OFF"
+                "TUR_USE_VULKAN": "OFF",
+                "TUR_USE_OPENGL": "ON"
             }
         }
     ],
