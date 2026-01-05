@@ -39,20 +39,18 @@ namespace tur
 		while (true)
 		{
 			task_t task;
+			std::unique_lock<std::mutex> lock(mQueueMutex);
 
-			{
-				std::unique_lock<std::mutex> lock(mQueueMutex);
+			mConditionalVar.wait(lock, [this] { return !mTasks.empty() || mStopExecution; });
 
-				mConditionalVar.wait(lock, [this] { return !mTasks.empty() || mStopExecution; });
+			if (mStopExecution && mTasks.empty())
+				return;
 
-				if (mStopExecution && mTasks.empty())
-					return;
-
-				task = std::move(mTasks.front());
-				mTasks.pop_front();
-			}
+			task = std::move(mTasks.front());
+			mTasks.pop_front();
 
 			task();
+			lock.unlock();
 		}
 	}
 }
