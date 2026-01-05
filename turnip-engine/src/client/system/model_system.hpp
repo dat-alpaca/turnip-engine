@@ -76,10 +76,12 @@ namespace tur
 		void on_mesh_component_added(entt::registry& registry, entt::entity entity)
 		{
 			Entity sceneEntity { entity, rScene };
-			auto& t = sceneEntity.add_component<TransformComponent>();
-			t.transform.position.x = 4.f;
-			t.transform.position.y = 4.f;
-			sceneEntity.add_component<CullingComponent>();
+
+			if(!sceneEntity.has_component<TransformComponent>())
+				sceneEntity.add_component<TransformComponent>();
+			
+			if(!sceneEntity.has_component<CullingComponent>())	
+				sceneEntity.add_component<CullingComponent>();
         }
 
 	public:

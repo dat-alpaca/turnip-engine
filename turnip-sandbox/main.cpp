@@ -42,6 +42,10 @@ private:
 
 		auto e = get_current_scene().add_entity();
 		e.add_component<MeshComponent>(modelHandle);
+		auto& t = e.get_component<TransformComponent>();
+		t.transform.position.x = 4.f;
+		t.transform.position.y = 4.f;	
+		t.transform.rotation.z = 90.f;
 	}
 
 private:
