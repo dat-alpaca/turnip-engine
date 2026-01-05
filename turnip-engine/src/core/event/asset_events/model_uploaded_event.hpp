@@ -1,27 +1,39 @@
 #pragma once
+#include "defines.hpp"
 #include "event/event.hpp"
 #include "assets/asset.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/texture.hpp"
 
 namespace tur
 {
+	struct ModelUploadData
+	{
+		asset_handle modelAssetHandle;
+		
+		buffer_handle vbo;
+		buffer_handle ebo;
+		u64 indexCount;
+
+		glm::vec4 baseColorFactor;
+		texture_handle albedoTexture;
+	};
+
 	struct ModelUploadedEvent : public Event
 	{
 		DEFINE_EVENT(EventType::MODEL_UPLOADED);
 
 	public:
-		ModelUploadedEvent(asset_handle assetHandle, buffer_handle vbo, buffer_handle ebo, u64 indexCount)
-			: assetHandle(assetHandle)
-			, vbo(vbo)
-			, ebo(ebo)
-			, indexCount(indexCount)
+		ModelUploadedEvent(const ModelUploadData& data)
+			: data(data)
 		{
+			TUR_ASSERT(data.modelAssetHandle != invalid_handle, "Invalid model asset handle uploaded");
+			TUR_ASSERT(data.vbo != invalid_handle, "Invalid vertex buffer handle uploaded");
+			TUR_ASSERT(data.ebo != invalid_handle, "Invalid index buffer handle uploaded");
+			TUR_ASSERT(data.indexCount >= 0, "Invalid index count uploaded");
 		}
 
 	public:
-		asset_handle assetHandle;
-		buffer_handle vbo;
-		buffer_handle ebo;
-		u64 indexCount;
+		ModelUploadData data;
 	};
 }

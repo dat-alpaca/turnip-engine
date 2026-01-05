@@ -55,6 +55,8 @@ namespace tur
 					internal.indexCount = model.indexCount;
 					internal.isVisible = culling.visible;
 
+					internal.albedo = model.albedo;
+
 					mModelCache[e] = mRenderer.add_model(internal);
 					continue;
 				}

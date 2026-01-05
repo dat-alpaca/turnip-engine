@@ -40,6 +40,7 @@ namespace tur
 			buffer_handle ubo = invalid_handle;
 
 			descriptor_set_handle setHandle = invalid_handle;
+			texture_handle albedo = invalid_handle;
 			bool isVisible = true;
 		};
     

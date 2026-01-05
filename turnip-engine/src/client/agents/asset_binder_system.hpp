@@ -1,5 +1,6 @@
 #pragma once
 #include "assets/model/model_asset.hpp"
+#include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 #include "defines.hpp"
 #include "event/asset_events/model_uploaded_event.hpp"
@@ -11,7 +12,6 @@
 #include "event_consumer.hpp"
 #include "event_emitter.hpp"
 #include "rhi/rhi.hpp"
-#include "model/model.hpp"
 
 #include "scene/components.hpp"
 #include "assets/asset_library.hpp"
@@ -75,8 +75,8 @@ namespace tur
 
 				case AssetType::MODEL:
 				{
-					auto [vbo, ebo, indexCount] = create_model_from_asset(event.assetHandle);
-					ModelUploadedEvent uploadEvent(event.assetHandle, vbo, ebo, indexCount);
+					auto data = create_model_from_asset(event.assetHandle);
+					ModelUploadedEvent uploadEvent(data);
 					callback(uploadEvent);
 				} break;
 
@@ -110,40 +110,11 @@ namespace tur
 	private:
 		texture_handle create_texture_from_asset(asset_handle assetHandle, bool isArray = false)
 		{
-			auto& resources = rRHI->get_resource_handler();
 			const TextureAsset& textureAsset = rLibrary->get_texture_asset(assetHandle);
-			const TextureOptions& options = textureAsset.options;
-
-			TextureDescriptor descriptor;
-			{
-				descriptor.width = textureAsset.width;
-				descriptor.height = textureAsset.height;
-				descriptor.layerWidth = options.layerWidth;
-				descriptor.layerHeight = options.layerHeight;
-				descriptor.depth = options.depth;
-				descriptor.mipLevels = options.mipLevels;
-				descriptor.samples = options.samples;
-				descriptor.arrayLayers = options.arrayLayers;
-
-				descriptor.format = options.format;
-				descriptor.type = (isArray) ? TextureType::ARRAY_TEXTURE_2D : TextureType::TEXTURE_2D;
-
-				descriptor.generateMipmaps = options.generateMipmaps;
-
-				descriptor.wrapS = options.wrapS;
-				descriptor.wrapT = options.wrapT;
-				descriptor.wrapR = options.wrapR;
-				descriptor.minFilter = options.minFilter;
-				descriptor.magFilter = options.magFilter;
-
-				descriptor.tiling = options.tiling;
-			}
-
-			texture_handle textureHandle = resources.create_texture(descriptor, textureAsset);
-			return textureHandle;
+			return upload_texture_from_asset(textureAsset, isArray);
 		}
 
-		std::tuple<buffer_handle, buffer_handle, u64> create_model_from_asset(asset_handle assetHandle)
+		ModelUploadData create_model_from_asset(asset_handle assetHandle)
 		{
 			auto& resources = rRHI->get_resource_handler();
 			const ModelAsset& modelAsset = rLibrary->get_model_asset(assetHandle);
@@ -164,7 +135,20 @@ namespace tur
 				{ .size = modelAsset.meshData.indices.size() }
 			);
 
-			return { vbo, ebo, modelAsset.meshData.indices.size() };
+			// Create textures:
+			texture_handle albedoTextureHandle = invalid_handle;
+			const auto& albedoTexture = modelAsset.meshMaterial.albedoTexture;
+			if(albedoTexture.width > 0 && albedoTexture.height > 0)
+				albedoTextureHandle = upload_texture_from_asset(modelAsset.meshMaterial.albedoTexture, false);
+
+			return ModelUploadData {
+				.modelAssetHandle = assetHandle,
+				.vbo = vbo,
+				.ebo = ebo,
+				.indexCount = modelAsset.meshData.indices.size(),
+				.baseColorFactor = modelAsset.meshMaterial.baseColorFactor,
+				.albedoTexture = albedoTextureHandle
+			};
 		}
 
 	private:
@@ -193,13 +177,50 @@ namespace tur
 			auto view = rScene->get_registry().view<MeshComponent>();
 			for (auto [e, mesh] : view.each())
 			{
-				if (mesh.assetHandle != modelUploadedEvent.assetHandle)
+				if (mesh.assetHandle != modelUploadedEvent.data.modelAssetHandle)
 					continue;
 				
-				mesh.vbo = modelUploadedEvent.vbo;
-				mesh.ebo = modelUploadedEvent.ebo;
-				mesh.indexCount = modelUploadedEvent.indexCount;
+				mesh.vbo = modelUploadedEvent.data.vbo;
+				mesh.ebo = modelUploadedEvent.data.ebo;
+				mesh.indexCount = modelUploadedEvent.data.indexCount;
+
+				mesh.baseColor = modelUploadedEvent.data.baseColorFactor; 
+				mesh.albedo = modelUploadedEvent.data.albedoTexture; 
 			}
+		}
+
+	private:
+		texture_handle upload_texture_from_asset(const TextureAsset& textureAsset, bool isArray)
+		{
+			const TextureOptions& options = textureAsset.options;
+
+			TextureDescriptor descriptor;
+			{
+				descriptor.width = textureAsset.width;
+				descriptor.height = textureAsset.height;
+				descriptor.layerWidth = options.layerWidth;
+				descriptor.layerHeight = options.layerHeight;
+				descriptor.depth = options.depth;
+				descriptor.mipLevels = options.mipLevels;
+				descriptor.samples = options.samples;
+				descriptor.arrayLayers = options.arrayLayers;
+
+				descriptor.format = options.format;
+				descriptor.type = (isArray) ? TextureType::ARRAY_TEXTURE_2D : TextureType::TEXTURE_2D;
+
+				descriptor.generateMipmaps = options.generateMipmaps;
+
+				descriptor.wrapS = options.wrapS;
+				descriptor.wrapT = options.wrapT;
+				descriptor.wrapR = options.wrapR;
+				descriptor.minFilter = options.minFilter;
+				descriptor.magFilter = options.magFilter;
+
+				descriptor.tiling = options.tiling;
+			}
+
+			auto& resources = rRHI->get_resource_handler();
+			return resources.create_texture(descriptor, textureAsset);
 		}
 
 	private:

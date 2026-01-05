@@ -134,13 +134,14 @@ namespace tur
 		mFilepathCache[filepath] = assetHandle;
 
 		rWorkerPool->submit<std::optional<ModelAsset>>([&, filepath, parentPath]() -> std::optional<ModelAsset> {
-			auto model = load_model_task(filepath);
-			if(!model.has_value())
+			auto modelResult = load_model_task(filepath);
+			if(!modelResult.has_value())
 				return std::nullopt;
 
 			ModelAsset asset;
-			asset.model = model.value();
-			asset.meshData = extract_mesh_data(model.value());
+			asset.model = modelResult.value();
+			asset.meshData = extract_mesh_data(modelResult.value());
+			asset.meshMaterial = extract_texture_data(modelResult.value());
 
 			return asset;
 		},
@@ -150,6 +151,7 @@ namespace tur
 
 			ModelAsset& loadedModelAsset = mModelAssets.get(assetHandle);
 			loadedModelAsset.model = asset.value().model;
+			loadedModelAsset.meshMaterial = asset.value().meshMaterial;
 			loadedModelAsset.meshData = asset.value().meshData;
 			loadedModelAsset.state = AssetState::READY;
 

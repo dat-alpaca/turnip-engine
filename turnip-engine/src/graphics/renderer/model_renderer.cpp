@@ -53,7 +53,10 @@ namespace tur
 				model.setHandle = resources.create_descriptor_set(setLayout);
 			}
 
-			resources.write_texture_to_set(model.setHandle, rRHI->DefaultTextureHandle, 1);
+			if(model.albedo == invalid_handle)
+				resources.write_texture_to_set(model.setHandle, rRHI->DefaultTextureHandle, 1);
+			else
+				resources.write_texture_to_set(model.setHandle, model.albedo, 1);
 
 			resources.update_buffer(model.ubo, &ubo, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(model.setHandle, model.ubo, {.size = sizeof(UBO)}, 0);
