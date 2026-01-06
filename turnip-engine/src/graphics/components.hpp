@@ -3,8 +3,8 @@
 
 #include "assets/asset.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/tile.hpp"
 #include "defines.hpp"
+#include "graphics/objects/tile.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/objects/buffer.hpp"
 
