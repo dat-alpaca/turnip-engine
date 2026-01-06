@@ -35,9 +35,7 @@ namespace tur
 		for(auto& model : mModelCache)
 		{
 			UBO ubo;
-			glm::mat4 i(1.f);
-			i = glm::translate(i, {4, 4, 0});
-			ubo.mvp = vp * i;
+			ubo.mvp = vp * model.transform;
 
 			if(model.ubo == invalid_handle)
 			{

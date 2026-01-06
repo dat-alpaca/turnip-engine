@@ -44,8 +44,11 @@ private:
 		e.add_component<MeshComponent>(modelHandle);
 		auto& t = e.get_component<TransformComponent>();
 		t.transform.position.x = 4.f;
-		t.transform.position.y = 4.f;	
-		t.transform.rotation.z = 90.f;
+		t.transform.position.y = 4.f;
+		t.transform.rotation.y = 90.f;
+		t.transform.scale.x = 3.f;
+		t.transform.scale.y = 3.f;
+		t.transform.scale.z = 3.f;
 	}
 
 private:

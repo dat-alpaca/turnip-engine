@@ -49,19 +49,19 @@ static constexpr tur::FilterMode get_filter_mode(int mode, bool isMinFilter)
 	{
 		switch (mode)
 		{
-            case 0:
+            case TINYGLTF_TEXTURE_FILTER_NEAREST:
 				return FilterMode::NEAREST;
 
-            case 1:
+            case TINYGLTF_TEXTURE_FILTER_LINEAR:
 				return FilterMode::LINEAR;
 
-            case 2:
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_NEAREST:
 				return FilterMode::NEAREST;
 
-            case 3:
+            case TINYGLTF_TEXTURE_FILTER_NEAREST_MIPMAP_LINEAR:
 				return FilterMode::BILINEAR;
 
-			case 4:
+			case TINYGLTF_TEXTURE_FILTER_LINEAR_MIPMAP_LINEAR:
 				return FilterMode::TRILINEAR;
 		}
 	}
@@ -69,10 +69,10 @@ static constexpr tur::FilterMode get_filter_mode(int mode, bool isMinFilter)
 	{
 		switch (mode)
 		{
-			case 0:
+			case TINYGLTF_TEXTURE_FILTER_NEAREST:
 				return FilterMode::NEAREST;
 
-			case 1:
+			case TINYGLTF_TEXTURE_FILTER_LINEAR:
 				return FilterMode::LINEAR;
 		}
 	}
@@ -86,11 +86,11 @@ static constexpr tur::WrapMode get_wrap_mode(int mode)
     using namespace tur;
     switch(mode)
     {
-        case 0:
+        case TINYGLTF_TEXTURE_WRAP_CLAMP_TO_EDGE:
             return WrapMode::CLAMP_TO_EDGE;
-        case 1:
+        case TINYGLTF_TEXTURE_WRAP_MIRRORED_REPEAT:
             return WrapMode::MIRRORED_REPEAT;
-        case 2:
+        case TINYGLTF_TEXTURE_WRAP_REPEAT:
             return WrapMode::REPEAT;
     }
 
