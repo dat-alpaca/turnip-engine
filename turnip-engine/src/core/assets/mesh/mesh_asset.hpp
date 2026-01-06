@@ -17,14 +17,13 @@ namespace tur
 		TextureAsset albedoTexture;
     };
 
-	struct ModelAsset : public Asset
+	struct MeshAsset : public Asset
 	{
 	public:
-		ModelAsset() { metadata.type = AssetType::MODEL; }
+		MeshAsset() { metadata.type = AssetType::MESH; }
 
 	public:
-		tinygltf::Model model; // todo: remove
-		MeshData meshData; // todo: one per mesh
-		MetallicRoughnessMaterialData meshMaterial; // todo: one per mesh
+		MeshData meshData;
+		MetallicRoughnessMaterialData meshMaterial;
 	};
 }

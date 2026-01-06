@@ -3,14 +3,14 @@
 #include <optional>
 #include <stb_image.h>
 
-#include "assets/model/model_asset.hpp"
+#include "assets/mesh/mesh_asset.hpp"
 #include "graphics/constants.hpp"
 #include "assets/asset.hpp"
 
 #include "graphics/objects/texture.hpp"
 #include "logging/logging.hpp"
 #include "texture/texture_loader.hpp"
-#include "model/model_loader.hpp"
+#include "mesh/mesh_loader.hpp"
 #include "audio/audio_loader.hpp"
 #include "utils/uuid/uuid.hpp"
 
@@ -118,44 +118,48 @@ namespace tur
 		return assetHandle;
 	}
 
-	asset_handle AssetLibrary::load_model_async(const std::filesystem::path& filepath)
+	asset_handle AssetLibrary::load_mesh_async(const std::filesystem::path& filepath)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
 			return mFilepathCache[filepath];
 
-		ModelAsset loadingAsset = {};
+		MeshAsset loadingAsset = {};
 		loadingAsset.metadata.filepath = filepath;
 		loadingAsset.metadata.uuid = UUID();
 		loadingAsset.state = AssetState::LOADING;
 
 		auto parentPath = filepath.parent_path();
 
-		asset_handle assetHandle = mModelAssets.add(loadingAsset);
+		asset_handle assetHandle = mMeshAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
 
-		rWorkerPool->submit<std::optional<ModelAsset>>([&, filepath, parentPath]() -> std::optional<ModelAsset> {
+		rWorkerPool->submit<std::optional<MeshAsset>>([&, filepath, parentPath]() -> std::optional<MeshAsset> {
 			auto modelResult = load_model_task(filepath);
 			if(!modelResult.has_value())
 				return std::nullopt;
 
-			ModelAsset asset;
-			asset.model = modelResult.value();
-			asset.meshData = extract_mesh_data(modelResult.value());
-			asset.meshMaterial = extract_texture_data(modelResult.value());
+			auto model = modelResult.value();
+			
+			// TODO: extract mesh data from all meshes
+
+			MeshAsset asset;
+			asset.meshData = extract_mesh_data(model);
+			asset.meshMaterial = extract_texture_data(model);
 
 			return asset;
 		},
-		[&, assetHandle](const std::optional<ModelAsset>& asset) {
+		[&, assetHandle](const std::optional<MeshAsset>& asset) {
 			if (!asset.has_value())
 				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
 
-			ModelAsset& loadedModelAsset = mModelAssets.get(assetHandle);
-			loadedModelAsset.model = asset.value().model;
-			loadedModelAsset.meshMaterial = asset.value().meshMaterial;
-			loadedModelAsset.meshData = asset.value().meshData;
-			loadedModelAsset.state = AssetState::READY;
+			auto mesh = asset.value();
 
-			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MODEL);
+			MeshAsset& loadedMeshAsset = mMeshAssets.get(assetHandle);
+			loadedMeshAsset.meshMaterial = mesh.meshMaterial;
+			loadedMeshAsset.meshData = mesh.meshData;
+			loadedMeshAsset.state = AssetState::READY;
+
+			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MESH);
 			mEventCallback(assetLoadedEvent);
 		});
 

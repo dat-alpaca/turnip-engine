@@ -29,8 +29,8 @@ private:
 		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
 
-		modelHandle = library.load_model_async("project/models/beretta_m9/beretta.gltf");
-		//modelHandle = library.load_model_async("project/models/crate/wooden crate.gltf");
+		meshHandle = library.load_mesh_async("project/models/beretta_m9/beretta.gltf");
+		//meshHandle = library.load_mesh_async("project/models/crate/wooden crate.gltf");
 	}
 
 	void initialize_entities()
@@ -41,7 +41,7 @@ private:
 		engine->get_event_callback()(deserializeEvent);
 
 		auto e = get_current_scene().add_entity();
-		e.add_component<MeshComponent>(modelHandle);
+		e.add_component<MeshComponent>(meshHandle);
 		auto& t = e.get_component<TransformComponent>();
 		t.transform.position.x = 4.f;
 		t.transform.position.y = 4.f;
@@ -52,7 +52,7 @@ private:
 	}
 
 private:
-	asset_handle modelHandle;
+	asset_handle meshHandle;
 	Project mProject;
 };
 

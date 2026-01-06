@@ -15,7 +15,7 @@
 
 namespace tur
 {
-	class ModelRenderer : public Renderer
+	class MeshRenderer : public Renderer
 	{
 	public:
 		struct Vertex
@@ -30,7 +30,7 @@ namespace tur
 			glm::mat4 mvp;
 		};
 
-		struct InternalModel
+		struct InternalMesh
 		{
 			glm::mat4 transform;
 
@@ -51,16 +51,16 @@ namespace tur
 		void render();
 
 	public:
-		handle_type add_model(const InternalModel& data)
+		handle_type add_mesh(const InternalMesh& data)
 		{
-			return mModelCache.add(data);
+			return mMeshCache.add(data);
 		}
 		
-		InternalModel& get_model(handle_type uniqueHandle) { return mModelCache.get(uniqueHandle); }
+		InternalMesh& get_mesh(handle_type uniqueHandle) { return mMeshCache.get(uniqueHandle); }
 
-		void remove_model(handle_type uniqueHandle)
+		void remove_mesh(handle_type uniqueHandle)
 		{
-			mModelCache.remove(uniqueHandle);
+			mMeshCache.remove(uniqueHandle);
 		}
 	
 	private:
@@ -77,6 +77,6 @@ namespace tur
 		pipeline_handle pipeline;
 
 	private:
-		free_list<InternalModel> mModelCache;
+		free_list<InternalMesh> mMeshCache;
 	};
 }

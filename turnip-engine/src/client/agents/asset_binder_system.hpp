@@ -1,9 +1,9 @@
 #pragma once
-#include "assets/model/model_asset.hpp"
+#include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 #include "defines.hpp"
-#include "event/asset_events/model_uploaded_event.hpp"
+#include "event/asset_events/mesh_uploaded_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/texture.hpp"
@@ -48,10 +48,10 @@ namespace tur
 				}
 			);
 
-			subscriber.subscribe<ModelUploadedEvent>(
-				[&](const ModelUploadedEvent& modelUploadedEvent) -> bool
+			subscriber.subscribe<MeshUploadedEvent>(
+				[&](const MeshUploadedEvent& meshUploadedEvent) -> bool
 				{
-					handle_model_uploaded_event(modelUploadedEvent);
+					handle_mesh_uploaded_event(meshUploadedEvent);
 					return false;
 				}
 			);
@@ -73,10 +73,10 @@ namespace tur
 					
 				} break;
 
-				case AssetType::MODEL:
+				case AssetType::MESH:
 				{
-					auto data = create_model_from_asset(event.assetHandle);
-					ModelUploadedEvent uploadEvent(data);
+					auto data = create_mesh_from_asset(event.assetHandle);
+					MeshUploadedEvent uploadEvent(data);
 					callback(uploadEvent);
 				} break;
 
@@ -102,9 +102,9 @@ namespace tur
 			}
 		}
 
-		void handle_model_uploaded_event(const ModelUploadedEvent& modelUploadedEvent)
+		void handle_mesh_uploaded_event(const MeshUploadedEvent& meshUploadedEvent)
 		{
-			update_model_handles(modelUploadedEvent);
+			update_mesh_handles(meshUploadedEvent);
 		}
 
 	private:
@@ -114,44 +114,44 @@ namespace tur
 			return upload_texture_from_asset(textureAsset, isArray);
 		}
 
-		ModelUploadData create_model_from_asset(asset_handle assetHandle)
+		MeshUploadData create_mesh_from_asset(asset_handle assetHandle)
 		{
 			auto& resources = rRHI->get_resource_handler();
-			const ModelAsset& modelAsset = rLibrary->get_model_asset(assetHandle);
+			const MeshAsset& meshAsset = rLibrary->get_mesh_asset(assetHandle);
 			
 			// VBO:
 			BufferDescriptor bufferDescriptor;
 			bufferDescriptor.type = BufferType::VERTEX_BUFFER;
 			
 			buffer_handle vbo = resources.create_buffer(
-				bufferDescriptor, modelAsset.meshData.vertices.data(), 
-				{ .size = modelAsset.meshData.vertices.size() }
+				bufferDescriptor, meshAsset.meshData.vertices.data(), 
+				{ .size = meshAsset.meshData.vertices.size() }
 			);
 
 			// EBO:
 			bufferDescriptor.type = BufferType::INDEX_BUFFER;
 			buffer_handle ebo = resources.create_buffer(
-				bufferDescriptor, modelAsset.meshData.indices.data(), 
-				{ .size = modelAsset.meshData.indices.size() }
+				bufferDescriptor, meshAsset.meshData.indices.data(), 
+				{ .size = meshAsset.meshData.indices.size() }
 			);
 
 			// Create textures:
 			texture_handle albedoTextureHandle = invalid_handle;
-			const auto& albedoTexture = modelAsset.meshMaterial.albedoTexture;
+			const auto& albedoTexture = meshAsset.meshMaterial.albedoTexture;
 			if(albedoTexture.width > 0 && albedoTexture.height > 0)
-				albedoTextureHandle = upload_texture_from_asset(modelAsset.meshMaterial.albedoTexture, false);
+				albedoTextureHandle = upload_texture_from_asset(meshAsset.meshMaterial.albedoTexture, false);
 
 			MetallicRoughnessMaterial material;
 			{
 				material.albedo = albedoTextureHandle;
-				material.baseColor = modelAsset.meshMaterial.baseColorFactor;
+				material.baseColor = meshAsset.meshMaterial.baseColorFactor;
 			}
 
-			return ModelUploadData {
-				.modelAssetHandle = assetHandle,
+			return MeshUploadData {
+				.meshAssetHandle = assetHandle,
 				.vbo = vbo,
 				.ebo = ebo,
-				.indexCount = modelAsset.meshData.indices.size(),
+				.indexCount = meshAsset.meshData.indices.size(),
 				.material = material
 			};
 		}
@@ -177,20 +177,20 @@ namespace tur
 			}
 		}
 
-		void update_model_handles(const ModelUploadedEvent& modelUploadedEvent)
+		void update_mesh_handles(const MeshUploadedEvent& meshUploadedEvent)
 		{
 			auto view = rScene->get_registry().view<MeshComponent>();
 			for (auto [e, mesh] : view.each())
 			{
-				if (mesh.assetHandle != modelUploadedEvent.data.modelAssetHandle)
+				if (mesh.assetHandle != meshUploadedEvent.data.meshAssetHandle)
 					continue;
 				
-				mesh.vbo = modelUploadedEvent.data.vbo;
-				mesh.ebo = modelUploadedEvent.data.ebo;
-				mesh.indexCount = modelUploadedEvent.data.indexCount;
+				mesh.vbo = meshUploadedEvent.data.vbo;
+				mesh.ebo = meshUploadedEvent.data.ebo;
+				mesh.indexCount = meshUploadedEvent.data.indexCount;
 
-				mesh.baseColor = modelUploadedEvent.data.material.baseColor; 
-				mesh.albedo = modelUploadedEvent.data.material.albedo; 
+				mesh.baseColor = meshUploadedEvent.data.material.baseColor; 
+				mesh.albedo = meshUploadedEvent.data.material.albedo; 
 			}
 		}
 

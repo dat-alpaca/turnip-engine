@@ -11,7 +11,7 @@
 #include "system/tilemap_system.hpp"
 #include "system/scene_signal_system.hpp"
 #include "system/camera_system.hpp"
-#include "system/model_system.hpp"
+#include "system/mesh_system.hpp"
 
 #include "agents/physics_script_agent.hpp"
 #include "agents/asset_binder_system.hpp"
@@ -62,7 +62,7 @@ namespace tur
 
 		ImmQuadSystem quadSystem;
 		TilemapSystem tilemapSystem;
-		ModelSystem mModelSystem;
+		MeshSystem mMeshSystem;
 
 	private:
 		PhysicsScriptAgent mPhysicsScriptAgent;

@@ -1,12 +1,10 @@
-#include "model_renderer.hpp"
 #include "defines.hpp"
-#include "glm/ext/matrix_transform.hpp"
+#include "mesh_renderer.hpp"
 #include "graphics/objects/buffer.hpp"
-#include <cstddef>
 
 namespace tur
 {
-	void ModelRenderer::initialize(NON_OWNING RenderInterface* rhi)
+	void MeshRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
@@ -14,16 +12,16 @@ namespace tur
 		rRHI = rhi;
 		initialize_resources();
 	}
-	void ModelRenderer::set_camera(NON_OWNING Camera* camera)
+	void MeshRenderer::set_camera(NON_OWNING Camera* camera)
 	{
 		rCamera = camera;
 	}
-	void ModelRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
+	void MeshRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
 	{
 		commandBuffer.set_clear_color(color, flags);
 	}
 
-	void ModelRenderer::render()
+	void MeshRenderer::render()
 	{
 		auto& rhi = *rRHI;
 		auto& resources = rhi.get_resource_handler();
@@ -32,32 +30,32 @@ namespace tur
 			return;
 
 		glm::mat4 vp = rCamera->projection() * rCamera->view();
-		for(auto& model : mModelCache)
+		for(auto& mesh : mMeshCache)
 		{
 			UBO ubo;
-			ubo.mvp = vp * model.transform;
+			ubo.mvp = vp * mesh.transform;
 
-			if(model.ubo == invalid_handle)
+			if(mesh.ubo == invalid_handle)
 			{
 				BufferDescriptor descriptor;
 				descriptor.type = BufferType::UNIFORM_BUFFER | BufferType::TRANSFER_DST;
 				descriptor.usage = BufferUsage::COHERENT | BufferUsage::PERSISTENT;
 
-				model.ubo = resources.create_empty_buffer(descriptor, sizeof(UBO));
+				mesh.ubo = resources.create_empty_buffer(descriptor, sizeof(UBO));
 			}
 
-			if(model.setHandle == invalid_handle)
+			if(mesh.setHandle == invalid_handle)
 			{
-				model.setHandle = resources.create_descriptor_set(setLayout);
+				mesh.setHandle = resources.create_descriptor_set(setLayout);
 			}
 
-			if(model.albedo == invalid_handle)
-				resources.write_texture_to_set(model.setHandle, rRHI->DefaultTextureHandle, 1);
+			if(mesh.albedo == invalid_handle)
+				resources.write_texture_to_set(mesh.setHandle, rRHI->DefaultTextureHandle, 1);
 			else
-				resources.write_texture_to_set(model.setHandle, model.albedo, 1);
+				resources.write_texture_to_set(mesh.setHandle, mesh.albedo, 1);
 
-			resources.update_buffer(model.ubo, &ubo, {.size = sizeof(UBO)});
-			resources.write_uniform_buffer_to_set(model.setHandle, model.ubo, {.size = sizeof(UBO)}, 0);
+			resources.update_buffer(mesh.ubo, &ubo, {.size = sizeof(UBO)});
+			resources.write_uniform_buffer_to_set(mesh.setHandle, mesh.ubo, {.size = sizeof(UBO)}, 0);
 		}
 
 		commandBuffer.begin(renderTarget);
@@ -65,7 +63,7 @@ namespace tur
 			commandBuffer.set_viewport(viewport);
 			commandBuffer.set_scissor(scissor);
 
-            for(const auto& data : mModelCache.available())
+            for(const auto& data : mMeshCache.available())
             {
 				if(data.vbo == invalid_handle || data.ebo == invalid_handle)	
 					continue;
@@ -81,12 +79,12 @@ namespace tur
 		commandBuffer.end();
 	}
 
-	void ModelRenderer::initialize_resources()
+	void MeshRenderer::initialize_resources()
 	{
 		initialize_descriptors();
 		initialize_pipeline();
 	}
-	void ModelRenderer::initialize_descriptors()
+	void MeshRenderer::initialize_descriptors()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
@@ -108,15 +106,15 @@ namespace tur
 		});
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
 	}
-	void ModelRenderer::initialize_pipeline()
+	void MeshRenderer::initialize_pipeline()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
 		// Shaders:
 		shader_handle vertexShader =
-			resources.create_shader({"res/shaders/model/model_vert.spv", ShaderType::VERTEX});
+			resources.create_shader({"res/shaders/mesh/mesh_vert.spv", ShaderType::VERTEX});
 		shader_handle fragmentShader =
-			resources.create_shader({"res/shaders/model/model_frag.spv", ShaderType::FRAGMENT});
+			resources.create_shader({"res/shaders/mesh/mesh_frag.spv", ShaderType::FRAGMENT});
 		
 		auto VertexBindings = std::vector<BindingDescriptor>
 		({

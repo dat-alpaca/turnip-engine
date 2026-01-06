@@ -1,4 +1,4 @@
-#include "model_loader.hpp"
+#include "mesh_loader.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "common.hpp"
 #include "graphics/objects/texture.hpp"
@@ -77,7 +77,7 @@ static constexpr tur::FilterMode get_filter_mode(int mode, bool isMinFilter)
 		}
 	}
 
-	TUR_LOG_ERROR("Invalid Model Texture Filter Mode: {}. Default: NEAREST", mode);
+	TUR_LOG_ERROR("Invalid GLTF Texture Filter Mode: {}. Default: NEAREST", mode);
 	return FilterMode::NEAREST;
 }
 
@@ -94,7 +94,7 @@ static constexpr tur::WrapMode get_wrap_mode(int mode)
             return WrapMode::REPEAT;
     }
 
-	TUR_LOG_ERROR("Invalid Model Texture Wrap Mode: {}. Default: REPEAT", mode);
+	TUR_LOG_ERROR("Invalid GLTF Texture Wrap Mode: {}. Default: REPEAT", mode);
     return WrapMode::REPEAT;
 }
 
@@ -136,7 +136,7 @@ namespace tur
     MeshData extract_mesh_data(const tinygltf::Model& model)
     {
         using namespace tinygltf;
-        MeshData modelData;
+        MeshData meshData;
 
         const auto& mesh = model.meshes.front();
 
@@ -189,11 +189,11 @@ namespace tur
                 destination += sizeof(glm::vec2);
             }
 
-            modelData.vertices = vertices;
-            modelData.indices = indicesData;
+            meshData.vertices = vertices;
+            meshData.indices = indicesData;
         }
 
-        return modelData;
+        return meshData;
     }
 
     MetallicRoughnessMaterialData extract_texture_data(const tinygltf::Model& model)

@@ -7,9 +7,9 @@
 
 namespace tur
 {
-	struct ModelUploadData
+	struct MeshUploadData
 	{
-		asset_handle modelAssetHandle;
+		asset_handle meshAssetHandle;
 		
 		buffer_handle vbo;
 		buffer_handle ebo;
@@ -18,21 +18,21 @@ namespace tur
 		MetallicRoughnessMaterial material;
 	};
 
-	struct ModelUploadedEvent : public Event
+	struct MeshUploadedEvent : public Event
 	{
-		DEFINE_EVENT(EventType::MODEL_UPLOADED);
+		DEFINE_EVENT(EventType::MESH_UPLOADED);
 
 	public:
-		ModelUploadedEvent(const ModelUploadData& data)
+		MeshUploadedEvent(const MeshUploadData& data)
 			: data(data)
 		{
-			TUR_ASSERT(data.modelAssetHandle != invalid_handle, "Invalid model asset handle uploaded");
+			TUR_ASSERT(data.meshAssetHandle != invalid_handle, "Invalid mesh asset handle uploaded");
 			TUR_ASSERT(data.vbo != invalid_handle, "Invalid vertex buffer handle uploaded");
 			TUR_ASSERT(data.ebo != invalid_handle, "Invalid index buffer handle uploaded");
 			TUR_ASSERT(data.indexCount >= 0, "Invalid index count uploaded");
 		}
 
 	public:
-		ModelUploadData data;
+		MeshUploadData data;
 	};
 }

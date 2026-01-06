@@ -68,14 +68,14 @@ namespace tur
 	{
 		quadSystem.on_update();
 		tilemapSystem.on_update(time);
-		mModelSystem.on_update();
+		mMeshSystem.on_update();
 
 		scriptSystem.on_update(time);
 		scenegraphSystem.on_update();
 
 		cameraSystem.on_update();
 		quadSystem.set_camera(cameraSystem.get_main_camera());
-		mModelSystem.set_camera(cameraSystem.get_main_camera());
+		mMeshSystem.set_camera(cameraSystem.get_main_camera());
 		tilemapSystem.set_camera(cameraSystem.get_main_camera());
 	}
 	void SceneView::on_post_update(const Time& time)
@@ -95,7 +95,7 @@ namespace tur
 
 			tilemapSystem.render();
 			quadSystem.render();
-			mModelSystem.render();
+			mMeshSystem.render();
 
 			std::vector<CommandBuffer::BufferType> commandBuffers;
 			{
@@ -109,7 +109,7 @@ namespace tur
 					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_buffer());
 
 				commandBuffers.push_back(
-					mModelSystem.renderer().get_command_buffer().get_buffer()
+					mMeshSystem.renderer().get_command_buffer().get_buffer()
 				);
 			}
 
@@ -130,7 +130,7 @@ namespace tur
 
 				quadSystem.set_scene(viewSwitch.currentScene);
 				tilemapSystem.set_scene(viewSwitch.currentScene);
-				mModelSystem.set_scene(viewSwitch.currentScene);
+				mMeshSystem.set_scene(viewSwitch.currentScene);
 
 				mAssetBinderSystem.set_scene(viewSwitch.currentScene);
 				physicsSystem.set_scene(viewSwitch.currentScene);
@@ -145,7 +145,7 @@ namespace tur
 		mAssetBinderSystem.on_event(event);
 		quadSystem.on_event(event);
 		tilemapSystem.on_event(event);
-		mModelSystem.on_event(event);
+		mMeshSystem.on_event(event);
 		scriptSystem.on_event(event);
 	}
 
@@ -160,8 +160,8 @@ namespace tur
 		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
 		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 
-		// Model:
-		mModelSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
-		mModelSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+		// Mesh:
+		mMeshSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
+		mMeshSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	}
 }

@@ -2,7 +2,7 @@
 #include <filesystem>
 #include <optional>
 #include <tiny_gltf.h>
-#include "assets/model/model_asset.hpp"
+#include "assets/mesh/mesh_asset.hpp"
 
 namespace tur 
 {
