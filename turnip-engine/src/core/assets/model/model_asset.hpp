@@ -11,7 +11,7 @@ namespace tur
         std::vector<byte> indices;
     };
 
-	struct MetallicRoughnessMaterial
+	struct MetallicRoughnessMaterialData
     {
 		glm::vec4 baseColorFactor;
 		TextureAsset albedoTexture;
@@ -25,6 +25,6 @@ namespace tur
 	public:
 		tinygltf::Model model; // todo: remove
 		MeshData meshData; // todo: one per mesh
-		MetallicRoughnessMaterial meshMaterial; // todo: one per mesh
+		MetallicRoughnessMaterialData meshMaterial; // todo: one per mesh
 	};
 }

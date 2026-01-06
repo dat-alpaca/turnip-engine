@@ -3,7 +3,7 @@
 #include "event/event.hpp"
 #include "assets/asset.hpp"
 #include "graphics/objects/buffer.hpp"
-#include "graphics/objects/texture.hpp"
+#include "graphics/objects/material.hpp"
 
 namespace tur
 {
@@ -15,8 +15,7 @@ namespace tur
 		buffer_handle ebo;
 		u64 indexCount;
 
-		glm::vec4 baseColorFactor;
-		texture_handle albedoTexture;
+		MetallicRoughnessMaterial material;
 	};
 
 	struct ModelUploadedEvent : public Event

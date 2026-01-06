@@ -196,9 +196,9 @@ namespace tur
         return modelData;
     }
 
-    MetallicRoughnessMaterial extract_texture_data(const tinygltf::Model& model)
+    MetallicRoughnessMaterialData extract_texture_data(const tinygltf::Model& model)
     {
-        MetallicRoughnessMaterial materialInfo;
+        MetallicRoughnessMaterialData materialInfo;
 
         const auto& mesh = model.meshes.front();
 

@@ -141,13 +141,18 @@ namespace tur
 			if(albedoTexture.width > 0 && albedoTexture.height > 0)
 				albedoTextureHandle = upload_texture_from_asset(modelAsset.meshMaterial.albedoTexture, false);
 
+			MetallicRoughnessMaterial material;
+			{
+				material.albedo = albedoTextureHandle;
+				material.baseColor = modelAsset.meshMaterial.baseColorFactor;
+			}
+
 			return ModelUploadData {
 				.modelAssetHandle = assetHandle,
 				.vbo = vbo,
 				.ebo = ebo,
 				.indexCount = modelAsset.meshData.indices.size(),
-				.baseColorFactor = modelAsset.meshMaterial.baseColorFactor,
-				.albedoTexture = albedoTextureHandle
+				.material = material
 			};
 		}
 
@@ -184,8 +189,8 @@ namespace tur
 				mesh.ebo = modelUploadedEvent.data.ebo;
 				mesh.indexCount = modelUploadedEvent.data.indexCount;
 
-				mesh.baseColor = modelUploadedEvent.data.baseColorFactor; 
-				mesh.albedo = modelUploadedEvent.data.albedoTexture; 
+				mesh.baseColor = modelUploadedEvent.data.material.baseColor; 
+				mesh.albedo = modelUploadedEvent.data.material.albedo; 
 			}
 		}
 
