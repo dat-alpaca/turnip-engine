@@ -8,6 +8,15 @@
             }
         }
     ],
+    "meshes": [
+        {
+            "metadata": {
+                "filepath": "models/beretta_m9/beretta.gltf",
+                "type": 4,
+                "uuid": 48292462292334848465
+            }
+        }
+    ],
     "textures": [
         {
             "channels": 4,

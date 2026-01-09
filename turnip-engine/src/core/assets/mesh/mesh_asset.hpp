@@ -15,6 +15,9 @@ namespace tur
     {
 		glm::vec4 baseColorFactor;
 		TextureAsset albedoTexture;
+		TextureAsset normalTexture;
+		TextureAsset metallicTexture;
+		TextureAsset roughnessTexture;
     };
 
 	struct MeshAsset : public Asset

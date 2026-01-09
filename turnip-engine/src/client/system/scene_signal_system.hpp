@@ -30,6 +30,7 @@ namespace tur
                     handle_textures(deserializedEvent.scene, deserializedEvent.project);
                     handle_audio(deserializedEvent.scene, deserializedEvent.project);
                     handle_script(deserializedEvent.scene, deserializedEvent.project);
+                    handle_meshes(deserializedEvent.scene, deserializedEvent.project);
                     return false;
 				}
 			);
@@ -87,6 +88,21 @@ namespace tur
                     continue;
 
                 script.filepath = project.get_project_filepath(script.filepath);
+            }
+        }
+
+        void handle_meshes(NON_OWNING Scene* scene, const Project& project)
+        {
+            TUR_ASS(rLibrary);
+            TUR_ASS(scene);
+
+            auto view = scene->get_registry().view<MeshComponent>();
+            for (auto [e, mesh] : view.each())
+            {
+                if(mesh.assetHandle != invalid_handle)
+                    continue;
+
+                mesh.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(mesh.filepath));
             }
         }
 

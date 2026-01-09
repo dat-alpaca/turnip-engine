@@ -55,7 +55,7 @@ namespace tur
 					internal.indexCount = mesh.indexCount;
 					internal.isVisible = culling.visible;
 
-					internal.albedo = mesh.albedo;
+					internal.material = mesh.material;
 
 					mMeshCache[e] = mRenderer.add_mesh(internal);
 					continue;

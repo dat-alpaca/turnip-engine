@@ -1,7 +1,7 @@
 #include "mesh_loader.hpp"
 #include "assets/texture/texture_asset.hpp"
-#include "common.hpp"
 #include "graphics/objects/texture.hpp"
+#include "common.hpp"
 
 static tur::u64 get_component_size(int componentType)
 {
@@ -17,7 +17,11 @@ static tur::u64 get_component_size(int componentType)
 
         case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
         case TINYGLTF_COMPONENT_TYPE_FLOAT:
+        case TINYGLTF_COMPONENT_TYPE_INT:
             return 4;
+
+        case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+            return 8;
 
         default:
             TUR_LOG_CRITICAL("Invalid tinygltf component type");
@@ -198,9 +202,32 @@ namespace tur
 
     MetallicRoughnessMaterialData extract_texture_data(const tinygltf::Model& model)
     {
+        using namespace tinygltf;
         MetallicRoughnessMaterialData materialInfo;
 
         const auto& mesh = model.meshes.front();
+
+        auto get_texture_asset = [](const Model& model, int index) -> TextureAsset {
+            if(index < 0)
+                return {};
+
+            const auto& texture = model.textures[index];
+            const auto& image   = model.images[texture.source];
+            const auto& sampler = model.samplers[texture.sampler];
+
+            TextureAsset asset;
+            {
+                asset.data = image.image;
+                asset.width = image.width;
+                asset.height = image.height;
+                asset.options.minFilter = get_filter_mode(sampler.minFilter, true);
+                asset.options.magFilter = get_filter_mode(sampler.magFilter, false);
+                asset.options.wrapS = get_wrap_mode(sampler.wrapS);
+                asset.options.wrapT = get_wrap_mode(sampler.wrapT);
+            }
+
+            return asset;
+        };
 
         for (const auto& primitive : mesh.primitives)
         {
@@ -219,29 +246,11 @@ namespace tur
                 };
             }
 
-            // Albedo:
-            int baseColorTextureIndex = pbr.baseColorTexture.index;
-            if(baseColorTextureIndex >= 0)
-            {
-                const auto& texture = model.textures[baseColorTextureIndex];
-                const auto& image   = model.images[texture.source];
-                const auto& sampler = model.samplers[texture.sampler];
-
-                TextureAsset asset;
-                {
-                    asset.data = image.image;
-                    asset.width = image.width;
-                    asset.height = image.height;
-
-                    asset.options.minFilter = get_filter_mode(sampler.minFilter, true);
-                    asset.options.magFilter = get_filter_mode(sampler.magFilter, false);
-
-                    asset.options.wrapS = get_wrap_mode(sampler.wrapS);
-                    asset.options.wrapT = get_wrap_mode(sampler.wrapT);
-                }
-
-                materialInfo.albedoTexture = asset;
-            }
+            // Textures:
+            materialInfo.albedoTexture = get_texture_asset(model, pbr.baseColorTexture.index);
+            materialInfo.normalTexture = get_texture_asset(model, material.normalTexture.index);
+            materialInfo.roughnessTexture = get_texture_asset(model, material.pbrMetallicRoughness.metallicRoughnessTexture.index);
+            materialInfo.metallicTexture = get_texture_asset(model, material.pbrMetallicRoughness.metallicFactor);
         }
 
         return materialInfo;

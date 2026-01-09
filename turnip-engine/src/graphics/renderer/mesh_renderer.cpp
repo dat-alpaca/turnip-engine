@@ -1,6 +1,9 @@
 #include "defines.hpp"
 #include "mesh_renderer.hpp"
+#include "glm/matrix.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/material.hpp"
 
 namespace tur
 {
@@ -33,7 +36,13 @@ namespace tur
 		for(auto& mesh : mMeshCache)
 		{
 			UBO ubo;
-			ubo.mvp = vp * mesh.transform;
+			{
+				ubo.model = mesh.transform;
+				ubo.view = rCamera->view();
+				ubo.projection = rCamera->projection();
+				ubo.cameraPosition = rCamera->position;
+				ubo.inverseTranspose = glm::inverse(glm::transpose(ubo.model));
+			}
 
 			if(mesh.ubo == invalid_handle)
 			{
@@ -45,14 +54,9 @@ namespace tur
 			}
 
 			if(mesh.setHandle == invalid_handle)
-			{
 				mesh.setHandle = resources.create_descriptor_set(setLayout);
-			}
 
-			if(mesh.albedo == invalid_handle)
-				resources.write_texture_to_set(mesh.setHandle, rRHI->DefaultTextureHandle, 1);
-			else
-				resources.write_texture_to_set(mesh.setHandle, mesh.albedo, 1);
+			write_material(mesh.setHandle, mesh.material);
 
 			resources.update_buffer(mesh.ubo, &ubo, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(mesh.setHandle, mesh.ubo, {.size = sizeof(UBO)}, 0);
@@ -99,6 +103,24 @@ namespace tur
 			},
 			{
 				.binding = 1,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
+			},
+			{
+				.binding = 2,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
+			},
+			{
+				.binding = 3,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
+			},
+			{
+				.binding = 4,
 			  	.amount = 1,
 			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
 			  	.stage = PipelineStage::FRAGMENT_STAGE
@@ -181,5 +203,36 @@ namespace tur
 		};
 
 		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
+	}
+
+	void MeshRenderer::write_material(descriptor_set_handle setHandle, const MetallicRoughnessMaterial& material)
+	{
+		auto& resources = rRHI->get_resource_handler();
+
+		// TODO: use a blank texture rather than the default one.
+
+		// Albedo:
+		if(material.albedo == invalid_handle)
+			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 1);
+		else
+			resources.write_texture_to_set(setHandle, material.albedo, 1);
+
+		// Normal:
+		if(material.normal == invalid_handle)
+			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 2);
+		else
+			resources.write_texture_to_set(setHandle, material.normal, 2);
+
+		// Metallic:
+		if(material.metallic == invalid_handle)
+			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 3);
+		else
+			resources.write_texture_to_set(setHandle, material.metallic, 3);
+
+		// Roughness:
+		if(material.roughness == invalid_handle)
+			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 4);
+		else
+			resources.write_texture_to_set(setHandle, material.roughness, 4);
 	}
 }

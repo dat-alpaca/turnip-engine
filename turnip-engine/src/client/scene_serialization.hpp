@@ -34,6 +34,8 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Camera, position, target);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraComponent, mainCamera, camera);
     
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MeshComponent, filepath);
+    
     NLOHMANN_MARK_AS_NON_SERIALIZABLE(CullingComponent);
 
     class JsonOutputArchive
@@ -147,6 +149,7 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
+            .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)
@@ -168,6 +171,7 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
+            .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)

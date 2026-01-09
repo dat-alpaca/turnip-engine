@@ -1,6 +1,7 @@
 #pragma once
 #include "defines.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/material.hpp"
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/camera.hpp"
@@ -27,7 +28,11 @@ namespace tur
 
 		struct UBO
 		{
-			glm::mat4 mvp;
+			glm::mat4 model;
+			glm::mat4 view;
+			glm::mat4 projection;
+			glm::mat3 inverseTranspose;
+			glm::vec3 cameraPosition;
 		};
 
 		struct InternalMesh
@@ -40,7 +45,7 @@ namespace tur
 			buffer_handle ubo = invalid_handle;
 
 			descriptor_set_handle setHandle = invalid_handle;
-			texture_handle albedo = invalid_handle;
+			MetallicRoughnessMaterial material;
 			bool isVisible = true;
 		};
     
@@ -67,6 +72,9 @@ namespace tur
 		void initialize_resources();
 		void initialize_descriptors();
 		void initialize_pipeline();
+
+	private:
+		void write_material(descriptor_set_handle setHandle, const MetallicRoughnessMaterial& material);
 
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;

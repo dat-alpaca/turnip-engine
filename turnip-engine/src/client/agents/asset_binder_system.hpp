@@ -137,13 +137,32 @@ namespace tur
 
 			// Create textures:
 			texture_handle albedoTextureHandle = invalid_handle;
+			texture_handle normalTextureHandle = invalid_handle;
+			texture_handle metallicTextureHandle = invalid_handle;
+			texture_handle rougnessTextureHandle = invalid_handle;
+
 			const auto& albedoTexture = meshAsset.meshMaterial.albedoTexture;
 			if(albedoTexture.width > 0 && albedoTexture.height > 0)
 				albedoTextureHandle = upload_texture_from_asset(meshAsset.meshMaterial.albedoTexture, false);
 
+			const auto& normalTexture = meshAsset.meshMaterial.normalTexture;
+			if(normalTexture.width > 0 && normalTexture.height > 0)
+				normalTextureHandle = upload_texture_from_asset(meshAsset.meshMaterial.normalTexture, false);
+
+			const auto& metallicTexture = meshAsset.meshMaterial.metallicTexture;
+			if(metallicTexture.width > 0 && metallicTexture.height > 0)
+				metallicTextureHandle = upload_texture_from_asset(meshAsset.meshMaterial.normalTexture, false);
+
+			const auto& roughnessTexture = meshAsset.meshMaterial.metallicTexture;
+			if(roughnessTexture.width > 0 && roughnessTexture.height > 0)
+				rougnessTextureHandle = upload_texture_from_asset(meshAsset.meshMaterial.normalTexture, false);
+
 			MetallicRoughnessMaterial material;
 			{
 				material.albedo = albedoTextureHandle;
+				material.normal = normalTextureHandle;
+				material.metallic = metallicTextureHandle;
+				material.roughness = rougnessTextureHandle;
 				material.baseColor = meshAsset.meshMaterial.baseColorFactor;
 			}
 
@@ -189,8 +208,7 @@ namespace tur
 				mesh.ebo = meshUploadedEvent.data.ebo;
 				mesh.indexCount = meshUploadedEvent.data.indexCount;
 
-				mesh.baseColor = meshUploadedEvent.data.material.baseColor; 
-				mesh.albedo = meshUploadedEvent.data.material.albedo; 
+				mesh.material = meshUploadedEvent.data.material; 
 			}
 		}
 

@@ -4,6 +4,7 @@
 #include "assets/asset.hpp"
 #include "graphics/camera.hpp"
 #include "defines.hpp"
+#include "graphics/objects/material.hpp"
 #include "graphics/objects/tile.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/objects/buffer.hpp"
@@ -36,7 +37,7 @@ namespace tur
 		CullingComponent() = default;
 		
 	public:
-		bool visible = true;
+		FIELD_SET_INTERNALLY bool visible = true;
 	};
 
 	struct Sprite2DComponent
@@ -49,8 +50,8 @@ namespace tur
 		}
 
 	public:
-		asset_handle assetHandle = invalid_handle;
-		texture_handle textureHandle = invalid_handle;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 		
 		std::filesystem::path filepath;
 	};
@@ -66,12 +67,12 @@ namespace tur
 		}
 
 	public:
-		std::vector<TilemapChunk> worldData;
-		u32 tilesPerChunk;
-		u32 tilePixelSize;
+		FIELD_SET_INTERNALLY std::vector<TilemapChunk> worldData;
+		FIELD_SET_INTERNALLY u32 tilesPerChunk;
+		FIELD_SET_INTERNALLY u32 tilePixelSize;
 
-		asset_handle assetHandle = invalid_handle;
-		texture_handle textureHandle = invalid_handle;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 
 		std::filesystem::path filepath;
 	};
@@ -86,15 +87,14 @@ namespace tur
 		}
 
 	public:
-		asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		std::filesystem::path filepath;
 
 	public:
-		FIELD_SET_INTERNALLY glm::vec4 baseColor;
+		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;
 
 		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
 		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;
-		FIELD_SET_INTERNALLY texture_handle albedo = invalid_handle;
 		FIELD_SET_INTERNALLY u64 indexCount = 0;
 	};
 }

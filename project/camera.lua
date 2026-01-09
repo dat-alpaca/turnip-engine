@@ -44,7 +44,11 @@ function camera:get_direction()
     end
 end
 
-function camera:on_update()
+function camera:on_update(time)
+    if Input.get_key_pressed(Input.Key.L) then
+        Log.info("FPS: " .. time:get_fps())
+    end
+
     self:get_direction()
 end
 

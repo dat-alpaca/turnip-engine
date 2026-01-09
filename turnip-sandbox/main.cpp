@@ -1,4 +1,5 @@
 #include "assets/asset.hpp"
+#include "assets/mesh/mesh_asset.hpp"
 #include "graphics/components.hpp"
 #include "scene/common_components.hpp"
 #include <turnip_engine.hpp>
@@ -29,8 +30,8 @@ private:
 		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
 
-		meshHandle = library.load_mesh_async("project/models/beretta_m9/beretta.gltf");
-		//meshHandle = library.load_mesh_async("project/models/crate/wooden crate.gltf");
+		for(const MeshAsset& mesh : mProject.get_meshes())
+			library.load_mesh_async(mProject.get_project_filepath(mesh.metadata.filepath));
 	}
 
 	void initialize_entities()
@@ -39,16 +40,6 @@ private:
 
 		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
 		engine->get_event_callback()(deserializeEvent);
-
-		auto e = get_current_scene().add_entity();
-		e.add_component<MeshComponent>(meshHandle);
-		auto& t = e.get_component<TransformComponent>();
-		t.transform.position.x = 4.f;
-		t.transform.position.y = 4.f;
-		t.transform.rotation.y = 90.f;
-		t.transform.scale.x = 3.f;
-		t.transform.scale.y = 3.f;
-		t.transform.scale.z = 3.f;
 	}
 
 private:
