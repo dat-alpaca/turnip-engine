@@ -69,6 +69,7 @@ end
 
 function camera:on_window_resize(width, height)
     self.camera_c:set_ortho(0.0, (width / self._pixel_per_meter), 0.0, (height / self._pixel_per_meter), -1, 1)
+    -- self.camera_c:set_perspective(40.0, (width / height), 0, 100)
 end
 
 return camera
