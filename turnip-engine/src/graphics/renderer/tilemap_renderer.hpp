@@ -2,7 +2,7 @@
 #include "defines.hpp"
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/camera.hpp"
-#include "graphics/tile.hpp"
+#include "graphics/objects/tile.hpp"
 
 #include "rhi/rhi.hpp"
 #include "utils/transform.hpp"

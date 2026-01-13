@@ -47,3 +47,6 @@
 [submodule "extern/box2d"]
 	path = extern/box2d
 	url = https://github.com/erincatto/box2d
+[submodule "vendor/tinygltf"]
+	path = extern/tinygltf
+	url = https://github.com/syoyo/tinygltf

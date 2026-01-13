@@ -1,11 +1,18 @@
 #include "asset_library.hpp"
 #include <miniaudio.h>
+#include <optional>
 #include <stb_image.h>
 
+#include "assets/mesh/mesh_asset.hpp"
 #include "graphics/constants.hpp"
 #include "assets/asset.hpp"
-#include "audio/audio_asset.hpp"
+
+#include "graphics/objects/texture.hpp"
+#include "logging/logging.hpp"
 #include "texture/texture_loader.hpp"
+#include "mesh/mesh_loader.hpp"
+#include "audio/audio_loader.hpp"
+#include "utils/uuid/uuid.hpp"
 
 namespace tur
 {
@@ -36,8 +43,10 @@ namespace tur
 			return mFilepathCache[filepath];
 
 		TextureAsset loadingAsset = {};
-		loadingAsset.state = AssetState::LOADING;
 		loadingAsset.options = options;
+		loadingAsset.metadata.uuid = UUID();
+		loadingAsset.metadata.filepath = filepath;
+		loadingAsset.state = AssetState::LOADING;
 
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
@@ -46,9 +55,9 @@ namespace tur
 			[filepath, options]()
 			{
 				if (!options.floatTexture)
-					return load_texture_task(filepath, options);
+					return load_texture_task(filepath);
 				else
-					return load_float_texture_task(filepath, options);
+					return load_float_texture_task(filepath);
 			},
 			[&, filepath, assetHandle](const texture_asset_opt& textureAsset)
 			{
@@ -56,8 +65,13 @@ namespace tur
 					return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
 
 				TextureAsset& loadedTextureAsset = mTextureAssets.get(assetHandle);
-				loadedTextureAsset = textureAsset.value();
-				loadedTextureAsset.state = AssetState::READY;
+				{
+					loadedTextureAsset.data = textureAsset->data;
+					loadedTextureAsset.width = textureAsset->width;
+					loadedTextureAsset.height = textureAsset->height;
+					loadedTextureAsset.channels = textureAsset->channels;
+					loadedTextureAsset.state = AssetState::READY;
+				}
 
 				AssetType type = AssetType::TEXTURE;
 				if(loadedTextureAsset.options.arrayLayers > 1)
@@ -83,15 +97,13 @@ namespace tur
 
 		asset_handle assetHandle = mAudioAssets.add({});
 		AudioAsset& audioAsset = mAudioAssets.get(assetHandle);
+
 		audioAsset.metadata.filepath = filepath;
 		audioAsset.state = AssetState::READY;
 
-		ma_result result = ma_sound_init_from_file(
-			&rAudioHandler->mEngine, filepath.string().c_str(), MA_SOUND_FLAG_ASYNC | MA_SOUND_FLAG_NO_SPATIALIZATION,
-			nullptr, nullptr, &audioAsset.sound
-		);
+		auto audioResult = load_audio_task(filepath, &audioAsset.sound, rAudioHandler->mEngine);
 
-		if (result != MA_SUCCESS)
+		if (audioResult != MA_SUCCESS)
 		{
 			TUR_LOG_ERROR("Failed to load audio: {}", filepath.string());
 			mAudioAssets.remove(assetHandle);
@@ -102,6 +114,54 @@ namespace tur
 
 		AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::AUDIO);
 		mEventCallback(assetLoadedEvent);
+
+		return assetHandle;
+	}
+
+	asset_handle AssetLibrary::load_mesh_async(const std::filesystem::path& filepath)
+	{
+		if (mFilepathCache.find(filepath) != mFilepathCache.end())
+			return mFilepathCache[filepath];
+
+		MeshAsset loadingAsset = {};
+		loadingAsset.metadata.filepath = filepath;
+		loadingAsset.metadata.uuid = UUID();
+		loadingAsset.state = AssetState::LOADING;
+
+		auto parentPath = filepath.parent_path();
+
+		asset_handle assetHandle = mMeshAssets.add(loadingAsset);
+		mFilepathCache[filepath] = assetHandle;
+
+		rWorkerPool->submit<std::optional<MeshAsset>>([&, filepath, parentPath]() -> std::optional<MeshAsset> {
+			auto modelResult = load_model_task(filepath);
+			if(!modelResult.has_value())
+				return std::nullopt;
+
+			auto model = modelResult.value();
+			
+			// TODO: extract mesh data from all meshes
+
+			MeshAsset asset;
+			asset.meshData = extract_mesh_data(model);
+			asset.meshMaterial = extract_texture_data(model);
+
+			return asset;
+		},
+		[&, assetHandle](const std::optional<MeshAsset>& asset) {
+			if (!asset.has_value())
+				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
+
+			auto mesh = asset.value();
+
+			MeshAsset& loadedMeshAsset = mMeshAssets.get(assetHandle);
+			loadedMeshAsset.meshMaterial = mesh.meshMaterial;
+			loadedMeshAsset.meshData = mesh.meshData;
+			loadedMeshAsset.state = AssetState::READY;
+
+			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MESH);
+			mEventCallback(assetLoadedEvent);
+		});
 
 		return assetHandle;
 	}

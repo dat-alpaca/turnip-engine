@@ -60,6 +60,7 @@ namespace tur::gl
 		ClearColor mColor;
 		ClearFlags mClearFlags;
 		u32 mRawClearFlags = 0;
+		u32 mCurrentStride = 0;
 	};
 }
 

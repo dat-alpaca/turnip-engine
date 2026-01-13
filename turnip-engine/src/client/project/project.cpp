@@ -73,6 +73,11 @@ namespace tur
     { 
         return assetLibraryObject["audios"]; 
     }
+
+    std::vector<MeshAsset> Project::get_meshes() const 
+    { 
+        return assetLibraryObject["meshes"]; 
+    }
 }
 
 namespace tur 

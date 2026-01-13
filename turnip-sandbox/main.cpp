@@ -1,3 +1,7 @@
+#include "assets/asset.hpp"
+#include "assets/mesh/mesh_asset.hpp"
+#include "graphics/components.hpp"
+#include "scene/common_components.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -25,6 +29,9 @@ private:
 
 		for(const AudioAsset& audio : mProject.get_audios())
 			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath));
+
+		for(const MeshAsset& mesh : mProject.get_meshes())
+			library.load_mesh_async(mProject.get_project_filepath(mesh.metadata.filepath));
 	}
 
 	void initialize_entities()
@@ -36,6 +43,7 @@ private:
 	}
 
 private:
+	asset_handle meshHandle;
 	Project mProject;
 };
 

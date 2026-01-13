@@ -31,13 +31,13 @@ namespace tur
 		void submit(std::function<ReturnType()> task, std::function<void(ReturnType)> callback = {})
 		{
 			{
-				std::unique_lock<std::mutex> lock(mQueueMutex);
+				std::lock_guard<std::mutex> lock(mQueueMutex);
 
 				mTasks.emplace_back(
-					[&, callback, task]()
+					[&, callback = std::move(callback), task = std::move(task)]()
 					{
 						ReturnType returnValue = task();
-						mCallbacks.push_back([callback, returnValue]() { callback(returnValue); });
+						mCallbacks.push_back([callback, returnValue = std::move(returnValue)]() { callback(returnValue); });
 					}
 				);
 			}

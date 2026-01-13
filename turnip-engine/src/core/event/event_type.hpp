@@ -33,6 +33,7 @@ namespace tur
 		PHYSICS_CONTACT_EVENT,
 
 		TEXTURE_UPLOADED,
+		MESH_UPLOADED,
 		AMOUNT
 	};
 

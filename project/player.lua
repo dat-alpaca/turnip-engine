@@ -29,6 +29,8 @@ end
 
 function player:on_update(time)
     local mouse_pos = Input.get_mouse_position()
+    do return end
+
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
         local world_position = camera:get_world_position(vec3(mouse_pos.x, mouse_pos.y, 1))
         self.transform_c.position.x = world_position.x

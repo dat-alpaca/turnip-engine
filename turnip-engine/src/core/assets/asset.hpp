@@ -11,7 +11,8 @@ namespace tur
 		NONE = 0,
 		TEXTURE,
 		TEXTURE_ARRAY,
-		AUDIO
+		AUDIO,
+		MESH
 	};
 	static inline constexpr const char* get_asset_type_name(AssetType type)
 	{
@@ -26,6 +27,9 @@ namespace tur
 
 		if (type == AssetType::AUDIO)
 			return "Audio";
+
+		if (type == AssetType::MESH)
+			return "Mesh";
 
 		return "Invalid";
 	}

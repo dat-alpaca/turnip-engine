@@ -25,7 +25,7 @@ namespace tur
 
 		// Event callbacks:
 		mSceneHolder.set_event_callback(engine->get_event_callback());
-		mTextureAgent.set_event_callback(engine->get_event_callback());
+		mAssetBinderSystem.set_event_callback(engine->get_event_callback());
 		add_scene(true);
 
 		// Renderers:
@@ -48,8 +48,8 @@ namespace tur
 		cameraSystem.initialize(mSceneHolder.get_current_scene());
 
 		// Binders:
-		mTextureAssetBinder.initialize(mSceneHolder.get_current_scene());
-		mTextureAgent.initialize(&engine->get_render_interface(), &engine->get_asset_library());
+		mAssetBinderSystem.initialize(&engine->get_render_interface(), &engine->get_asset_library());
+		mAssetBinderSystem.set_scene(mSceneHolder.get_current_scene());
 
 		// Scene Signals:
 		signalSystem.initialize(&engine->get_asset_library());
@@ -68,12 +68,14 @@ namespace tur
 	{
 		quadSystem.on_update();
 		tilemapSystem.on_update(time);
+		mMeshSystem.on_update();
 
 		scriptSystem.on_update(time);
 		scenegraphSystem.on_update();
 
 		cameraSystem.on_update();
 		quadSystem.set_camera(cameraSystem.get_main_camera());
+		mMeshSystem.set_camera(cameraSystem.get_main_camera());
 		tilemapSystem.set_camera(cameraSystem.get_main_camera());
 	}
 	void SceneView::on_post_update(const Time& time)
@@ -93,6 +95,7 @@ namespace tur
 
 			tilemapSystem.render();
 			quadSystem.render();
+			mMeshSystem.render();
 
 			std::vector<CommandBuffer::BufferType> commandBuffers;
 			{
@@ -104,6 +107,10 @@ namespace tur
 
 				if(!tilemapSystem.renderer().is_empty())
 					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_buffer());
+
+				commandBuffers.push_back(
+					mMeshSystem.renderer().get_command_buffer().get_buffer()
+				);
 			}
 
 			commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});
@@ -120,9 +127,12 @@ namespace tur
 			{
 				scenegraphSystem.set_scene(viewSwitch.currentScene);
 				scriptSystem.set_scene(viewSwitch.currentScene);
+
 				quadSystem.set_scene(viewSwitch.currentScene);
 				tilemapSystem.set_scene(viewSwitch.currentScene);
-				mTextureAssetBinder.set_scene(viewSwitch.currentScene);
+				mMeshSystem.set_scene(viewSwitch.currentScene);
+
+				mAssetBinderSystem.set_scene(viewSwitch.currentScene);
 				physicsSystem.set_scene(viewSwitch.currentScene);
 				mPhysicsScriptAgent.set_scene(viewSwitch.currentScene);
 
@@ -132,10 +142,10 @@ namespace tur
 
 		signalSystem.on_event(event);
 		mPhysicsScriptAgent.on_event(event);
-		mTextureAgent.on_event(event);
-		mTextureAssetBinder.on_event(event);
+		mAssetBinderSystem.on_event(event);
 		quadSystem.on_event(event);
 		tilemapSystem.on_event(event);
+		mMeshSystem.on_event(event);
 		scriptSystem.on_event(event);
 	}
 
@@ -149,5 +159,9 @@ namespace tur
 		// Tilemap:
 		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
 		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+
+		// Mesh:
+		mMeshSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
+		mMeshSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
 	}
 }

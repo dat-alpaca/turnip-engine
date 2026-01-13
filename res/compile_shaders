@@ -13,3 +13,5 @@ glslc ./shaders/none/none.frag -o ./shaders/none/none_frag.spv
 glslc ./shaders/tile/tile.vert -o ./shaders/tile/tile_vert.spv
 glslc ./shaders/tile/tile.frag -o ./shaders/tile/tile_frag.spv
 
+glslc ./shaders/mesh/mesh.vert -o ./shaders/mesh/mesh_vert.spv
+glslc ./shaders/mesh/mesh.frag -o ./shaders/mesh/mesh_frag.spv

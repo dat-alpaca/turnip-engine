@@ -22,9 +22,10 @@
 #include "asset_events/asset_loaded_event.hpp"
 #include "asset_events/asset_unloaded_event.hpp"
 #include "asset_events/scene_deserialization.hpp"
+#include "asset_events/texture_uploaded_event.hpp"
+#include "asset_events/mesh_uploaded_event.hpp"
 
 #include "scene_events/scene_switched_event.hpp"
 
-#include "graphics_events/texture_uploaded_event.hpp"
 
 #include "physics_events/contact_event.hpp"

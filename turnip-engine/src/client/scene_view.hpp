@@ -8,13 +8,13 @@
 #include "system/physics_system.hpp"
 #include "system/scenegraph_system.hpp"
 #include "system/script_system.hpp"
-#include "system/texture_asset_binder_system.hpp"
 #include "system/tilemap_system.hpp"
 #include "system/scene_signal_system.hpp"
 #include "system/camera_system.hpp"
+#include "system/mesh_system.hpp"
 
 #include "agents/physics_script_agent.hpp"
-#include "agents/texture_asset_agent.hpp"
+#include "agents/asset_binder_system.hpp"
 
 namespace tur
 {
@@ -54,15 +54,17 @@ namespace tur
 	protected:
 		ScenegraphSystem scenegraphSystem;
 		ScriptSystem scriptSystem;
-		ImmQuadSystem quadSystem;
-		TilemapSystem tilemapSystem;
+		
 		CameraSystem cameraSystem;
 		PhysicsSystem physicsSystem;
 		SceneSignalSystem signalSystem;
+		AssetBinderSystem mAssetBinderSystem;
+
+		ImmQuadSystem quadSystem;
+		TilemapSystem tilemapSystem;
+		MeshSystem mMeshSystem;
 
 	private:
-		TextureAssetBinderSystem mTextureAssetBinder;
-		TextureAssetBinderAgent mTextureAgent;
 		PhysicsScriptAgent mPhysicsScriptAgent;
 		SceneHolder mSceneHolder;
 	};

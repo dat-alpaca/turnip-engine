@@ -2,7 +2,7 @@
 #include "client/agents/event_consumer.hpp"
 #include "client/agents/event_emitter.hpp"
 #include "client/agents/physics_script_agent.hpp"
-#include "client/agents/texture_asset_agent.hpp"
+#include "client/agents/asset_binder_system.hpp"
 
 #include "client/project/project.hpp"
 
@@ -12,7 +12,6 @@
 #include "client/system/scene_signal_system.hpp"
 #include "client/system/scenegraph_system.hpp"
 #include "client/system/script_system.hpp"
-#include "client/system/texture_asset_binder_system.hpp"
 #include "client/system/tilemap_system.hpp"
 
 #include "client/asset_serialization.hpp"

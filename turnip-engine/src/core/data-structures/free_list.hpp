@@ -103,9 +103,9 @@ namespace tur
 			return available;
 		}
 
-		std::vector<std::reference_wrapper<Type>> available() const
+		std::vector<Type> available() const
 		{
-			std::vector<std::reference_wrapper<Type>> available;
+			std::vector<Type> available;
 			available.reserve(mData.size() - mFreeList.size());
 
 			for (u64 i = 0; i < mData.size(); ++i)
