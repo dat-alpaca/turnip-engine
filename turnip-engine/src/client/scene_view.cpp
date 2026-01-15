@@ -122,19 +122,19 @@ namespace tur
 	void SceneView::on_event(Event& event)
 	{
 		Subscriber subscriber(event);
-		subscriber.subscribe<ViewSwitchedEvent>(
-			[&](const ViewSwitchedEvent& viewSwitch) -> bool
+		subscriber.subscribe<SceneSwitchedEvent>(
+			[&](const SceneSwitchedEvent& sceneSwitch) -> bool
 			{
-				scenegraphSystem.set_scene(viewSwitch.currentScene);
-				scriptSystem.set_scene(viewSwitch.currentScene);
+				scenegraphSystem.set_scene(sceneSwitch.currentScene);
+				scriptSystem.set_scene(sceneSwitch.currentScene);
 
-				quadSystem.set_scene(viewSwitch.currentScene);
-				tilemapSystem.set_scene(viewSwitch.currentScene);
-				mMeshSystem.set_scene(viewSwitch.currentScene);
+				quadSystem.set_scene(sceneSwitch.currentScene);
+				tilemapSystem.set_scene(sceneSwitch.currentScene);
+				mMeshSystem.set_scene(sceneSwitch.currentScene);
 
-				mAssetBinderSystem.set_scene(viewSwitch.currentScene);
-				physicsSystem.set_scene(viewSwitch.currentScene);
-				mPhysicsScriptAgent.set_scene(viewSwitch.currentScene);
+				mAssetBinderSystem.set_scene(sceneSwitch.currentScene);
+				physicsSystem.set_scene(sceneSwitch.currentScene);
+				mPhysicsScriptAgent.set_scene(sceneSwitch.currentScene);
 
 				return false;
 			}

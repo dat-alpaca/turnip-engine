@@ -5,11 +5,13 @@
 #include "data-structures/free_list.hpp"
 
 #include "assets/asset.hpp"
-#include "audio/audio_handler.hpp"
-#include "texture/texture_options.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 
+#include "audio/audio_handler.hpp"
+#include "texture/texture_options.hpp"
+
 #include <filesystem>
+#include <vector>
 
 namespace tur
 {
@@ -20,15 +22,16 @@ namespace tur
 
 	public:
 		void initialize(WorkerPool* workerPool, AudioHandler* audioHandler);
+		void on_event(Event& event);
 		void shutdown();
 
 		void set_event_callback(const EventCallback& eventCallback);
 		void create_default_texture();
 
 	public:
-		asset_handle load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options = {});
-		asset_handle load_audio_async(const std::filesystem::path& filepath);
-		asset_handle load_mesh_async(const std::filesystem::path& filepath);
+		asset_handle load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options = {}, AssetLifetime lifetime = AssetLifetime::APPLICATION);
+		asset_handle load_audio_async(const std::filesystem::path& filepath, AssetLifetime lifetime = AssetLifetime::APPLICATION);
+		asset_handle load_mesh_async(const std::filesystem::path& filepath, AssetLifetime lifetime = AssetLifetime::APPLICATION);
 
 	public:
 		inline asset_handle get_asset_handle(const std::filesystem::path& filepath)
@@ -76,5 +79,9 @@ namespace tur
 		free_list<TextureAsset> mTextureAssets;
 		free_list<AudioAsset> mAudioAssets;
 		free_list<MeshAsset> mMeshAssets;
+
+		std::vector<asset_handle> mTextureRemoveOnSceneChange;
+		std::vector<asset_handle> mAudioRemoveOnSceneChange;
+		std::vector<asset_handle> mMeshRemoveOnSceneChange;
 	};
 }

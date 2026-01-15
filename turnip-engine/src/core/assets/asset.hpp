@@ -34,11 +34,18 @@ namespace tur
 		return "Invalid";
 	}
 
+	enum class AssetLifetime
+    {
+        APPLICATION,
+        SCENE_BOUND
+    };
+
 	struct AssetMetadata
 	{
 		std::filesystem::path filepath;
 		UUID uuid;
 		AssetType type;
+		AssetLifetime lifetime = AssetLifetime::APPLICATION;
 	};
 
 	enum class AssetState

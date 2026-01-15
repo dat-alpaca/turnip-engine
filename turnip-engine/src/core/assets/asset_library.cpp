@@ -4,8 +4,11 @@
 #include <stb_image.h>
 
 #include "assets/mesh/mesh_asset.hpp"
-#include "graphics/constants.hpp"
 #include "assets/asset.hpp"
+
+#include "event/scene_events/scene_switched_event.hpp"
+#include "event/subscriber.hpp"
+#include "graphics/constants.hpp"
 
 #include "graphics/objects/texture.hpp"
 #include "logging/logging.hpp"
@@ -26,6 +29,23 @@ namespace tur
 
 		create_default_texture();
 	}
+	void AssetLibrary::on_event(Event& event)
+	{
+		Subscriber subscriber(event);
+		subscriber.subscribe<SceneSwitchedEvent>([&](const SceneSwitchedEvent& event){
+
+			for(auto textureHandle : mTextureRemoveOnSceneChange)
+				mTextureAssets.remove(textureHandle);
+
+			for(auto audioHandle : mAudioRemoveOnSceneChange)
+				mAudioAssets.remove(audioHandle);
+
+			for(auto meshHandle : mMeshRemoveOnSceneChange)
+				mMeshAssets.remove(meshHandle);
+
+			return false;
+		});
+	}
 	void AssetLibrary::shutdown()
 	{
 		mTextureAssets.clear();
@@ -37,7 +57,7 @@ namespace tur
 		mEventCallback = eventCallback;
 	}
 
-	asset_handle AssetLibrary::load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options)
+	asset_handle AssetLibrary::load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options, AssetLifetime lifetime)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
 			return mFilepathCache[filepath];
@@ -50,6 +70,9 @@ namespace tur
 
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
+
+		if (lifetime == AssetLifetime::SCENE_BOUND)
+			mTextureRemoveOnSceneChange.push_back(assetHandle);
 
 		rWorkerPool->submit<texture_asset_opt>(
 			[filepath, options]()
@@ -88,7 +111,7 @@ namespace tur
 		return assetHandle;
 	}
 
-	asset_handle AssetLibrary::load_audio_async(const std::filesystem::path& filepath)
+	asset_handle AssetLibrary::load_audio_async(const std::filesystem::path& filepath, AssetLifetime lifetime)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
 			return mFilepathCache[filepath];
@@ -100,6 +123,9 @@ namespace tur
 
 		audioAsset.metadata.filepath = filepath;
 		audioAsset.state = AssetState::READY;
+
+		if(lifetime == AssetLifetime::SCENE_BOUND)
+			mAudioRemoveOnSceneChange.push_back(assetHandle);
 
 		auto audioResult = load_audio_task(filepath, &audioAsset.sound, rAudioHandler->mEngine);
 
@@ -118,7 +144,7 @@ namespace tur
 		return assetHandle;
 	}
 
-	asset_handle AssetLibrary::load_mesh_async(const std::filesystem::path& filepath)
+	asset_handle AssetLibrary::load_mesh_async(const std::filesystem::path& filepath, AssetLifetime lifetime)
 	{
 		if (mFilepathCache.find(filepath) != mFilepathCache.end())
 			return mFilepathCache[filepath];
@@ -129,9 +155,11 @@ namespace tur
 		loadingAsset.state = AssetState::LOADING;
 
 		auto parentPath = filepath.parent_path();
-
 		asset_handle assetHandle = mMeshAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
+
+		if(lifetime == AssetLifetime::SCENE_BOUND)
+			mMeshRemoveOnSceneChange.push_back(assetHandle);
 
 		rWorkerPool->submit<std::optional<MeshAsset>>([&, filepath, parentPath]() -> std::optional<MeshAsset> {
 			auto modelResult = load_model_task(filepath);

@@ -4,12 +4,12 @@
 
 namespace tur
 {
-	struct ViewSwitchedEvent : public Event
+	struct SceneSwitchedEvent : public Event
 	{
 		DEFINE_EVENT(EventType::SCENE_SWITCHED);
 
 	public:
-		ViewSwitchedEvent(NON_OWNING Scene* currentScene) : currentScene(currentScene) {}
+		SceneSwitchedEvent(NON_OWNING Scene* currentScene) : currentScene(currentScene) {}
 
 	public:
 		Scene* currentScene = nullptr;

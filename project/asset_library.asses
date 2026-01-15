@@ -4,7 +4,8 @@
             "metadata": {
                 "filepath": "audio/sound.wav",
                 "type": 3,
-                "uuid": 16292462592774848465
+                "uuid": 16292462592774848465,
+                "lifetime": 0
             }
         }
     ],
@@ -13,7 +14,8 @@
             "metadata": {
                 "filepath": "models/beretta_m9/beretta.gltf",
                 "type": 4,
-                "uuid": 48292462292334848465
+                "uuid": 48292462292334848465,
+                "lifetime": 1
             }
         }
     ],
@@ -24,7 +26,8 @@
             "metadata": {
                 "filepath": "textures/face.png",
                 "type": 1,
-                "uuid": 444101566143258990
+                "uuid": 444101566143258990,
+                "lifetime": 0
             },
             "options": {
                 "arrayLayers": 1,
@@ -54,7 +57,8 @@
             "metadata": {
                 "filepath": "textures/floor0.png",
                 "type": 1,
-                "uuid": 444101512133258990
+                "uuid": 444101512133258990,
+                "lifetime": 0
             },
             "options": {
                 "arrayLayers": 1,
@@ -84,7 +88,8 @@
             "metadata": {
                 "filepath": "textures/face_sheet.png",
                 "type": 1,
-                "uuid": 3047054274889524964
+                "uuid": 3047054274889524964,
+                "lifetime": 0
             },
             "options": {
                 "arrayLayers": 5,

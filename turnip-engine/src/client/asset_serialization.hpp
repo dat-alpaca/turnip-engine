@@ -11,7 +11,7 @@
 
 namespace tur
 {
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AssetMetadata, filepath, uuid, type);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AssetMetadata, filepath, uuid, type, lifetime);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TextureOptions, dataFormat, floatTexture, layerWidth, layerHeight,
         depth, mipLevels, samples, arrayLayers, format, type,
         wrapS, wrapT, wrapR, minFilter, magFilter,
@@ -19,7 +19,6 @@ namespace tur
     );
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TextureAsset, metadata, width, height, channels, options);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioAsset, metadata);
-
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MeshData, vertices, indices);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MetallicRoughnessMaterialData, baseColorFactor, albedoTexture, normalTexture, metallicTexture, roughnessTexture);
