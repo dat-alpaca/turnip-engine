@@ -33,7 +33,7 @@ namespace tur
 		}
 		void set_current_scene(scene_handle handle)
 		{
-			TUR_ASSERT(handle >= 0 && handle < mScenes.size() - 1, "Invalid scene handle provided");
+			TUR_ASSERT(handle >= 0 && handle < mScenes.size(), "Invalid scene handle provided");
 			mCurrentScene = mScenes[handle].get();
 
 			SceneSwitchedEvent sceneSwitchedEvent(mCurrentScene);
@@ -44,7 +44,7 @@ namespace tur
 		NON_OWNING Scene* get_current_scene() const { return mCurrentScene; }
 		NON_OWNING Scene* get_scene(scene_handle handle) const
 		{
-			TUR_ASSERT(handle >= 0 && handle < mScenes.size() - 1, "Invalid scene handle provided");
+			TUR_ASSERT(handle >= 0 && handle < mScenes.size(), "Invalid scene handle provided");
 			return mScenes[handle].get();
 		}
 
