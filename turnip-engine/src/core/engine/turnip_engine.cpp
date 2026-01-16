@@ -57,6 +57,7 @@ namespace tur::engine
 	static void on_event(Event& event, TurnipEngine& engine)
 	{
 		engine.get_render_interface().on_event(event);
+		engine.get_asset_library().on_event(event);
 
 		for (const auto& view : engine.get_view_handler().get_views())
 			view->on_event(event);
@@ -139,18 +140,12 @@ namespace tur
 			mWorkerPool.poll_tasks();
 
 			mTime.cycle(mWindow->get_time());
-			mTitleAccumulatedTime += mTime.get_delta_time();
+			mFixedUpdateTimer += mTime.get_delta_time();
 
-			if(mTitleAccumulatedTime >= 1.f)
-			{
-				// mTitleAccumulatedTime = 0.0f;
-				// glfwSetWindowTitle(mWindow->get_window(), std::to_string(mTime.get_fps()).c_str());
-			}
-
-			if(mTitleAccumulatedTime >= mConfigData.physicsConfig.fixedTimeStep)
+			if(mFixedUpdateTimer >= mConfigData.physicsConfig.fixedTimeStep)
 			{
 				engine::on_fixed_update(mViewHandler);
-				mTitleAccumulatedTime = 0.0f;
+				mFixedUpdateTimer = 0.0f;
 			}
 			
 			engine::on_update(mViewHandler, mTime);

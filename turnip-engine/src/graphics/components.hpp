@@ -53,7 +53,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 		
-		std::filesystem::path filepath;
+		UUID uuid;
 	};
 
 	struct Tilemap2DComponent
@@ -74,7 +74,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 
-		std::filesystem::path filepath;
+		UUID uuid;
 	};
 
 	struct MeshComponent
@@ -88,7 +88,7 @@ namespace tur
 
 	public:
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
-		std::filesystem::path filepath;
+		UUID uuid;
 
 	public:
 		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;

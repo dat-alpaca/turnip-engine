@@ -1,6 +1,7 @@
 #pragma once
 #include "defines.hpp"
 #include "event/events.hpp"
+#include "utils/uuid/uuid.hpp"
 #include "worker/worker_pool.hpp"
 #include "data-structures/free_list.hpp"
 
@@ -29,9 +30,9 @@ namespace tur
 		void create_default_texture();
 
 	public:
-		asset_handle load_texture_async(const std::filesystem::path& filepath, const TextureOptions& options = {}, AssetLifetime lifetime = AssetLifetime::APPLICATION);
-		asset_handle load_audio_async(const std::filesystem::path& filepath, AssetLifetime lifetime = AssetLifetime::APPLICATION);
-		asset_handle load_mesh_async(const std::filesystem::path& filepath, AssetLifetime lifetime = AssetLifetime::APPLICATION);
+		asset_handle load_texture_async(const std::filesystem::path& filepath, const AssetMetadata& metadata, const TextureOptions& options = {});
+		asset_handle load_audio_async(const std::filesystem::path& filepath, const AssetMetadata& metadata);
+		asset_handle load_mesh_async(const std::filesystem::path& filepath, const AssetMetadata& metadata);
 
 	public:
 		inline asset_handle get_asset_handle(const std::filesystem::path& filepath)
@@ -40,6 +41,13 @@ namespace tur
 				return invalid_handle;
 
 			return mFilepathCache.at(filepath);
+		}
+		inline asset_handle get_asset_handle(UUID uuid)
+		{
+			if(mUUIDCache.find(uuid) == mUUIDCache.end())
+				return invalid_handle;
+
+			return mUUIDCache.at(uuid);
 		}
 
 		inline TextureAsset& get_texture_asset(asset_handle handle)
@@ -76,6 +84,8 @@ namespace tur
 
 	private:
 		std::unordered_map<std::filesystem::path, asset_handle> mFilepathCache;
+		std::unordered_map<UUID, asset_handle> mUUIDCache;
+
 		free_list<TextureAsset> mTextureAssets;
 		free_list<AudioAsset> mAudioAssets;
 		free_list<MeshAsset> mMeshAssets;

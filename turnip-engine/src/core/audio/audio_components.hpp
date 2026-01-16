@@ -14,6 +14,6 @@ namespace tur
 
 	public:
 		asset_handle assetHandle = invalid_handle;
-		std::filesystem::path filepath;
+		UUID uuid;
 	};
 }

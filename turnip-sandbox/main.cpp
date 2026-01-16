@@ -25,13 +25,13 @@ private:
 	{
 		AssetLibrary& library = engine->get_asset_library();
 		for(const TextureAsset& texture : mProject.get_textures())
-			library.load_texture_async(mProject.get_project_filepath(texture.metadata.filepath), texture.options, texture.metadata.lifetime);
+			library.load_texture_async(mProject.get_project_filepath(texture.metadata.filepath), texture.metadata, texture.options);
 
 		for(const AudioAsset& audio : mProject.get_audios())
-			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath), audio.metadata.lifetime);
+			library.load_audio_async(mProject.get_project_filepath(audio.metadata.filepath), audio.metadata);
 
 		for(const MeshAsset& mesh : mProject.get_meshes())
-			library.load_mesh_async(mProject.get_project_filepath(mesh.metadata.filepath), mesh.metadata.lifetime);
+			library.load_mesh_async(mProject.get_project_filepath(mesh.metadata.filepath), mesh.metadata);
 	}
 
 	void initialize_entities()

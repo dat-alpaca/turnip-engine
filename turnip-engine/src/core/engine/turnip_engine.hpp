@@ -57,7 +57,7 @@ namespace tur
 		ConfigData mConfigData;
 		Time mTime;
 		
-		f64 mTitleAccumulatedTime = 0.0f;
+		f64 mFixedUpdateTimer = 0.0f;
 
 		EventCallback mMainEventCallback;
 		bool mShutdownRequested = false;

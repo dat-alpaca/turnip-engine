@@ -48,7 +48,7 @@ namespace tur
                 if(sprite.assetHandle != invalid_handle)
                     continue;
 
-                sprite.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(sprite.filepath));
+                sprite.assetHandle = rLibrary->get_asset_handle(sprite.uuid);
             }
 
             auto viewTilemap = scene->get_registry().view<Tilemap2DComponent>();
@@ -57,7 +57,7 @@ namespace tur
                 if(tilemap.assetHandle != invalid_handle)
                     continue;
 
-                tilemap.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(tilemap.filepath));
+                tilemap.assetHandle = rLibrary->get_asset_handle(tilemap.uuid);
             }
         }
 
@@ -72,7 +72,7 @@ namespace tur
                 if(audio.assetHandle != invalid_handle)
                     continue;
 
-                audio.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(audio.filepath));
+                audio.assetHandle = rLibrary->get_asset_handle(audio.uuid);
             }
         }
 
@@ -102,7 +102,7 @@ namespace tur
                 if(mesh.assetHandle != invalid_handle)
                     continue;
 
-                mesh.assetHandle = rLibrary->get_asset_handle(project.get_project_filepath(mesh.filepath));
+                mesh.assetHandle = rLibrary->get_asset_handle(mesh.uuid);
             }
         }
 

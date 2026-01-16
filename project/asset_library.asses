@@ -4,7 +4,7 @@
             "metadata": {
                 "filepath": "audio/sound.wav",
                 "type": 3,
-                "uuid": 16292462592774848465,
+                "uuid": 162924625927748484,
                 "lifetime": 0
             }
         }
@@ -14,7 +14,7 @@
             "metadata": {
                 "filepath": "models/beretta_m9/beretta.gltf",
                 "type": 4,
-                "uuid": 48292462292334848465,
+                "uuid": 482924622923348484,
                 "lifetime": 1
             }
         }
