@@ -1,5 +1,6 @@
 #pragma once
 #include "common.hpp"
+#include "defines.hpp"
 #include "event/events.hpp"
 #include "scene.hpp"
 #include <vector>
@@ -51,6 +52,7 @@ namespace tur
 	private:
 		std::vector<tur_unique<Scene>> mScenes;
 		Scene* mCurrentScene = nullptr;
+
 		EventCallback mEventCallback;
 	};
 }

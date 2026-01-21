@@ -1,6 +1,7 @@
 {
     "name": "project",
     "scenes": [
-        "main_scene.scene"
+        "main_scene.scene",
+        "another_scene.scene"
     ]
 }

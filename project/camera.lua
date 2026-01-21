@@ -42,6 +42,13 @@ function camera:get_direction()
     if Input.get_key_pressed(Input.Key.X) then
         self._direction = vec3(self._direction.x, self._direction.y,  1.0)
     end
+
+    if Input.get_key_pressed(Input.Key.P) then
+        Scene.switch(0)
+    end
+    if Input.get_key_pressed(Input.Key.L) then
+        Scene.switch(1)
+    end
 end
 
 function camera:on_update(time)

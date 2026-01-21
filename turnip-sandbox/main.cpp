@@ -36,10 +36,27 @@ private:
 
 	void initialize_entities()
 	{
-		deserialize_scene(&get_current_scene(), mProject, "main_scene.scene");
+		bool isMainSet = false;
+		for(const auto& sceneFilepath : mProject.get_scene_filepaths())
+		{
+			if(!isMainSet)
+			{
+				deserialize_scene(&get_current_scene(), mProject, sceneFilepath);
+				
+				SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
+				engine->get_event_callback()(deserializeEvent);
+				
+				isMainSet = true;
+				continue;
+			}
 
-		SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
-		engine->get_event_callback()(deserializeEvent);
+			scene_handle sceneHandle = add_scene();
+			Scene& scene = get_scene(sceneHandle);
+			deserialize_scene(&scene, mProject, sceneFilepath);
+
+			SceneDeserializedEvent deserializeEvent(&scene, mProject);
+			engine->get_event_callback()(deserializeEvent);
+		}
 	}
 
 private:

@@ -25,6 +25,11 @@ namespace tur
             cull_scene_orthographic();
 		}
 
+        void on_scene_switched()
+        {
+            
+        }
+
     private:
         void setup_registry_events()
         {

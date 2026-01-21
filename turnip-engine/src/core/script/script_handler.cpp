@@ -9,6 +9,7 @@
 #include "scene/common_components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
+#include "scene/scene_holder.hpp"
 #include "utils/time/time.hpp"
 #include <sol/raii.hpp>
 
@@ -186,6 +187,15 @@ namespace tur
 	void ScriptHandler::initialize_audio(NON_OWNING AudioHandler* audioHandler)
 	{
 		rAudioHandler = audioHandler;
+	}
+	void ScriptHandler::initialize_scene(NON_OWNING SceneHolder* sceneHolder)
+	{
+		rSceneHolder = sceneHolder;
+
+		mLua["Scene"] = mLua.create_table();
+		mLua["Scene"]["switch"] = [&](scene_handle handle){
+			rSceneHolder->set_current_scene(handle);
+		};
 	}
 	void ScriptHandler::initialize_logging()
 	{

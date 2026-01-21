@@ -36,6 +36,10 @@ namespace tur
         {
             return folderPath / filepath;
         }
+        inline std::vector<std::filesystem::path> get_scene_filepaths() const
+        {
+            return mSceneFilepaths;
+        }
 
     private:
         void read_project();

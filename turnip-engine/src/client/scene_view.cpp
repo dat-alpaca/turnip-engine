@@ -23,6 +23,9 @@ namespace tur
 		// Default assets:
 		engine->get_asset_library().create_default_texture();
 
+		// Scene Holder:
+		engine->get_script_handler().initialize_scene(&mSceneHolder);
+
 		// Event callbacks:
 		mSceneHolder.set_event_callback(engine->get_event_callback());
 		mAssetBinderSystem.set_event_callback(engine->get_event_callback());
