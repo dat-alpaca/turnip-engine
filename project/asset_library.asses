@@ -115,6 +115,7 @@
         }
     ],
     "cubemaps": [
+
         {
             "channels": 3,
             "filepaths": [

@@ -90,7 +90,7 @@ namespace tur
 			{
 				if (!textureAsset.has_value())
 					return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
-
+				
 				TextureAsset& loadedTextureAsset = mTextureAssets.get(assetHandle);
 				{
 					loadedTextureAsset.data = textureAsset->data;
@@ -182,9 +182,10 @@ namespace tur
 			return asset;
 		},
 		[&, assetHandle](const std::optional<MeshAsset>& asset) {
+			
 			if (!asset.has_value())
 				return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
-
+			
 			auto mesh = asset.value();
 
 			MeshAsset& loadedMeshAsset = mMeshAssets.get(assetHandle);
@@ -221,11 +222,14 @@ namespace tur
 			{
 				return load_cubemap_task(filepaths, channels);
 			},
-			[&, assetHandle](const std::optional<CubemapAsset>& cubemapAsset)
+			[this, assetHandle](const std::optional<CubemapAsset>& cubemapAsset)
 			{
 				if (!cubemapAsset.has_value())
-					return TUR_LOG_ERROR("Failed to load cubemap asset into the asset library.");
-
+				{
+					TUR_LOG_ERROR("Failed to load cubemap asset into the asset library.");
+					return;
+				}
+		
 				CubemapAsset& loadedCubemapAsset = mCubemapAssets.get(assetHandle);
 				{
 					loadedCubemapAsset.data = cubemapAsset->data;

@@ -11,6 +11,7 @@
 
 #include "common.hpp"
 #include "config/worker_config.hpp"
+#include "logging/logging.hpp"
 
 namespace tur
 {
@@ -34,10 +35,15 @@ namespace tur
 				std::lock_guard<std::mutex> lock(mQueueMutex);
 
 				mTasks.emplace_back(
-					[&, callback = std::move(callback), task = std::move(task)]()
+					[this, callback = std::move(callback), task = std::move(task)]()
 					{
 						ReturnType returnValue = task();
-						mCallbacks.push_back([callback, returnValue = std::move(returnValue)]() { callback(returnValue); });
+
+						if(callback)
+						{
+							std::lock_guard<std::mutex> lockCallback(mCallbackMutex);
+							mCallbacks.push_back([callback, returnValue = std::move(returnValue)]() { callback(returnValue); });
+						}
 					}
 				);
 			}
@@ -55,6 +61,7 @@ namespace tur
 
 		std::condition_variable mConditionalVar;
 		std::mutex mQueueMutex;
+		std::mutex mCallbackMutex;
 
 		bool mStopExecution = false;
 	};

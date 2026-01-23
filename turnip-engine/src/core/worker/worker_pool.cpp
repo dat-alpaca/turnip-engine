@@ -1,4 +1,5 @@
 #include "worker_pool.hpp"
+#include "logging/logging.hpp"
 
 namespace tur
 {
@@ -26,12 +27,15 @@ namespace tur
 
 	void WorkerPool::poll_tasks()
 	{
-		std::unique_lock<std::mutex> lock(mQueueMutex);
+		std::vector<task_t> loadedCallbacks;
 
-		for (const auto& task : mCallbacks)
+		{
+			std::lock_guard<std::mutex> lock(mCallbackMutex);
+			loadedCallbacks.swap(mCallbacks);
+		}
+
+		for (auto& task : loadedCallbacks)
 			task();
-
-		mCallbacks.clear();
 	}
 
 	void WorkerPool::worker_function()
@@ -40,7 +44,6 @@ namespace tur
 		{
 			task_t task;
 			std::unique_lock<std::mutex> lock(mQueueMutex);
-
 			mConditionalVar.wait(lock, [this] { return !mTasks.empty() || mStopExecution; });
 
 			if (mStopExecution && mTasks.empty())
@@ -48,9 +51,9 @@ namespace tur
 
 			task = std::move(mTasks.front());
 			mTasks.pop_front();
+			lock.unlock();
 
 			task();
-			lock.unlock();
 		}
 	}
 }

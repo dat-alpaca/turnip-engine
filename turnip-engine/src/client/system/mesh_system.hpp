@@ -61,8 +61,14 @@ namespace tur
 					continue;
 				}
 
-				mRenderer.get_mesh(mMeshCache[e]).isVisible = culling.visible;
-				mRenderer.get_mesh(mMeshCache[e]).transform = transform.worldTransform.transform();
+				auto& rendererMesh = mRenderer.get_mesh(mMeshCache[e]);
+
+				rendererMesh.ebo = mesh.ebo;
+				rendererMesh.vbo = mesh.vbo;
+				rendererMesh.indexCount = mesh.indexCount;
+				rendererMesh.material = mesh.material;
+				rendererMesh.isVisible = culling.visible;
+				rendererMesh.transform = transform.worldTransform.transform();
 			}
 		}
 
