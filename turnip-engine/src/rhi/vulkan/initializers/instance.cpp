@@ -159,7 +159,7 @@ namespace tur::vulkan
 			for (const auto& layer : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", layer);
 
-			TUR_LOG_CRITICAL("Gracefully handling unsupported layers.");
+			// TUR_LOG_CRITICAL("Gracefully handling unsupported layers.");
 		}
 
 		validationResults = validate_extensions(supportedExtensions, extensions);
@@ -169,7 +169,7 @@ namespace tur::vulkan
 			for (const auto& extension : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", extension);
 
-			TUR_LOG_CRITICAL("Gracefully handling unsupported extensions.");
+			// TUR_LOG_CRITICAL("Gracefully handling unsupported extensions.");
 		}
 
 		// Instance:

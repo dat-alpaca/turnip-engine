@@ -186,6 +186,7 @@ namespace tur::gl
 			pipeline.inputAssemblyStage = descriptor.inputAssemblyStage;
 			pipeline.vertexInputStage = descriptor.vertexInputStage;
 
+			pipeline.depthDescriptor = descriptor.depthDescriptor;
 			pipeline.rasterizerStage = descriptor.rasterizerStage;
 			pipeline.setLayout = descriptor.setLayout;
 			pipeline.handle = pipelineID;
@@ -286,6 +287,16 @@ namespace tur::gl
 			} break;
 			
 			case TextureType::CUBE_MAP:
+			{
+				for(u32 i = 0; i < 6; ++i)
+				{
+					glTextureSubImage3D(
+						texture.handle, 0, 0, 0, i, asset.width, asset.height, 1, dataFormat, dataType, 
+						asset.data.data() + asset.width * asset.height * asset.channels * sizeof(byte) * i
+					);
+				}
+			} break;
+
 			case TextureType::TEXTURE_3D:
 				glTextureSubImage3D(
 					texture.handle, 0, 0, 0, 0, asset.width, asset.height, 1, dataFormat, dataType, asset.data.data()

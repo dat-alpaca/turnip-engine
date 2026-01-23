@@ -12,6 +12,11 @@ namespace tur
 		ALL = COLOR | DEPTH | STENCIL
 	};
 
+	inline ClearFlags operator|(ClearFlags lhs, ClearFlags rhs)
+	{
+		return static_cast<ClearFlags>(static_cast<u32>(lhs) | static_cast<u32>(rhs));
+	}
+
 	struct ClearColor
 	{
 	public:

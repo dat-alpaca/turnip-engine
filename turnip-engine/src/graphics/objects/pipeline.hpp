@@ -131,6 +131,28 @@ namespace tur
 
 namespace tur
 {
+	enum class DepthCompareOp
+	{
+		NEVER,
+		ALWAYS,
+		EQUAL,
+		NOT_EQUAL,
+		LESS,
+		LESS_OR_EQUAL,
+		GREATER,
+		GREATER_OR_EQUAL
+	};
+
+	struct DepthDescriptor
+	{
+		bool depthTestEnable = true;
+		bool depthWriteEnable = true;
+		DepthCompareOp compareOp = DepthCompareOp::LESS;
+	};
+}
+
+namespace tur
+{
 	using pipeline_handle = handle_type;
 
 	enum class DynamicState
@@ -144,6 +166,7 @@ namespace tur
 		VertexInputDescriptor vertexInputStage;
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
+		DepthDescriptor depthDescriptor;
 
 		descriptor_set_layout_handle setLayout;
 

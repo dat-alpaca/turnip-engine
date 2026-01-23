@@ -4,6 +4,7 @@
 #include <vector>
 #include <string>
 
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "scene/scene.hpp"
 #include "assets/audio/audio_asset.hpp"
@@ -31,6 +32,7 @@ namespace tur
         std::vector<TextureAsset> get_textures() const;
         std::vector<AudioAsset> get_audios() const;
         std::vector<MeshAsset> get_meshes() const;
+        std::vector<CubemapAsset> get_cubemaps() const;
     
         inline std::filesystem::path get_project_filepath(const std::filesystem::path& filepath) const
         {

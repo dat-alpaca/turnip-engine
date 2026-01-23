@@ -2,6 +2,7 @@
 #include "assets/asset.hpp"
 #include "assets/asset_library.hpp"
 #include "assets/audio/audio_asset.hpp"
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 
@@ -23,6 +24,8 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MeshData, vertices, indices);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MetallicRoughnessMaterialData, baseColorFactor, albedoTexture, normalTexture, metallicTexture, roughnessTexture);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MeshAsset, metadata);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CubemapAsset, metadata, filepaths, width, height, channels, options);
     
     inline nlohmann::json serialize_asset_library(NON_OWNING AssetLibrary* library)
     {
@@ -42,8 +45,12 @@ namespace tur
             object["audios"].push_back(audio);
 
         object["meshes"] = nlohmann::json::array(); 
-        for(const auto& audio : library->get_mesh_assets())
-            object["meshes"].push_back(audio);
+        for(const auto& mesh : library->get_mesh_assets())
+            object["meshes"].push_back(mesh);
+
+        object["cubemaps"] = nlohmann::json::array(); 
+        for(const auto& cubemap : library->get_cubemap_assets())
+            object["cubemaps"].push_back(cubemap);
 
         return object;
     }

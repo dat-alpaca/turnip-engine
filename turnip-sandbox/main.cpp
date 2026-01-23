@@ -1,4 +1,5 @@
 #include "assets/asset.hpp"
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "graphics/components.hpp"
 #include "scene/common_components.hpp"
@@ -32,6 +33,15 @@ private:
 
 		for(const MeshAsset& mesh : mProject.get_meshes())
 			library.load_mesh_async(mProject.get_project_filepath(mesh.metadata.filepath), mesh.metadata);
+
+		for(const CubemapAsset& cubemap : mProject.get_cubemaps())
+		{
+			std::array<std::filesystem::path, 6> filepaths;
+			for(u64 i = 0; i < 6; ++i)
+				filepaths[i] = mProject.get_project_filepath(cubemap.filepaths[i]);
+
+			library.load_cubemap_async(filepaths, cubemap);
+		}
 	}
 
 	void initialize_entities()

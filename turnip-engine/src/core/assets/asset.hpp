@@ -11,6 +11,7 @@ namespace tur
 		NONE = 0,
 		TEXTURE,
 		TEXTURE_ARRAY,
+		CUBEMAP,
 		AUDIO,
 		MESH
 	};

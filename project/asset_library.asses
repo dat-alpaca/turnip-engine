@@ -113,5 +113,46 @@
             },
             "width": 160
         }
+    ],
+    "cubemaps": [
+        {
+            "channels": 3,
+            "filepaths": [
+                "cubemaps/yokohama/posx.jpg",
+                "cubemaps/yokohama/negx.jpg",
+                "cubemaps/yokohama/negy.jpg",
+                "cubemaps/yokohama/posy.jpg",
+                "cubemaps/yokohama/posz.jpg",
+                "cubemaps/yokohama/negz.jpg"
+            ],
+            "metadata": {
+                "filepath": "cubemaps/posx.jpg",
+                "type": 3,
+                "uuid": 1147054274889511900,
+                "lifetime": 0
+            },
+            "options": {
+                "arrayLayers": 6,
+                "dataFormat": 2,
+                "depth": 1,
+                "floatTexture": false,
+                "format": 2,
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": 3,
+                "wrapS": 3,
+                "wrapT": 3
+            },
+            "width": 2048,
+            "height": 2048
+        }
     ]
 }

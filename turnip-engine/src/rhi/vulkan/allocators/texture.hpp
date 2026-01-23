@@ -5,6 +5,7 @@
 #include "assert/assert.hpp"
 #include "rhi/vulkan/objects/texture.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -39,7 +40,14 @@ namespace tur::vulkan
 			imageCreateInfo.extent = texture.extent;
 
 			imageCreateInfo.mipLevels = descriptor.mipLevels;
-			imageCreateInfo.arrayLayers = descriptor.arrayLayers;
+
+			if(descriptor.type == TextureType::CUBE_MAP)
+				imageCreateInfo.flags |= vk::ImageCreateFlagBits::eCubeCompatible;
+
+			if(descriptor.type == TextureType::CUBE_MAP)
+				imageCreateInfo.arrayLayers = 6;
+			else
+				imageCreateInfo.arrayLayers = descriptor.arrayLayers;
 
 			TUR_ASSERT(descriptor.samples <= 16, "Invalid sample size");
 			TUR_ASSERT(descriptor.samples > 0, "Invalid sample size");
@@ -114,7 +122,7 @@ namespace tur::vulkan
 			imageViewCreateInfo.subresourceRange.baseMipLevel = 0;
 			imageViewCreateInfo.subresourceRange.levelCount = 1;
 			imageViewCreateInfo.subresourceRange.baseArrayLayer = 0;
-			imageViewCreateInfo.subresourceRange.layerCount = descriptor.arrayLayers;
+			imageViewCreateInfo.subresourceRange.layerCount = imageCreateInfo.arrayLayers;
 
 			// TODO: descriptor aspect flags
 			imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;

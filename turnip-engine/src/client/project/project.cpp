@@ -78,6 +78,11 @@ namespace tur
     { 
         return assetLibraryObject["meshes"]; 
     }
+
+    std::vector<CubemapAsset> Project::get_cubemaps() const 
+    { 
+        return assetLibraryObject["cubemaps"]; 
+    }
 }
 
 namespace tur 

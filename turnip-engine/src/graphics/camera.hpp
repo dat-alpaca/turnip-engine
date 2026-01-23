@@ -1,4 +1,5 @@
 #pragma once
+#include "glm/trigonometric.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -25,7 +26,7 @@ namespace tur
 		}
 		void set_perspective(float fov, float aspectRatio, float zNear, float zFar)
 		{
-			mProjection = glm::perspective(fov, aspectRatio, zNear, zFar);
+			mProjection = glm::perspective(glm::radians(fov), aspectRatio, zNear, zFar);
 
 			mDimensions = {};
 			mDimensions.fov = fov;
@@ -36,7 +37,7 @@ namespace tur
 			mIsOrthographic = false;
 		}
 
-		void update_view() { mView = glm::lookAt(position, target, Camera::Up); }
+		void update_view() { mView = glm::lookAt(position, position + target, Camera::Up); }
 
 	public:
 		glm::vec3 position = glm::vec3(0.0f);

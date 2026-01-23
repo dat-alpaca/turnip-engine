@@ -50,7 +50,8 @@ namespace tur
 				"MOUSE_7", 				MouseButton::MOUSE_BUTTON_7,
 				"MOUSE_8", 				MouseButton::MOUSE_BUTTON_8,
 				"MOUSE_LEFT", 			MouseButton::MOUSE_BUTTON_LEFT,
-				"MOUSE_RIGHT", 			MouseButton::MOUSE_BUTTON_RIGHT
+				"MOUSE_RIGHT", 			MouseButton::MOUSE_BUTTON_RIGHT,
+				"MOUSE_MIDDLE", 		MouseButton::MOUSE_BUTTON_3
 			);
 		}
 
@@ -350,16 +351,21 @@ namespace tur
 			sol::usertype<CameraComponent> cameraType = mLua.new_usertype<CameraComponent>("camera");
 			cameraType["get_world_position"] = [&](CameraComponent& component, const glm::vec3& position) 
 			{
-				auto& camera = component.camera;
-				glm::vec2 dimensions = rWindow->get_dimensions();
-				glm::vec2 inverseDimensions = glm::vec2(1.0f / dimensions.x, 1.0f / dimensions.y);
+				if(component.camera.is_orthographic())
+				{
+					auto& camera = component.camera;
+					glm::vec2 dimensions = rWindow->get_dimensions();
+					glm::vec2 inverseDimensions = glm::vec2(1.0f / dimensions.x, 1.0f / dimensions.y);
 
-				float x = 2.0f * position.x * inverseDimensions.x - 1.0f;
-				float y = 2.0f * position.y * inverseDimensions.y - 1.0f;
+					float x = 2.0f * position.x * inverseDimensions.x - 1.0f;
+					float y = 2.0f * position.y * inverseDimensions.y - 1.0f;
 
-				glm::mat4 inverted = glm::inverse(camera.projection() * camera.view());
-				glm::vec4 worldPosition = inverted * glm::vec4(x, y, 0.0, 1.0f);
-				return glm::vec2(worldPosition);
+					glm::mat4 inverted = glm::inverse(camera.projection() * camera.view());
+					glm::vec4 worldPosition = inverted * glm::vec4(x, y, 0.0, 1.0f);
+					return glm::vec2(worldPosition);
+				}
+
+				return glm::vec2(0.0f);
 			};
 			cameraType["get_position"] = [&](CameraComponent& component) 
 			{
@@ -383,13 +389,13 @@ namespace tur
 			};
 			cameraType["set_perspective"] = [&](CameraComponent& component, float fov, float aspectRatio, float zNear, float zFar) 
 			{
-				component.camera.set_orthogonal(fov, aspectRatio, zNear, zFar);
+				component.camera.set_perspective(fov, aspectRatio, zNear, zFar);
 			};
 			cameraType["set_main"] = [&](CameraComponent& component, bool value) 
 			{
 				component.mainCamera = value;
 			};
-			cameraType["get_main"] = [&](CameraComponent& component) 
+			cameraType["is_main"] = [&](CameraComponent& component) 
 			{
 				return component.mainCamera;
 			};

@@ -7,6 +7,7 @@
 
 #include "assets/asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
+#include "assets/cubemap/cubemap_asset.hpp"
 
 #include "audio/audio_handler.hpp"
 #include "texture/texture_options.hpp"
@@ -33,6 +34,7 @@ namespace tur
 		asset_handle load_texture_async(const std::filesystem::path& filepath, const AssetMetadata& metadata, const TextureOptions& options = {});
 		asset_handle load_audio_async(const std::filesystem::path& filepath, const AssetMetadata& metadata);
 		asset_handle load_mesh_async(const std::filesystem::path& filepath, const AssetMetadata& metadata);
+		asset_handle load_cubemap_async(const std::array<std::filesystem::path, 6>& filepaths, const CubemapAsset& asset);
 
 	public:
 		inline asset_handle get_asset_handle(const std::filesystem::path& filepath)
@@ -57,6 +59,13 @@ namespace tur
 
 			return mTextureAssets.get(handle);
 		}
+		inline CubemapAsset& get_cubemap_asset(asset_handle handle)
+		{
+			if (handle == invalid_handle)
+				TUR_LOG_CRITICAL("Invalid asset handle passed to get_cubemap_asset()");
+
+			return mCubemapAssets.get(handle);
+		}
 		inline AudioAsset& get_audio_asset(asset_handle handle)
 		{
 			if (handle == invalid_handle)
@@ -76,6 +85,7 @@ namespace tur
 		inline free_list<TextureAsset>& get_texture_assets() { return mTextureAssets; };
 		inline free_list<AudioAsset>& get_audio_assets() { return mAudioAssets; }
 		inline free_list<MeshAsset>& get_mesh_assets() { return mMeshAssets; }
+		inline free_list<CubemapAsset>& get_cubemap_assets() { return mCubemapAssets; }
 
 	private:
 		NON_OWNING WorkerPool* rWorkerPool = nullptr;
@@ -89,9 +99,11 @@ namespace tur
 		free_list<TextureAsset> mTextureAssets;
 		free_list<AudioAsset> mAudioAssets;
 		free_list<MeshAsset> mMeshAssets;
+		free_list<CubemapAsset> mCubemapAssets;
 
 		std::vector<asset_handle> mTextureRemoveOnSceneChange;
 		std::vector<asset_handle> mAudioRemoveOnSceneChange;
 		std::vector<asset_handle> mMeshRemoveOnSceneChange;
+		std::vector<asset_handle> mCubemapRemoveOnSceneChange;
 	};
 }

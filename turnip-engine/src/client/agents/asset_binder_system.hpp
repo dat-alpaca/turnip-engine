@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
@@ -73,6 +74,14 @@ namespace tur
 					
 				} break;
 
+				case AssetType::CUBEMAP:
+				{
+					texture_handle textureHandle = create_cubemap_texture_from_asset(event.assetHandle);
+					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
+					callback(uploadEvent);
+					
+				} break;
+
 				case AssetType::MESH:
 				{
 					auto data = create_mesh_from_asset(event.assetHandle);
@@ -96,6 +105,10 @@ namespace tur
 				case AssetType::TEXTURE_ARRAY:
 					update_texture_array_handle(textureUploaded);
 					break;
+
+				case AssetType::CUBEMAP:
+					update_cubemap_handle(textureUploaded);
+					break;
 				
 				default:
 					TUR_LOG_ERROR("Attempted to register an invalid asset type as texture.");
@@ -112,6 +125,12 @@ namespace tur
 		{
 			const TextureAsset& textureAsset = rLibrary->get_texture_asset(assetHandle);
 			return upload_texture_from_asset(textureAsset, isArray);
+		}
+
+		texture_handle create_cubemap_texture_from_asset(asset_handle assetHandle)
+		{
+			const CubemapAsset& cubemapAsset = rLibrary->get_cubemap_asset(assetHandle);
+			return upload_cubemap_from_asset(cubemapAsset);
 		}
 
 		MeshUploadData create_mesh_from_asset(asset_handle assetHandle)
@@ -196,6 +215,16 @@ namespace tur
 			}
 		}
 
+		void update_cubemap_handle(const TextureUploadedEvent& cubemapUploaded)
+		{
+			auto view = rScene->get_registry().view<CubemapComponent>();
+			for (auto [e, cubemap] : view.each())
+			{
+				if (cubemap.assetHandle == cubemapUploaded.assetHandle)
+					cubemap.textureHandle = cubemapUploaded.textureHandle;
+			}
+		}
+
 		void update_mesh_handles(const MeshUploadedEvent& meshUploadedEvent)
 		{
 			auto view = rScene->get_registry().view<MeshComponent>();
@@ -243,6 +272,48 @@ namespace tur
 			}
 
 			auto& resources = rRHI->get_resource_handler();
+			return resources.create_texture(descriptor, textureAsset);
+		}
+
+		texture_handle upload_cubemap_from_asset(const CubemapAsset& cubemapAsset)
+		{
+			const TextureOptions& options = cubemapAsset.options;
+
+			TextureDescriptor descriptor;
+			{
+				descriptor.width = cubemapAsset.width;
+				descriptor.height = cubemapAsset.height;
+				descriptor.layerWidth = options.layerWidth;
+				descriptor.layerHeight = options.layerHeight;
+				descriptor.depth = options.depth;
+				descriptor.mipLevels = options.mipLevels;
+				descriptor.samples = options.samples;
+				descriptor.arrayLayers = 6;
+
+				descriptor.format = options.format;
+				descriptor.type = TextureType::CUBE_MAP;
+
+				descriptor.generateMipmaps = options.generateMipmaps;
+
+				descriptor.wrapS = options.wrapS;
+				descriptor.wrapT = options.wrapT;
+				descriptor.wrapR = options.wrapR;
+				descriptor.minFilter = options.minFilter;
+				descriptor.magFilter = options.magFilter;
+
+				descriptor.tiling = options.tiling;
+			}
+
+			auto& resources = rRHI->get_resource_handler();
+
+			TextureAsset textureAsset = {};
+			{
+				textureAsset.data = cubemapAsset.data;
+				textureAsset.width = cubemapAsset.width;
+				textureAsset.height = cubemapAsset.height;
+				textureAsset.channels = cubemapAsset.channels;
+				textureAsset.options = cubemapAsset.options;
+			}
 			return resources.create_texture(descriptor, textureAsset);
 		}
 

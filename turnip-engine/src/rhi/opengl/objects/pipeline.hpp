@@ -44,6 +44,39 @@ namespace tur::gl
 		return GL_FRONT;
 	}
 
+	constexpr inline gl_handle get_compare_op(DepthCompareOp op)
+	{
+		switch(op)
+		{
+			case DepthCompareOp::NEVER:
+				return GL_NEVER;
+
+			case DepthCompareOp::ALWAYS:
+				return GL_ALWAYS;
+
+			case DepthCompareOp::EQUAL:
+				return GL_EQUAL;
+
+			case DepthCompareOp::NOT_EQUAL:
+				return GL_NOTEQUAL;
+
+			case DepthCompareOp::LESS:
+				return GL_LESS;
+
+			case DepthCompareOp::LESS_OR_EQUAL:
+				return GL_LEQUAL;
+
+			case DepthCompareOp::GREATER:
+				return GL_GREATER;
+
+			case DepthCompareOp::GREATER_OR_EQUAL:
+				return GL_GEQUAL;
+		}
+
+		TUR_LOG_ERROR("Invalid Depth Compare Operation: {}. Default: GL_LESS", static_cast<int>(op));
+		return GL_LESS;
+	}
+
 	constexpr inline gl_handle get_polygon_mode(PolygonMode polygonMode)
 	{
 		switch (polygonMode)
@@ -218,6 +251,7 @@ namespace tur::gl
 		VertexInputDescriptor vertexInputStage;
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
+		DepthDescriptor depthDescriptor;
 
 		descriptor_set_layout_handle setLayout;
 		gl_handle handle = invalid_handle;

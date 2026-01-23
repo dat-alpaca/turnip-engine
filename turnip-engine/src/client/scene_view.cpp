@@ -70,6 +70,7 @@ namespace tur
 	void SceneView::on_update(const Time& time)
 	{
 		quadSystem.on_update();
+		mCubemapSystem.on_update();
 		tilemapSystem.on_update(time);
 		mMeshSystem.on_update();
 
@@ -78,6 +79,7 @@ namespace tur
 
 		cameraSystem.on_update();
 		quadSystem.set_camera(cameraSystem.get_main_camera());
+		mCubemapSystem.set_camera(cameraSystem.get_main_camera());
 		mMeshSystem.set_camera(cameraSystem.get_main_camera());
 		tilemapSystem.set_camera(cameraSystem.get_main_camera());
 	}
@@ -91,7 +93,7 @@ namespace tur
 
 		CommandBuffer commandBuffer = rhi.create_command_buffer();
 		commandBuffer.reset(rhi.get_current_command_buffer());
-		commandBuffer.set_clear_color({}, ClearFlags::COLOR);
+		commandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
 
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
@@ -99,6 +101,7 @@ namespace tur
 			tilemapSystem.render();
 			quadSystem.render();
 			mMeshSystem.render();
+			mCubemapSystem.render();
 
 			std::vector<CommandBuffer::BufferType> commandBuffers;
 			{
@@ -113,6 +116,10 @@ namespace tur
 
 				commandBuffers.push_back(
 					mMeshSystem.renderer().get_command_buffer().get_buffer()
+				);
+
+				commandBuffers.push_back(
+					mCubemapSystem.renderer().get_command_buffer().get_buffer()
 				);
 			}
 
@@ -132,6 +139,7 @@ namespace tur
 				scriptSystem.set_scene(sceneSwitch.currentScene);
 
 				quadSystem.set_scene(sceneSwitch.currentScene);
+				mCubemapSystem.set_scene(sceneSwitch.currentScene);
 				tilemapSystem.set_scene(sceneSwitch.currentScene);
 				mMeshSystem.set_scene(sceneSwitch.currentScene);
 
@@ -147,6 +155,7 @@ namespace tur
 		mPhysicsScriptAgent.on_event(event);
 		mAssetBinderSystem.on_event(event);
 		quadSystem.on_event(event);
+		mCubemapSystem.on_event(event);
 		tilemapSystem.on_event(event);
 		mMeshSystem.on_event(event);
 		scriptSystem.on_event(event);
@@ -157,14 +166,18 @@ namespace tur
 		// Renderer Systems:
 		auto& rhi = engine->get_render_interface();
 		quadSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
-		quadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+		quadSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
 	
 		// Tilemap:
 		tilemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
-		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+		tilemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
 
 		// Mesh:
 		mMeshSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
-		mMeshSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR);
+		mMeshSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
+
+		// Cubemap:
+		mCubemapSystem.initialize(&rhi, mSceneHolder.get_current_scene(), nullptr);
+		mCubemapSystem.renderer().set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
 	}
 }

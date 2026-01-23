@@ -53,7 +53,23 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 		
-		UUID uuid;
+		UUID uuid; // texture UUID
+	};
+
+	struct CubemapComponent
+	{
+	public:
+		CubemapComponent() = default;
+		CubemapComponent(asset_handle assetHandle)
+			: assetHandle(assetHandle)
+		{
+		}
+
+	public:
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
+		
+		UUID uuid; // texture UUID
 	};
 
 	struct Tilemap2DComponent
@@ -74,7 +90,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 
-		UUID uuid;
+		UUID uuid; // texture UUID
 	};
 
 	struct MeshComponent
@@ -88,7 +104,7 @@ namespace tur
 
 	public:
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
-		UUID uuid;
+		UUID uuid; // mesh UUID
 
 	public:
 		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;

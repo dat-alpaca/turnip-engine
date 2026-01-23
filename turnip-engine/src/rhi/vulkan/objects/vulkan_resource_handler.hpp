@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "core/assets/texture/texture_asset.hpp"
 
 #include "graphics/objects/descriptor.hpp"

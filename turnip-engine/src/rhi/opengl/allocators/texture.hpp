@@ -47,6 +47,9 @@ namespace tur::gl
 				break;
 
 			case TextureType::CUBE_MAP:
+				glTextureStorage2D(textureID, descriptor.mipLevels, textureFormat, descriptor.width, descriptor.height);
+				break;
+
 			case TextureType::TEXTURE_3D:
 				glTextureStorage3D(textureID, descriptor.mipLevels, textureFormat, descriptor.width, descriptor.height, descriptor.arrayLayers);
 				break;

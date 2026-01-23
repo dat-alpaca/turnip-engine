@@ -3,6 +3,7 @@
 #include <optional>
 #include <stb_image.h>
 
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/asset.hpp"
 
@@ -43,6 +44,9 @@ namespace tur
 			for(auto meshHandle : mMeshRemoveOnSceneChange)
 				mMeshAssets.remove(meshHandle);
 
+			for(auto cubemapHandle : mCubemapRemoveOnSceneChange)
+				mCubemapAssets.remove(cubemapHandle);
+
 			return false;
 		});
 	}
@@ -82,7 +86,7 @@ namespace tur
 				else
 					return load_float_texture_task(filepath);
 			},
-			[&, filepath, assetHandle](const texture_asset_opt& textureAsset)
+			[&, assetHandle](const texture_asset_opt& textureAsset)
 			{
 				if (!textureAsset.has_value())
 					return TUR_LOG_ERROR("Failed to load texture asset into the asset library.");
@@ -191,6 +195,50 @@ namespace tur
 			AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MESH);
 			mEventCallback(assetLoadedEvent);
 		});
+
+		return assetHandle;
+	}
+
+	asset_handle AssetLibrary::load_cubemap_async(const std::array<std::filesystem::path, 6>& filepaths, const CubemapAsset& asset)
+	{
+		if (mFilepathCache.find(asset.metadata.filepath) != mFilepathCache.end())
+			return mFilepathCache[asset.metadata.filepath];
+
+		CubemapAsset loadingAsset = {};
+		loadingAsset.options = asset.options;
+		loadingAsset.metadata = asset.metadata;
+		loadingAsset.state = AssetState::LOADING;
+
+		asset_handle assetHandle = mCubemapAssets.add(loadingAsset);
+		mFilepathCache[asset.metadata.filepath] = assetHandle;
+		mUUIDCache[asset.metadata.uuid] = assetHandle;
+
+		if (asset.metadata.lifetime == AssetLifetime::SCENE_BOUND)
+			mCubemapRemoveOnSceneChange.push_back(assetHandle);
+
+		rWorkerPool->submit<std::optional<CubemapAsset>>(
+			[filepaths, channels = asset.channels]()
+			{
+				return load_cubemap_task(filepaths, channels);
+			},
+			[&, assetHandle](const std::optional<CubemapAsset>& cubemapAsset)
+			{
+				if (!cubemapAsset.has_value())
+					return TUR_LOG_ERROR("Failed to load cubemap asset into the asset library.");
+
+				CubemapAsset& loadedCubemapAsset = mCubemapAssets.get(assetHandle);
+				{
+					loadedCubemapAsset.data = cubemapAsset->data;
+					loadedCubemapAsset.width = cubemapAsset->width;
+					loadedCubemapAsset.height = cubemapAsset->height;
+					loadedCubemapAsset.channels = cubemapAsset->channels;
+					loadedCubemapAsset.state = AssetState::READY;
+				}
+
+				AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::CUBEMAP);
+				mEventCallback(assetLoadedEvent);
+			}
+		);
 
 		return assetHandle;
 	}

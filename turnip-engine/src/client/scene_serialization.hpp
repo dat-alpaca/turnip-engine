@@ -20,6 +20,7 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TransformComponent, transform);
     
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Sprite2DComponent, uuid);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(CubemapComponent, uuid);
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TileFlags, data);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Tile, position, layer, flags);
@@ -149,6 +150,7 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
+            .get<CubemapComponent>(archive)
             .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
             .get<Body2DComponent>(archive)
@@ -171,6 +173,7 @@ namespace tur
             .get<NameComponent>(archive)
             .get<TransformComponent>(archive)
             .get<Sprite2DComponent>(archive)
+            .get<CubemapComponent>(archive)
             .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
             .get<Body2DComponent>(archive)

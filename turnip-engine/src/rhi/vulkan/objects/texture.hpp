@@ -34,7 +34,7 @@ namespace tur::vulkan
 				return vk::ImageType::e3D;
 
 			case TextureType::CUBE_MAP:
-				return vk::ImageType::e3D;
+				return vk::ImageType::e2D;
 		}
 
 		TUR_LOG_ERROR("Invalid Texture Type: {}. Default: e2D", static_cast<int>(type));

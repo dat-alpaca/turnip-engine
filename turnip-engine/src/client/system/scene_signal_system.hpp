@@ -1,6 +1,7 @@
 #pragma once
 #include "assert/assert.hpp"
 #include "assets/asset_library.hpp"
+#include "assets/cubemap/cubemap_asset.hpp"
 #include "audio/audio_components.hpp"
 #include "defines.hpp"
 
@@ -58,6 +59,15 @@ namespace tur
                     continue;
 
                 tilemap.assetHandle = rLibrary->get_asset_handle(tilemap.uuid);
+            }
+
+            auto viewCubemap = scene->get_registry().view<CubemapComponent>();
+            for (auto [e, cubemap] : viewCubemap.each())
+            {
+                if(cubemap.assetHandle != invalid_handle)
+                    continue;
+
+                cubemap.assetHandle = rLibrary->get_asset_handle(cubemap.uuid);
             }
         }
 

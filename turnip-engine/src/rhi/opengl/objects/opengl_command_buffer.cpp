@@ -38,6 +38,7 @@ namespace tur::gl
 		else
 			glBindFramebuffer(GL_FRAMEBUFFER, resources.get_render_targets().get(renderTarget).handle);
 
+		glEnable(GL_DEPTH_TEST);
 		glDepthRange(0.0, 1.0);
 	}
 	void CommandBufferGL::begin_rendering()
@@ -127,7 +128,10 @@ namespace tur::gl
 		glFrontFace(get_front_face(mPipeline.rasterizerStage.frontFace));
 		glPolygonMode(GL_FRONT_AND_BACK, get_polygon_mode(mPipeline.rasterizerStage.polygonMode));
 		glCullFace(get_cull_mode(mPipeline.rasterizerStage.cullMode));
-
+		
+		glDepthMask(mPipeline.depthDescriptor.depthWriteEnable);
+		glDepthFunc(get_compare_op(mPipeline.depthDescriptor.compareOp));
+			
 		// Setup vertex input bindings & attributes:
 		for (const auto& binding : mPipeline.vertexInputStage.vertexBindings)
 		{

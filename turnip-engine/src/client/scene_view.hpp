@@ -12,6 +12,7 @@
 #include "system/scene_signal_system.hpp"
 #include "system/camera_system.hpp"
 #include "system/mesh_system.hpp"
+#include "system/cubemap_system.hpp"
 
 #include "agents/physics_script_agent.hpp"
 #include "agents/asset_binder_system.hpp"
@@ -62,6 +63,7 @@ namespace tur
 		AssetBinderSystem mAssetBinderSystem;
 
 		ImmQuadSystem quadSystem;
+		CubemapSystem mCubemapSystem;
 		TilemapSystem tilemapSystem;
 		MeshSystem mMeshSystem;
 
