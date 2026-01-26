@@ -90,10 +90,16 @@ namespace tur::vulkan
 				usageFlags |= vk::ImageUsageFlagBits::eSampled;
 			}
 			
-			if(descriptor.isAttachment)
+			if(descriptor.isColorAttachment)
 			{
 				usageFlags |= vk::ImageUsageFlagBits::eTransferSrc;
 				usageFlags |= vk::ImageUsageFlagBits::eColorAttachment;
+			}
+
+			if(descriptor.isDepthAttachment)
+			{
+				usageFlags |= vk::ImageUsageFlagBits::eTransferSrc;
+				usageFlags |= vk::ImageUsageFlagBits::eDepthStencilAttachment;
 			}
 
 			imageCreateInfo.usage = usageFlags;
@@ -131,7 +137,10 @@ namespace tur::vulkan
 				imageViewCreateInfo.subresourceRange.layerCount = 6;
 
 			// TODO: descriptor aspect flags
-			imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+			if(!descriptor.isDepthAttachment)
+				imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
+			else
+				imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 		}
 
 		texture.imageView = check_vk_object(device.createImageView(imageViewCreateInfo), "ImageView");

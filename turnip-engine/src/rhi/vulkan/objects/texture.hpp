@@ -130,8 +130,8 @@ namespace tur::vulkan
 			case TextureFormat::DEPTH_16_UNORM:
 				return vk::Format::eD16Unorm;
 
-			case TextureFormat::DEPTH_STENCIL16_S8U_INT:
-				return vk::Format::eD16UnormS8Uint;
+			case TextureFormat::DEPTH_STENCIL24_S8U_INT:
+				return vk::Format::eD24UnormS8Uint;
 
 			case TextureFormat::R8_UNORM:
 				return vk::Format::eR8Unorm;
@@ -163,8 +163,8 @@ namespace tur::vulkan
 			case vk::Format::eD16Unorm:
 				return TextureFormat::DEPTH_16_UNORM;
 
-			case vk::Format::eD16UnormS8Uint:
-				return TextureFormat::DEPTH_STENCIL16_S8U_INT;
+			case vk::Format::eD24UnormS8Uint:
+				return TextureFormat::DEPTH_STENCIL24_S8U_INT;
 
 			case vk::Format::eR8Unorm:
 				return TextureFormat::R8_UNORM;

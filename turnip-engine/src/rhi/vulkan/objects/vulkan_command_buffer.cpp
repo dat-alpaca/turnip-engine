@@ -49,11 +49,12 @@ namespace tur::vulkan
 			
 			RenderTarget target = get_render_target();
 			auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
+			auto& depthTexture = resources.get_textures().get(target.depthAttachment.textureHandle);
 
 			renderingInfo.colorAttachmentCount = 1;
 			renderingInfo.pColorAttachmentFormats = &colorTexture.format;
-			renderingInfo.depthAttachmentFormat = vk::Format::eUndefined;
-			renderingInfo.stencilAttachmentFormat = vk::Format::eUndefined;
+			renderingInfo.depthAttachmentFormat = depthTexture.format;
+			renderingInfo.stencilAttachmentFormat = depthTexture.format;
 			renderingInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
 
 			inheritanceInfo.pNext = &renderingInfo;
@@ -78,6 +79,7 @@ namespace tur::vulkan
 
 		RenderTarget target = get_render_target();
 		auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
+		auto& depthTexture = resources.get_textures().get(target.depthAttachment.textureHandle);
 
 		utils::transition_texture_layout(
 			*rRHI, colorTexture,
@@ -92,9 +94,16 @@ namespace tur::vulkan
 
 		if (target.depthAttachment.textureHandle != invalid_handle)
 		{
-			// TODO: enable depth
-			auto& texture = resources.get_textures().get(target.depthAttachment.textureHandle);
-			// utils::transition_texture_layout(*rRHI, texture, vk::ImageLayout::eDepthStencilAttachmentOptimal);
+			utils::transition_texture_layout(
+				*rRHI, depthTexture,
+				{
+					.newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
+					.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+					.srcAccessMask = vk::AccessFlagBits2::eNone,
+					.dstStageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+					.dstAccessMask = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite
+				}
+			);
 		}
 
 		// 3. create rendering info
@@ -110,11 +119,11 @@ namespace tur::vulkan
 				vk::ClearValue({mClearColor.color.r, mClearColor.color.g, mClearColor.color.b, mClearColor.color.a}
 			);
 
-			depthAttachmentInfo.imageView = nullptr;
+			depthAttachmentInfo.imageView = depthTexture.imageView;
 			depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
 			depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
-			depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eLoad;
-			depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
+			depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eClear;
+			depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eDontCare;
 			depthAttachmentInfo.clearValue =
 				vk::ClearValue(vk::ClearDepthStencilValue(mClearColor.depth, mClearColor.stencil));
 
@@ -124,8 +133,8 @@ namespace tur::vulkan
 			renderInfo.colorAttachmentCount = 1;
 			renderInfo.layerCount = 1;
 			renderInfo.pColorAttachments = &colorAttachmentInfo;
-			// renderInfo.pDepthAttachment = &depthAttachmentInfo;
-			// renderInfo.pStencilAttachment = nullptr;
+			renderInfo.pDepthAttachment = &depthAttachmentInfo;
+			renderInfo.pStencilAttachment = &depthAttachmentInfo;
 		}
 
 		mCommandBuffer.beginRendering(renderInfo);

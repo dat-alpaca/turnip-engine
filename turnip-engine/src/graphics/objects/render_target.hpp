@@ -27,7 +27,8 @@ namespace tur
 
 	struct RenderTargetDescriptor
 	{
-		std::vector<AttachmentDescription> attachmentDescriptions = {};
+		AttachmentDescription colorAttachment;
+		AttachmentDescription depthAttachment;
 	};
 
 	using render_target_handle = handle_type;

@@ -125,18 +125,28 @@ namespace tur::vulkan
 		if (mState.mainRenderTargetHandle != invalid_handle)
 			mResources.destroy_render_target(mState.mainRenderTargetHandle);
 
+		// TODO: global render target settings
+		// TODO: different load/store ops
+
 		RenderTargetDescriptor descriptor;
 		{
 			TextureDescriptor textureDesc;
-			textureDesc.format = TextureFormat::RGBA8_UNORM; // TODO: add a global variable to it
+			textureDesc.format = TextureFormat::RGBA8_UNORM; 
 			textureDesc.width = mState.swapchainExtent.width;
 			textureDesc.height = mState.swapchainExtent.height;
-			textureDesc.isAttachment = true;
+			textureDesc.isColorAttachment = true;
 
-			AttachmentDescription attachment;
-			attachment.textureDescriptor = textureDesc;
+			descriptor.colorAttachment.textureDescriptor = textureDesc;
+		}
 
-			descriptor.attachmentDescriptions.push_back(attachment);
+		{
+			TextureDescriptor depthDesc;
+			depthDesc.format = TextureFormat::DEPTH_STENCIL24_S8U_INT;
+			depthDesc.width = mState.swapchainExtent.width;
+			depthDesc.height = mState.swapchainExtent.height;
+			depthDesc.isDepthAttachment = true;
+
+			descriptor.depthAttachment.textureDescriptor = depthDesc;
 		}
 
 		mState.mainRenderTargetHandle = mResources.create_render_target(descriptor);
@@ -358,8 +368,8 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 			else
 				aspectMask = vk::ImageAspectFlagBits::eColor;
 

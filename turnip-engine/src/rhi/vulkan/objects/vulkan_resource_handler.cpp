@@ -55,14 +55,13 @@ namespace tur::vulkan
 	render_target_handle ResourceHandler::create_render_target(const RenderTargetDescriptor& descriptor)
 	{
 		RenderTarget renderTarget;
-		renderTarget.colorAttachment.loadOp = descriptor.attachmentDescriptions[0].loadOp;
-		renderTarget.colorAttachment.storeOp = descriptor.attachmentDescriptions[0].storeOp;
-		renderTarget.colorAttachment.textureHandle =
-			create_empty_texture(descriptor.attachmentDescriptions[0].textureDescriptor);
-
-		// TODO: support depth and stencil
-		// renderTarget.depthAttachment.loadOp = descriptor.attachmentDescriptions[1].loadOp;
-		// renderTarget.depthAttachment.storeOp = descriptor.attachmentDescriptions[1].storeOp;
+		renderTarget.colorAttachment.loadOp = descriptor.colorAttachment.loadOp;
+		renderTarget.colorAttachment.storeOp = descriptor.colorAttachment.storeOp;
+		renderTarget.colorAttachment.textureHandle = create_empty_texture(descriptor.colorAttachment.textureDescriptor);
+		
+		renderTarget.depthAttachment.loadOp = descriptor.depthAttachment.loadOp;
+		renderTarget.depthAttachment.storeOp = descriptor.depthAttachment.storeOp;
+		renderTarget.depthAttachment.textureHandle = create_empty_texture(descriptor.depthAttachment.textureDescriptor);
 
 		return mRenderTargets.add(renderTarget);
 	}

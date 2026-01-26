@@ -106,7 +106,7 @@ namespace tur::gl
 			case TextureFormat::DEPTH_16_UNORM:
 				return GL_DEPTH_COMPONENT;
 
-			case TextureFormat::DEPTH_STENCIL16_S8U_INT:
+			case TextureFormat::DEPTH_STENCIL24_S8U_INT:
 				return GL_DEPTH_STENCIL;
 
 			case TextureFormat::R8_UNORM:
