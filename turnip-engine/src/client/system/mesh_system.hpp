@@ -47,6 +47,12 @@ namespace tur
             auto view = rScene->get_registry().view<TransformComponent, MeshComponent, const CullingComponent>();
 			for (auto [e, transform, mesh, culling] : view.each())
 			{
+				if(!mesh.material.is_valid())
+					continue;
+
+				if(mesh.vbo == invalid_handle || mesh.ebo == invalid_handle)
+					continue;
+
 				if(mMeshCache.find(e) == mMeshCache.end())
 				{
 					MeshRenderer::InternalMesh internal;
@@ -54,6 +60,7 @@ namespace tur
 					internal.vbo = mesh.vbo;
 					internal.indexCount = mesh.indexCount;
 					internal.isVisible = culling.visible;
+					internal.indexType = mesh.indexType;
 
 					internal.material = mesh.material;
 

@@ -114,13 +114,11 @@ namespace tur
 				if(!tilemapSystem.renderer().is_empty())
 					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_buffer());
 
-				commandBuffers.push_back(
-					mMeshSystem.renderer().get_command_buffer().get_buffer()
-				);
+				if(mMeshSystem.renderer().mesh_count() > 0)
+					commandBuffers.push_back(mMeshSystem.renderer().get_command_buffer().get_buffer());
 
-				commandBuffers.push_back(
-					mCubemapSystem.renderer().get_command_buffer().get_buffer()
-				);
+				if(mCubemapSystem.renderer().is_valid())
+					commandBuffers.push_back(mCubemapSystem.renderer().get_command_buffer().get_buffer());
 			}
 
 			commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});

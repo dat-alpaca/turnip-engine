@@ -1,5 +1,6 @@
 #pragma once
 #include "client/system/system.hpp"
+#include "defines.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/components.hpp"
@@ -46,6 +47,9 @@ namespace tur
 			auto view = rScene->get_registry().view<CubemapComponent>();
 			for (auto [e, cubemap] : view.each())
             {
+				if(cubemap.textureHandle == invalid_handle)
+					continue;
+				
 				mCubemapRenderer.set_cubemap_details(cubemap.textureHandle);
                 cubemapSet = true;
                 return;

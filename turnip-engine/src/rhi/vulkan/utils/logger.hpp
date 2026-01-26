@@ -1,5 +1,6 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
+#include "logging/logging.hpp"
 
 // TODO: improve this thing someday.
 

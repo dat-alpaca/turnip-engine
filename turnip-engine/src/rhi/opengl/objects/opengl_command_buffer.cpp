@@ -204,12 +204,13 @@ namespace tur::gl
 	void CommandBufferGL::draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance)
 	{
 		gl_handle topology = get_primitive_topology(mPipeline.inputAssemblyStage.topology);
+		u32 indexSize = indexCount * get_buffer_index_size(mBufferIndexType);
 
 		if (instanceCount == 1)
-			glDrawElements(topology, indexCount, get_buffer_index_type(mBufferIndexType), nullptr);
+			glDrawElements(topology, indexSize, get_buffer_index_type(mBufferIndexType), nullptr);
 		else
 			glDrawElementsInstanced(
-				topology, indexCount, get_buffer_index_type(mBufferIndexType), nullptr, instanceCount
+				topology, indexSize, get_buffer_index_type(mBufferIndexType), nullptr, instanceCount
 			);
 	}
 }

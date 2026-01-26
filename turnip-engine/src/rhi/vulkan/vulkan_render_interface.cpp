@@ -1,6 +1,7 @@
 #include "vulkan_render_interface.hpp"
 #include "rhi/vulkan/allocators/allocators.hpp"
 #include "rhi/vulkan/initializers/initializers.hpp"
+#include "rhi/vulkan/objects/texture.hpp"
 
 // TODO: substitute vk::result checks
 
@@ -130,6 +131,7 @@ namespace tur::vulkan
 			textureDesc.format = TextureFormat::RGBA8_UNORM; // TODO: add a global variable to it
 			textureDesc.width = mState.swapchainExtent.width;
 			textureDesc.height = mState.swapchainExtent.height;
+			textureDesc.isAttachment = true;
 
 			AttachmentDescription attachment;
 			attachment.textureDescriptor = textureDesc;

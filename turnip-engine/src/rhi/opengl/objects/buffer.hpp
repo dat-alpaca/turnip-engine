@@ -34,6 +34,24 @@ namespace tur::gl
 
 		return GL_UNSIGNED_INT;
 	}
+
+	constexpr static inline u32 get_buffer_index_size(BufferIndexType type)
+	{
+		switch (type)
+		{
+			case BufferIndexType::UNSIGNED_BYTE:
+				return 1;
+
+			case BufferIndexType::UNSIGNED_SHORT:
+				return 2;
+
+			case BufferIndexType::UNSIGNED_INT:
+				return 4;
+		}
+
+		TUR_LOG_ERROR("Invalid Index Buffer Type: {}. Default: GL_UNSIGNED_INT", static_cast<int>(type));
+		return 4;
+	}
 }
 
 namespace tur::gl

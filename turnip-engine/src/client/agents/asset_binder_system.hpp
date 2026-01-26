@@ -96,6 +96,12 @@ namespace tur
 
 		void handle_texture_uploaded_event(const TextureUploadedEvent& textureUploaded)
 		{
+			if(textureUploaded.textureHandle == invalid_handle)
+			{
+				TUR_LOG_ERROR("Attempted to upload an invalid texture handle.");
+				return;
+			}
+
 			switch(textureUploaded.type)
 			{
 				case AssetType::TEXTURE:
@@ -185,11 +191,28 @@ namespace tur
 				material.baseColor = meshAsset.meshMaterial.baseColorFactor;
 			}
 
+			u64 indexCount = meshAsset.meshData.indices.size();
+			switch(meshAsset.meshData.indexType)
+			{
+				case tur::BufferIndexType::UNSIGNED_BYTE:
+					indexCount /= sizeof(byte);
+					break;
+
+				case tur::BufferIndexType::UNSIGNED_SHORT:
+					indexCount /= sizeof(unsigned short);
+					break;
+
+				case tur::BufferIndexType::UNSIGNED_INT:
+					indexCount /= sizeof(unsigned int);
+					break;
+			}
+
 			return MeshUploadData {
 				.meshAssetHandle = assetHandle,
 				.vbo = vbo,
 				.ebo = ebo,
-				.indexCount = meshAsset.meshData.indices.size(),
+				.indexCount = indexCount,
+				.indexType = meshAsset.meshData.indexType,
 				.material = material
 			};
 		}
@@ -228,14 +251,17 @@ namespace tur
 		void update_mesh_handles(const MeshUploadedEvent& meshUploadedEvent)
 		{
 			auto view = rScene->get_registry().view<MeshComponent>();
-			for (auto [e, mesh] : view.each())
+			for (auto entity : view)
 			{
+				auto& mesh = view.get<MeshComponent>(entity);
+
 				if (mesh.assetHandle != meshUploadedEvent.data.meshAssetHandle)
 					continue;
 				
 				mesh.vbo = meshUploadedEvent.data.vbo;
 				mesh.ebo = meshUploadedEvent.data.ebo;
 				mesh.indexCount = meshUploadedEvent.data.indexCount;
+				mesh.indexType = meshUploadedEvent.data.indexType;
 
 				mesh.material = meshUploadedEvent.data.material; 
 			}
@@ -272,7 +298,7 @@ namespace tur
 			}
 
 			auto& resources = rRHI->get_resource_handler();
-			return resources.create_texture(descriptor, textureAsset);
+			return resources.create_texture(descriptor, textureAsset); 
 		}
 
 		texture_handle upload_cubemap_from_asset(const CubemapAsset& cubemapAsset)
@@ -314,7 +340,8 @@ namespace tur
 				textureAsset.channels = cubemapAsset.channels;
 				textureAsset.options = cubemapAsset.options;
 			}
-			return resources.create_texture(descriptor, textureAsset);
+
+			return resources.create_texture(descriptor, textureAsset); 
 		}
 
 	private:

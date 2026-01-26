@@ -52,6 +52,9 @@ namespace tur
 			currentTextureHandle = handle;
 		}
 
+	public:
+		inline bool is_valid() const { return currentTextureHandle != invalid_handle && rCamera; }
+
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
 		NON_OWNING Camera* rCamera = nullptr;

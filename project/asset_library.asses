@@ -134,10 +134,10 @@
             },
             "options": {
                 "arrayLayers": 6,
-                "dataFormat": 2,
+                "dataFormat": 3,
                 "depth": 1,
                 "floatTexture": false,
-                "format": 2,
+                "format": 3,
                 "generateMipmaps": false,
                 "isTextureArray": false,
                 "layerHeight": 0,

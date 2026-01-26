@@ -2,6 +2,7 @@
 #include <tiny_gltf.h>
 #include "assets/asset.hpp"
 #include "assets/texture/texture_asset.hpp"
+#include "graphics/objects/buffer.hpp"
 
 namespace tur
 {
@@ -9,6 +10,7 @@ namespace tur
     {
         std::vector<byte> vertices;
         std::vector<byte> indices;
+		BufferIndexType indexType;
     };
 
 	struct MetallicRoughnessMaterialData

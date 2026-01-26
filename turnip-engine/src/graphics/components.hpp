@@ -112,5 +112,6 @@ namespace tur
 		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
 		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;
 		FIELD_SET_INTERNALLY u64 indexCount = 0;
+		FIELD_SET_INTERNALLY BufferIndexType indexType = BufferIndexType::UNSIGNED_BYTE;
 	};
 }

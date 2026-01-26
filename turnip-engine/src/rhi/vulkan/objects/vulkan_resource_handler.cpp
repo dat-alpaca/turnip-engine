@@ -1,4 +1,5 @@
 #include "vulkan_resource_handler.hpp"
+#include "defines.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 #include <vk_mem_alloc.h>
 
@@ -417,8 +418,12 @@ namespace tur::vulkan
 	{
 		auto& state = rRHI->get_state();
 		auto& device = state.logicalDevice;
-		Texture texture = allocate_texture(state.logicalDevice, state.vmaAllocator, descriptor);
-		texture_handle handle = mTextures.add(texture);
+		auto textureResult = allocate_texture(state.logicalDevice, state.vmaAllocator, descriptor);
+		
+		if(!textureResult.has_value())
+			return invalid_handle;
+
+		texture_handle handle = mTextures.add(*textureResult);
 
 		// Data:
 		if (asset.data.size())
@@ -426,16 +431,19 @@ namespace tur::vulkan
 
 		else
 			utils::transition_texture_layout_imm(
-				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+				*rRHI, *textureResult, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
 			);
 
 		return handle;
 	}
 	texture_handle ResourceHandler::create_empty_texture(const TextureDescriptor& descriptor)
 	{
-		return mTextures.add(
-			allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor)
-		);
+		auto textureResult = allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor);
+		
+		if(!textureResult.has_value())
+			return invalid_handle;
+
+		return mTextures.add(*textureResult);
 	}
 	void ResourceHandler::update_texture(texture_handle textureHandle, const TextureAsset& asset)
 	{

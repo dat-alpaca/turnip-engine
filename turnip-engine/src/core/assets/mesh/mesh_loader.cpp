@@ -1,5 +1,6 @@
 #include "mesh_loader.hpp"
 #include "assets/texture/texture_asset.hpp"
+#include "graphics/objects/buffer.hpp"
 #include "graphics/objects/texture.hpp"
 #include "common.hpp"
 
@@ -102,6 +103,41 @@ static constexpr tur::WrapMode get_wrap_mode(int mode)
     return WrapMode::REPEAT;
 }
 
+static constexpr tur::BufferIndexType get_buffer_index_type(int type)
+{
+    using namespace tur;
+    switch (type) 
+    {
+        case TINYGLTF_COMPONENT_TYPE_BYTE:
+            break;
+        
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_BYTE:
+            return BufferIndexType::UNSIGNED_BYTE;
+
+        case TINYGLTF_COMPONENT_TYPE_SHORT:
+            break;
+        
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_SHORT:
+            return BufferIndexType::UNSIGNED_SHORT;
+
+        case TINYGLTF_COMPONENT_TYPE_UNSIGNED_INT:
+            return BufferIndexType::UNSIGNED_INT;
+        
+        case TINYGLTF_COMPONENT_TYPE_FLOAT:
+            break;
+
+        case TINYGLTF_COMPONENT_TYPE_INT:
+            break;
+            
+        case TINYGLTF_COMPONENT_TYPE_DOUBLE:
+            break;
+    }
+
+	TUR_LOG_ERROR("Unsupported buffer index type: {}. Default: UNSIGNED_BYTE", type);
+    return BufferIndexType::UNSIGNED_BYTE;
+}
+
+
 namespace tur 
 {
     std::optional<tinygltf::Model> load_model_task(const std::filesystem::path& filepath)
@@ -168,6 +204,7 @@ namespace tur
         {
             // Indices:
             auto indicesData = get_data(model, primitive, primitive.indices);
+            meshData.indexType = get_buffer_index_type(model.accessors[primitive.indices].componentType);
 
             // Data:
             auto positionData = get_data(model, primitive, primitive.attributes.at("POSITION"));

@@ -159,8 +159,6 @@ namespace tur
 		TextureFormat format = TextureFormat::RGBA8_UNORM;
 		TextureType type = TextureType::TEXTURE_2D;
 
-		bool generateMipmaps = false;
-
 		WrapMode wrapS = WrapMode::CLAMP_TO_BORDER;
 		WrapMode wrapT = WrapMode::CLAMP_TO_BORDER;
 		WrapMode wrapR = WrapMode::CLAMP_TO_BORDER;
@@ -168,5 +166,8 @@ namespace tur
 		FilterMode magFilter = FilterMode::NEAREST;
 
 		TextureTiling tiling = TextureTiling::OPTIMAL;
+
+		bool generateMipmaps = false;
+		bool isAttachment = false;
 	};
 }
