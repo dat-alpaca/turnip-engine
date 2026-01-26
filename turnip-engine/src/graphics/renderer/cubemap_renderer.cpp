@@ -1,5 +1,5 @@
 #include "cubemap_renderer.hpp"
-#include "glad/gl.h"
+#include "defines.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/renderer/cubemap_renderer.hpp"
@@ -28,7 +28,7 @@ namespace tur
 		auto& rhi = *rRHI;
 		auto& resources = rhi.get_resource_handler();
 
-		if(!rCamera || !currentTextureHandle)
+		if(!rCamera || currentTextureHandle == invalid_handle)
 			return;
 
 		UBO uboData;
@@ -40,12 +40,9 @@ namespace tur
 
 			resources.update_buffer(ubo, &uboData, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(setHandle, ubo, {.size = sizeof(UBO)}, 0);
-		}	
 
-		if (currentTextureHandle != invalid_handle)
 			resources.write_texture_to_set(setHandle, currentTextureHandle, 1);
-		else
-			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 1);
+		}
 
 		commandBuffer.begin(renderTarget);
 
@@ -54,13 +51,11 @@ namespace tur
 
 			commandBuffer.bind_vertex_buffer(vbo, 0);
 			commandBuffer.bind_pipeline(pipeline);
-			glDepthFunc(GL_LEQUAL);
 
 			commandBuffer.bind_descriptor_set(setHandle);
 			commandBuffer.draw(36, 1, 0, 0);
 
 		commandBuffer.end();
-		glDepthFunc(GL_LESS);
 	}
 
 	void CubemapRenderer::initialize_resources()

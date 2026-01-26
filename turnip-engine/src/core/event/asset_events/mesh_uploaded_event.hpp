@@ -14,6 +14,7 @@ namespace tur
 		buffer_handle vbo;
 		buffer_handle ebo;
 		u64 indexCount;
+		BufferIndexType indexType;
 
 		MetallicRoughnessMaterial material;
 	};

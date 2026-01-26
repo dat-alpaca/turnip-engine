@@ -2,6 +2,7 @@
 #include "GLFW/glfw3.h"
 #include "assets/asset_library.hpp"
 #include "core/config/config_data.hpp"
+#include "defines.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/types/queue_operations.hpp"
@@ -124,6 +125,8 @@ namespace tur
 			}
 
 			mRenderInterface.DefaultTextureHandle = mRenderInterface.get_resource_handler().create_texture(descriptor, asset);
+			if(mRenderInterface.DefaultTextureHandle == invalid_handle)
+				TUR_LOG_CRITICAL("Failed to create a default texture handle");
 		}
 
 		// Physics:

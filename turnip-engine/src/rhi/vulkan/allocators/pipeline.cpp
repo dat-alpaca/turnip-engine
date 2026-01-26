@@ -1,6 +1,42 @@
 #include "pipeline.hpp"
+#include "graphics/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/vulkan_resource_handler.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+
+static inline vk::CompareOp get_compare_op(tur::DepthCompareOp op)
+{
+	using namespace tur;
+
+	switch(op)
+	{
+		case DepthCompareOp::NEVER:
+			return vk::CompareOp::eNever;
+
+		case DepthCompareOp::ALWAYS:
+			return vk::CompareOp::eAlways;
+
+		case DepthCompareOp::EQUAL:
+			return vk::CompareOp::eEqual;
+
+		case DepthCompareOp::NOT_EQUAL:
+			return vk::CompareOp::eNotEqual;
+
+		case DepthCompareOp::LESS:
+			return vk::CompareOp::eLess;
+
+		case DepthCompareOp::LESS_OR_EQUAL:
+			return vk::CompareOp::eLessOrEqual;
+
+		case DepthCompareOp::GREATER:
+			return vk::CompareOp::eGreater;
+
+		case DepthCompareOp::GREATER_OR_EQUAL:
+			return vk::CompareOp::eGreaterOrEqual;
+	}
+
+	TUR_LOG_ERROR("Invalid Depth Compare Operation: {}. Default: CompareOp::eLess", static_cast<int>(op));
+	return vk::CompareOp::eLess;
+}
 
 // Shaders:
 namespace tur::vulkan
@@ -280,12 +316,12 @@ namespace tur::vulkan
 // Depth & Stencil
 namespace tur::vulkan
 {
-	static vk::PipelineDepthStencilStateCreateInfo create_depth_stencil_objects()
+	static vk::PipelineDepthStencilStateCreateInfo create_depth_stencil_objects(const DepthDescriptor& descriptor)
 	{
 		vk::PipelineDepthStencilStateCreateInfo depthStencil = {};
-		depthStencil.depthTestEnable = false;
-		depthStencil.depthWriteEnable = false;
-		depthStencil.depthCompareOp = vk::CompareOp::eAlways;
+		depthStencil.depthTestEnable = descriptor.depthTestEnable;
+		depthStencil.depthWriteEnable = descriptor.depthWriteEnable;
+		depthStencil.depthCompareOp = get_compare_op(descriptor.compareOp);
 
 		return depthStencil;
 	}
@@ -388,7 +424,7 @@ namespace tur::vulkan
 		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment();
 		vk::PipelineColorBlendStateCreateInfo colorBlending = create_color_blend_state(colorAttachment);
 
-		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects();
+		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects(descriptor.depthDescriptor);
 
 		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout.layout);
 		pipeline.layout = check_vk_result(device.createPipelineLayout(pipelineLayout));
@@ -396,10 +432,13 @@ namespace tur::vulkan
 		// Pipeline (! No renderpass since the vulkan device is using dynamic rendering):
 		// TODO: add rendering info to descriptor parameters
 		vk::PipelineRenderingCreateInfo renderingInfo = {};
-		vk::Format format = get_texture_format(descriptor.targetFormat);
+		vk::Format colorFormat = get_texture_format(descriptor.workImageFormat);
+		vk::Format depthStencilFormat = get_texture_format(descriptor.depthStencilImageFormat);
 		{
 			renderingInfo.colorAttachmentCount = 1;
-			renderingInfo.pColorAttachmentFormats = &format;
+			renderingInfo.pColorAttachmentFormats = &colorFormat;
+			renderingInfo.depthAttachmentFormat = depthStencilFormat;
+			renderingInfo.stencilAttachmentFormat = depthStencilFormat;
 		}
 
 		// Pipeline Info:

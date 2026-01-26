@@ -43,7 +43,8 @@ namespace tur
 			buffer_handle vbo = invalid_handle;
 			buffer_handle ebo = invalid_handle;
 			buffer_handle ubo = invalid_handle;
-
+			BufferIndexType indexType = BufferIndexType::UNSIGNED_BYTE;
+	
 			descriptor_set_handle setHandle = invalid_handle;
 			MetallicRoughnessMaterial material;
 			bool isVisible = true;
@@ -67,6 +68,8 @@ namespace tur
 		{
 			mMeshCache.remove(uniqueHandle);
 		}
+
+		inline u32 mesh_count() const { return mMeshCache.size(); }
 	
 	private:
 		void initialize_resources();

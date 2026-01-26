@@ -8,6 +8,8 @@
 #include <iterator>
 #include <optional>
 #include <stb_image.h>
+#include <stb_image_write.h>
+#include <string>
 
 namespace tur
 {
@@ -67,7 +69,7 @@ namespace tur
 		return asset;
 	}
 
-	inline std::optional<CubemapAsset> load_cubemap_task(const std::array<std::filesystem::path, 6>& filepaths, u32 desiredChannels = 0)
+	inline std::optional<CubemapAsset> load_cubemap_task(const std::array<std::filesystem::path, 6>& filepaths)
 	{
 		CubemapAsset asset = {};
 		if(filepaths.size() != 6)
@@ -89,9 +91,9 @@ namespace tur
 
 			int width, height, channels;
 			stbi_set_flip_vertically_on_load(true);
-			byte* data = stbi_load(filepath.string().c_str(), &width, &height, &channels, desiredChannels);
+			byte* data = stbi_load(filepath.string().c_str(), &width, &height, &channels, STBI_rgb_alpha);
 
-			layerSize = width * height * channels * sizeof(byte);
+			layerSize = width * height * 4 * sizeof(byte);
 
 			if(!parametersSet)
 			{

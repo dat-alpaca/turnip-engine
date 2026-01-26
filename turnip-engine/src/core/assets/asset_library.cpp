@@ -218,9 +218,9 @@ namespace tur
 			mCubemapRemoveOnSceneChange.push_back(assetHandle);
 
 		rWorkerPool->submit<std::optional<CubemapAsset>>(
-			[filepaths, channels = asset.channels]()
+			[filepaths]()
 			{
-				return load_cubemap_task(filepaths, channels);
+				return load_cubemap_task(filepaths);
 			},
 			[this, assetHandle](const std::optional<CubemapAsset>& cubemapAsset)
 			{

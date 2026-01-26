@@ -37,14 +37,7 @@ namespace tur
 		if(mTiles.empty())
 			return;
 
-		// Tile data:
-		if(atlasHandle == invalid_handle)
-			resources.write_texture_to_set(mainSet, rRHI->DefaultTextureHandle, 2);
-		else
-			resources.write_texture_to_set(mainSet, atlasHandle, 2);
-
 		resources.update_buffer(ssbo, mTiles.data(), Range{ .size = mTiles.size() * sizeof(Tile) });
-		resources.write_storage_buffer_to_set(mainSet, ssbo, Range{ .size = mTiles.size() * sizeof(Tile) }, 0);
 		
 		// World data:
 		{
@@ -55,8 +48,16 @@ namespace tur
 			}
 			
 			resources.update_buffer(worldUBO, &ubo, Range{ .size=sizeof(WorldUBO) });
-			resources.write_uniform_buffer_to_set(mainSet, worldUBO, Range{ .size=sizeof(WorldUBO) }, 1);
 		}
+		
+		resources.write_storage_buffer_to_set(mainSet, ssbo, Range{ .size = mTiles.size() * sizeof(Tile) }, 0);
+		resources.write_uniform_buffer_to_set(mainSet, worldUBO, Range{ .size=sizeof(WorldUBO) }, 1);
+		
+		// Tile data:
+		if(atlasHandle == invalid_handle)
+			resources.write_texture_to_set(mainSet, rRHI->DefaultTextureHandle, 2);
+		else
+			resources.write_texture_to_set(mainSet, atlasHandle, 2);
 		
 		commandBuffer.begin(renderTarget);
 		{

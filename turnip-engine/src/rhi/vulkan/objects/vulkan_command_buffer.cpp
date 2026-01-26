@@ -49,11 +49,12 @@ namespace tur::vulkan
 			
 			RenderTarget target = get_render_target();
 			auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
+			auto& depthStencilTexture = resources.get_textures().get(target.depthStencilAttachment.textureHandle);
 
 			renderingInfo.colorAttachmentCount = 1;
 			renderingInfo.pColorAttachmentFormats = &colorTexture.format;
-			renderingInfo.depthAttachmentFormat = vk::Format::eUndefined;
-			renderingInfo.stencilAttachmentFormat = vk::Format::eUndefined;
+			renderingInfo.depthAttachmentFormat = depthStencilTexture.format;
+			renderingInfo.stencilAttachmentFormat = depthStencilTexture.format;
 			renderingInfo.rasterizationSamples = vk::SampleCountFlagBits::e1;
 
 			inheritanceInfo.pNext = &renderingInfo;
@@ -78,6 +79,7 @@ namespace tur::vulkan
 
 		RenderTarget target = get_render_target();
 		auto& colorTexture = resources.get_textures().get(target.colorAttachment.textureHandle);
+		auto& depthStencilTexture = resources.get_textures().get(target.depthStencilAttachment.textureHandle);
 
 		utils::transition_texture_layout(
 			*rRHI, colorTexture,
@@ -90,16 +92,23 @@ namespace tur::vulkan
 			}
 		);
 
-		if (target.depthAttachment.textureHandle != invalid_handle)
+		if (target.depthStencilAttachment.textureHandle != invalid_handle)
 		{
-			// TODO: enable depth
-			auto& texture = resources.get_textures().get(target.depthAttachment.textureHandle);
-			// utils::transition_texture_layout(*rRHI, texture, vk::ImageLayout::eDepthStencilAttachmentOptimal);
+			utils::transition_texture_layout(
+				*rRHI, depthStencilTexture,
+				{
+					.newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
+					.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
+					.srcAccessMask = vk::AccessFlagBits2::eNone,
+					.dstStageMask = vk::PipelineStageFlagBits2::eEarlyFragmentTests | vk::PipelineStageFlagBits2::eLateFragmentTests,
+					.dstAccessMask = vk::AccessFlagBits2::eDepthStencilAttachmentRead | vk::AccessFlagBits2::eDepthStencilAttachmentWrite
+				}
+			);
 		}
 
 		// 3. create rendering info
 		vk::RenderingInfo renderInfo = {};
-		vk::RenderingAttachmentInfo colorAttachmentInfo = {}, depthAttachmentInfo = {};
+		vk::RenderingAttachmentInfo colorAttachmentInfo = {}, depthStencilAttachmentInfo = {};
 		{
 			colorAttachmentInfo.imageView = colorTexture.imageView;
 			colorAttachmentInfo.imageLayout = vk::ImageLayout::eAttachmentOptimal;
@@ -110,12 +119,12 @@ namespace tur::vulkan
 				vk::ClearValue({mClearColor.color.r, mClearColor.color.g, mClearColor.color.b, mClearColor.color.a}
 			);
 
-			depthAttachmentInfo.imageView = nullptr;
-			depthAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
-			depthAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
-			depthAttachmentInfo.loadOp = vk::AttachmentLoadOp::eLoad;
-			depthAttachmentInfo.storeOp = vk::AttachmentStoreOp::eStore;
-			depthAttachmentInfo.clearValue =
+			depthStencilAttachmentInfo.imageView = depthStencilTexture.imageView;
+			depthStencilAttachmentInfo.imageLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal;
+			depthStencilAttachmentInfo.resolveMode = vk::ResolveModeFlagBits::eNone;
+			depthStencilAttachmentInfo.loadOp = vk::AttachmentLoadOp::eClear;
+			depthStencilAttachmentInfo.storeOp = vk::AttachmentStoreOp::eDontCare;
+			depthStencilAttachmentInfo.clearValue =
 				vk::ClearValue(vk::ClearDepthStencilValue(mClearColor.depth, mClearColor.stencil));
 
 			// TODO: use the 	rendertarget
@@ -124,8 +133,8 @@ namespace tur::vulkan
 			renderInfo.colorAttachmentCount = 1;
 			renderInfo.layerCount = 1;
 			renderInfo.pColorAttachments = &colorAttachmentInfo;
-			// renderInfo.pDepthAttachment = &depthAttachmentInfo;
-			// renderInfo.pStencilAttachment = nullptr;
+			renderInfo.pDepthAttachment = &depthStencilAttachmentInfo;
+			renderInfo.pStencilAttachment = &depthStencilAttachmentInfo;
 		}
 
 		mCommandBuffer.beginRendering(renderInfo);
@@ -232,7 +241,7 @@ namespace tur::vulkan
 
 			blitRegion.srcSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;
 			blitRegion.srcSubresource.baseArrayLayer = 0;
-			blitRegion.srcSubresource.layerCount = 1;
+			blitRegion.srcSubresource.layerCount = 1	;
 			blitRegion.srcSubresource.mipLevel = 0;
 
 			blitRegion.dstSubresource.aspectMask = vk::ImageAspectFlagBits::eColor;

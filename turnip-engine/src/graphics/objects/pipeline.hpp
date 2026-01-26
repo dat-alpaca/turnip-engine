@@ -182,6 +182,7 @@ namespace tur
 		shader_handle fragmentShader = invalid_handle;
 
 		// Work image texture format:
-		TextureFormat targetFormat = TextureFormat::RGBA8_UNORM;
+		TextureFormat workImageFormat = TextureFormat::RGBA8_UNORM;
+		TextureFormat depthStencilImageFormat = TextureFormat::DEPTH_STENCIL24_S8U_INT;
 	};
 }

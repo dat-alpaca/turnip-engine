@@ -1,6 +1,7 @@
 #include "vulkan_render_interface.hpp"
 #include "rhi/vulkan/allocators/allocators.hpp"
 #include "rhi/vulkan/initializers/initializers.hpp"
+#include "rhi/vulkan/objects/texture.hpp"
 
 // TODO: substitute vk::result checks
 
@@ -124,17 +125,28 @@ namespace tur::vulkan
 		if (mState.mainRenderTargetHandle != invalid_handle)
 			mResources.destroy_render_target(mState.mainRenderTargetHandle);
 
+		// TODO: global render target settings
+		// TODO: different load/store ops
+
 		RenderTargetDescriptor descriptor;
 		{
 			TextureDescriptor textureDesc;
-			textureDesc.format = TextureFormat::RGBA8_UNORM; // TODO: add a global variable to it
+			textureDesc.format = TextureFormat::RGBA8_UNORM; 
 			textureDesc.width = mState.swapchainExtent.width;
 			textureDesc.height = mState.swapchainExtent.height;
+			textureDesc.isColorAttachment = true;
 
-			AttachmentDescription attachment;
-			attachment.textureDescriptor = textureDesc;
+			descriptor.colorAttachment.textureDescriptor = textureDesc;
+		}
 
-			descriptor.attachmentDescriptions.push_back(attachment);
+		{
+			TextureDescriptor depthDesc;
+			depthDesc.format = TextureFormat::DEPTH_STENCIL24_S8U_INT;
+			depthDesc.width = mState.swapchainExtent.width;
+			depthDesc.height = mState.swapchainExtent.height;
+			depthDesc.isDepthStencilAttachment = true;
+
+			descriptor.depthStencilAttachment.textureDescriptor = depthDesc;
 		}
 
 		mState.mainRenderTargetHandle = mResources.create_render_target(descriptor);
@@ -337,10 +349,7 @@ namespace tur::vulkan::utils
 		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
 
 		if (texture.layout == description.newLayout)
-		{
-			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
-		}
 
 		vk::ImageAspectFlags aspectMask;
 		vk::ImageSubresourceRange subresourceRange;
@@ -356,8 +365,8 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 			else
 				aspectMask = vk::ImageAspectFlagBits::eColor;
 
@@ -399,8 +408,8 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 			else
 				aspectMask = vk::ImageAspectFlagBits::eColor;
 

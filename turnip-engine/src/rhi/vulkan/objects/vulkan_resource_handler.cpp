@@ -1,4 +1,6 @@
 #include "vulkan_resource_handler.hpp"
+#include "defines.hpp"
+#include "graphics/objects/texture.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 #include <vk_mem_alloc.h>
 
@@ -54,14 +56,13 @@ namespace tur::vulkan
 	render_target_handle ResourceHandler::create_render_target(const RenderTargetDescriptor& descriptor)
 	{
 		RenderTarget renderTarget;
-		renderTarget.colorAttachment.loadOp = descriptor.attachmentDescriptions[0].loadOp;
-		renderTarget.colorAttachment.storeOp = descriptor.attachmentDescriptions[0].storeOp;
-		renderTarget.colorAttachment.textureHandle =
-			create_empty_texture(descriptor.attachmentDescriptions[0].textureDescriptor);
-
-		// TODO: support depth and stencil
-		// renderTarget.depthAttachment.loadOp = descriptor.attachmentDescriptions[1].loadOp;
-		// renderTarget.depthAttachment.storeOp = descriptor.attachmentDescriptions[1].storeOp;
+		renderTarget.colorAttachment.loadOp = descriptor.colorAttachment.loadOp;
+		renderTarget.colorAttachment.storeOp = descriptor.colorAttachment.storeOp;
+		renderTarget.colorAttachment.textureHandle = create_empty_texture(descriptor.colorAttachment.textureDescriptor);
+		
+		renderTarget.depthStencilAttachment.loadOp = descriptor.depthStencilAttachment.loadOp;
+		renderTarget.depthStencilAttachment.storeOp = descriptor.depthStencilAttachment.storeOp;
+		renderTarget.depthStencilAttachment.textureHandle = create_empty_texture(descriptor.depthStencilAttachment.textureDescriptor);
 
 		return mRenderTargets.add(renderTarget);
 	}
@@ -73,8 +74,8 @@ namespace tur::vulkan
 		if (renderTarget.colorAttachment.textureHandle != invalid_handle)
 			destroy_texture(renderTarget.colorAttachment.textureHandle);
 
-		if (renderTarget.depthAttachment.textureHandle != invalid_handle)
-			destroy_texture(renderTarget.depthAttachment.textureHandle);
+		if (renderTarget.depthStencilAttachment.textureHandle != invalid_handle)
+			destroy_texture(renderTarget.depthStencilAttachment.textureHandle);
 	}
 
 	descriptor_set_layout_handle
@@ -379,6 +380,13 @@ namespace tur::vulkan
 						region.bufferRowLength = width;
         				region.bufferImageHeight = height;
 
+						if(texture.descriptor.type == TextureType::CUBE_MAP)
+						{
+							region.bufferOffset = layer * width * height * formatSize;
+							region.bufferRowLength = 0;
+							region.bufferImageHeight = 0;
+						}
+
 						region.imageSubresource.aspectMask = aspectMask;
 						region.imageSubresource.mipLevel = 0;
 						region.imageSubresource.baseArrayLayer = layer;
@@ -417,8 +425,12 @@ namespace tur::vulkan
 	{
 		auto& state = rRHI->get_state();
 		auto& device = state.logicalDevice;
-		Texture texture = allocate_texture(state.logicalDevice, state.vmaAllocator, descriptor);
-		texture_handle handle = mTextures.add(texture);
+		auto textureResult = allocate_texture(state.logicalDevice, state.vmaAllocator, descriptor);
+		
+		if(!textureResult.has_value())
+			return invalid_handle;
+
+		texture_handle handle = mTextures.add(*textureResult);
 
 		// Data:
 		if (asset.data.size())
@@ -426,16 +438,19 @@ namespace tur::vulkan
 
 		else
 			utils::transition_texture_layout_imm(
-				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+				*rRHI, *textureResult, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
 			);
 
 		return handle;
 	}
 	texture_handle ResourceHandler::create_empty_texture(const TextureDescriptor& descriptor)
 	{
-		return mTextures.add(
-			allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor)
-		);
+		auto textureResult = allocate_texture(rRHI->get_state().logicalDevice, rRHI->get_state().vmaAllocator, descriptor);
+		
+		if(!textureResult.has_value())
+			return invalid_handle;
+
+		return mTextures.add(*textureResult);
 	}
 	void ResourceHandler::update_texture(texture_handle textureHandle, const TextureAsset& asset)
 	{

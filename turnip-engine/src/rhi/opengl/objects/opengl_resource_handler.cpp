@@ -290,9 +290,10 @@ namespace tur::gl
 			{
 				for(u32 i = 0; i < 6; ++i)
 				{
+					// Cubemaps are forced to be in RGBA format.
 					glTextureSubImage3D(
 						texture.handle, 0, 0, 0, i, asset.width, asset.height, 1, dataFormat, dataType, 
-						asset.data.data() + asset.width * asset.height * asset.channels * sizeof(byte) * i
+						asset.data.data() + asset.width * asset.height * 4 * sizeof(byte) * i
 					);
 				}
 			} break;

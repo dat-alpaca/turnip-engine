@@ -45,7 +45,7 @@ namespace tur
 		RGBA16_SFLOAT,
 
 		DEPTH_16_UNORM,
-		DEPTH_STENCIL16_S8U_INT,
+		DEPTH_STENCIL24_S8U_INT,
 
 		B8G8R8A8_UNORM
 	};
@@ -72,7 +72,7 @@ namespace tur
 			case TextureFormat::DEPTH_16_UNORM:
 				return sizeof(u16);
 
-			case TextureFormat::DEPTH_STENCIL16_S8U_INT:
+			case TextureFormat::DEPTH_STENCIL24_S8U_INT:
 				return sizeof(u32);
 
 			case TextureFormat::B8G8R8A8_UNORM:
@@ -159,8 +159,6 @@ namespace tur
 		TextureFormat format = TextureFormat::RGBA8_UNORM;
 		TextureType type = TextureType::TEXTURE_2D;
 
-		bool generateMipmaps = false;
-
 		WrapMode wrapS = WrapMode::CLAMP_TO_BORDER;
 		WrapMode wrapT = WrapMode::CLAMP_TO_BORDER;
 		WrapMode wrapR = WrapMode::CLAMP_TO_BORDER;
@@ -168,5 +166,9 @@ namespace tur
 		FilterMode magFilter = FilterMode::NEAREST;
 
 		TextureTiling tiling = TextureTiling::OPTIMAL;
+
+		bool generateMipmaps = false;
+		bool isColorAttachment = false;
+		bool isDepthStencilAttachment = false;
 	};
 }

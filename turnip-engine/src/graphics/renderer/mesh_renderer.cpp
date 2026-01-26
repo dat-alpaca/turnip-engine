@@ -56,7 +56,8 @@ namespace tur
 			if(mesh.setHandle == invalid_handle)
 				mesh.setHandle = resources.create_descriptor_set(setLayout);
 
-			write_material(mesh.setHandle, mesh.material);
+			if(mesh.material.is_valid())
+				write_material(mesh.setHandle, mesh.material);
 
 			resources.update_buffer(mesh.ubo, &ubo, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(mesh.setHandle, mesh.ubo, {.size = sizeof(UBO)}, 0);
@@ -73,7 +74,7 @@ namespace tur
 					continue;
 
                 commandBuffer.bind_pipeline(pipeline);
-                commandBuffer.bind_index_buffer(data.ebo, BufferIndexType::UNSIGNED_SHORT);
+                commandBuffer.bind_index_buffer(data.ebo, data.indexType);
                 commandBuffer.bind_vertex_buffer(data.vbo, 0);
 
                 commandBuffer.bind_descriptor_set(data.setHandle);
