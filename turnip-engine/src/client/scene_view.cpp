@@ -98,22 +98,22 @@ namespace tur
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
 
-			tilemapSystem.render();
 			quadSystem.render();
+			tilemapSystem.render();
 			mMeshSystem.render();
 			mCubemapSystem.render();
 
 			std::vector<CommandBuffer::BufferType> commandBuffers;
 			{
-				commandBuffers.reserve(2);
+				commandBuffers.reserve(4);
 
 				commandBuffers.push_back(
 					quadSystem.renderer().get_command_buffer().get_buffer()
 				);
-
+				
 				if(!tilemapSystem.renderer().is_empty())
 					commandBuffers.push_back(tilemapSystem.renderer().get_command_buffer().get_buffer());
-
+				
 				if(mMeshSystem.renderer().mesh_count() > 0)
 					commandBuffers.push_back(mMeshSystem.renderer().get_command_buffer().get_buffer());
 
