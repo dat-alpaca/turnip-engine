@@ -183,6 +183,6 @@ namespace tur
 
 		// Work image texture format:
 		TextureFormat workImageFormat = TextureFormat::RGBA8_UNORM;
-		TextureFormat depthImageFormat = TextureFormat::DEPTH_STENCIL24_S8U_INT;
+		TextureFormat depthStencilImageFormat = TextureFormat::DEPTH_STENCIL24_S8U_INT;
 	};
 }

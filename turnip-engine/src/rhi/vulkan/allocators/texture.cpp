@@ -96,7 +96,7 @@ namespace tur::vulkan
 				usageFlags |= vk::ImageUsageFlagBits::eColorAttachment;
 			}
 
-			if(descriptor.isDepthAttachment)
+			if(descriptor.isDepthStencilAttachment)
 			{
 				usageFlags |= vk::ImageUsageFlagBits::eTransferSrc;
 				usageFlags |= vk::ImageUsageFlagBits::eDepthStencilAttachment;
@@ -137,7 +137,7 @@ namespace tur::vulkan
 				imageViewCreateInfo.subresourceRange.layerCount = 6;
 
 			// TODO: descriptor aspect flags
-			if(!descriptor.isDepthAttachment)
+			if(!descriptor.isDepthStencilAttachment)
 				imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eColor;
 			else
 				imageViewCreateInfo.subresourceRange.aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;

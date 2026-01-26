@@ -14,6 +14,6 @@ namespace tur::vulkan
 	struct RenderTarget
 	{
 		RenderAttachment colorAttachment;
-		RenderAttachment depthAttachment;
+		RenderAttachment depthStencilAttachment;
 	};
 }

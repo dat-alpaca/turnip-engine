@@ -28,7 +28,7 @@ namespace tur
 	struct RenderTargetDescriptor
 	{
 		AttachmentDescription colorAttachment;
-		AttachmentDescription depthAttachment;
+		AttachmentDescription depthStencilAttachment;
 	};
 
 	using render_target_handle = handle_type;

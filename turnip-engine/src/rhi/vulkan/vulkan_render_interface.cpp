@@ -144,9 +144,9 @@ namespace tur::vulkan
 			depthDesc.format = TextureFormat::DEPTH_STENCIL24_S8U_INT;
 			depthDesc.width = mState.swapchainExtent.width;
 			depthDesc.height = mState.swapchainExtent.height;
-			depthDesc.isDepthAttachment = true;
+			depthDesc.isDepthStencilAttachment = true;
 
-			descriptor.depthAttachment.textureDescriptor = depthDesc;
+			descriptor.depthStencilAttachment.textureDescriptor = depthDesc;
 		}
 
 		mState.mainRenderTargetHandle = mResources.create_render_target(descriptor);
@@ -349,10 +349,7 @@ namespace tur::vulkan::utils
 		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
 
 		if (texture.layout == description.newLayout)
-		{
-			// TODO: TUR_LOG_WARN("Attempted to transition to the same image layout.");
 			return;
-		}
 
 		vk::ImageAspectFlags aspectMask;
 		vk::ImageSubresourceRange subresourceRange;
@@ -411,8 +408,8 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth;
+			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
+				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
 			else
 				aspectMask = vk::ImageAspectFlagBits::eColor;
 

@@ -1,5 +1,6 @@
 #include "vulkan_resource_handler.hpp"
 #include "defines.hpp"
+#include "graphics/objects/texture.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 #include <vk_mem_alloc.h>
 
@@ -59,9 +60,9 @@ namespace tur::vulkan
 		renderTarget.colorAttachment.storeOp = descriptor.colorAttachment.storeOp;
 		renderTarget.colorAttachment.textureHandle = create_empty_texture(descriptor.colorAttachment.textureDescriptor);
 		
-		renderTarget.depthAttachment.loadOp = descriptor.depthAttachment.loadOp;
-		renderTarget.depthAttachment.storeOp = descriptor.depthAttachment.storeOp;
-		renderTarget.depthAttachment.textureHandle = create_empty_texture(descriptor.depthAttachment.textureDescriptor);
+		renderTarget.depthStencilAttachment.loadOp = descriptor.depthStencilAttachment.loadOp;
+		renderTarget.depthStencilAttachment.storeOp = descriptor.depthStencilAttachment.storeOp;
+		renderTarget.depthStencilAttachment.textureHandle = create_empty_texture(descriptor.depthStencilAttachment.textureDescriptor);
 
 		return mRenderTargets.add(renderTarget);
 	}
@@ -73,8 +74,8 @@ namespace tur::vulkan
 		if (renderTarget.colorAttachment.textureHandle != invalid_handle)
 			destroy_texture(renderTarget.colorAttachment.textureHandle);
 
-		if (renderTarget.depthAttachment.textureHandle != invalid_handle)
-			destroy_texture(renderTarget.depthAttachment.textureHandle);
+		if (renderTarget.depthStencilAttachment.textureHandle != invalid_handle)
+			destroy_texture(renderTarget.depthStencilAttachment.textureHandle);
 	}
 
 	descriptor_set_layout_handle
@@ -378,6 +379,13 @@ namespace tur::vulkan
 						region.bufferOffset = layer * texture.descriptor.layerWidth * formatSize;
 						region.bufferRowLength = width;
         				region.bufferImageHeight = height;
+
+						if(texture.descriptor.type == TextureType::CUBE_MAP)
+						{
+							region.bufferOffset = layer * width * height * formatSize;
+							region.bufferRowLength = 0;
+							region.bufferImageHeight = 0;
+						}
 
 						region.imageSubresource.aspectMask = aspectMask;
 						region.imageSubresource.mipLevel = 0;

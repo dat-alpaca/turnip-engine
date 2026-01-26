@@ -433,12 +433,12 @@ namespace tur::vulkan
 		// TODO: add rendering info to descriptor parameters
 		vk::PipelineRenderingCreateInfo renderingInfo = {};
 		vk::Format colorFormat = get_texture_format(descriptor.workImageFormat);
-		vk::Format depthFormat = get_texture_format(descriptor.depthImageFormat);
+		vk::Format depthStencilFormat = get_texture_format(descriptor.depthStencilImageFormat);
 		{
 			renderingInfo.colorAttachmentCount = 1;
 			renderingInfo.pColorAttachmentFormats = &colorFormat;
-			renderingInfo.depthAttachmentFormat = depthFormat;
-			renderingInfo.stencilAttachmentFormat = depthFormat;
+			renderingInfo.depthAttachmentFormat = depthStencilFormat;
+			renderingInfo.stencilAttachmentFormat = depthStencilFormat;
 		}
 
 		// Pipeline Info:

@@ -169,6 +169,6 @@ namespace tur
 
 		bool generateMipmaps = false;
 		bool isColorAttachment = false;
-		bool isDepthAttachment = false;
+		bool isDepthStencilAttachment = false;
 	};
 }
