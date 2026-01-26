@@ -5,15 +5,14 @@
 
 # Getting Started
 Turnip doesn't have prebuilt binaries yet, so if you want to use it, you'll need to build it yourself (sorry).
-Keep in mind that the latest version of this project has been only tested on [Pop!_OS 22.04 LTS](https://system76.com/pop/) and [Fedora Linux 43 (KDE Plasma Edition)](https://www.fedoraproject.org/). Both `X11` and `Wayland` display server protocols have been tested using a [GeForce RTX™ 3050](https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3050/), and [driver version 580.119.02](https://www.nvidia.com/en-us/drivers/details/259145/). The latest version of the engine only supports `Vulkan 1.3` and above, and `OpenGL 4.6` and above. The OpenGL implementation is more likely than not, not fully implemented at any given moment, as I prioritize making sure the Vulkan RHI implementation is up to date first. Plans for supporting `OpenGL 3.3` exist, but are not a guarantee. 
+Keep in mind that the latest version of this project has been only tested on [Pop!_OS 22.04 LTS](https://system76.com/pop/) and [Fedora Linux 43 (KDE Plasma Edition)](https://www.fedoraproject.org/). Both `X11` and `Wayland` display server protocols have been tested using a [GeForce RTX™ 3050](https://www.nvidia.com/en-us/geforce/graphics-cards/30-series/rtx-3050/), and [driver version 580.119.02](https://www.nvidia.com/en-us/drivers/details/259145/). The latest version of the engine only supports `Vulkan 1.3` and above, and `OpenGL 4.6` and above. The OpenGL implementation is more likely than not, not fully implemented at any given moment, as I prioritize making sure the Vulkan RHI implementation is up to date first (for the most part). Plans for supporting `OpenGL 3.3` exist. 
 
 You can check whether or not your graphics card supports the Vulkan features this engine uses [here](http://www.vulkan.gpuinfo.org/displayreport.php?id=39663#extensions).
 
-Mainly, you it requires:
+Mainly, it requires:
 * VK_KHR_swapchain
 * VK_KHR_synchronization2
 * VK_KHR_dynamic_rendering
-
 
 ## Prerequisites
 Building this project requires the following:
@@ -22,7 +21,7 @@ Building this project requires the following:
 * [CMake](https://cmake.org/download/)
 * [Vulkan SDK](https://vulkan.lunarg.com/) (If you are using the Vulkan build)
 
-If you are in a Linux desktop distribution, you must install the following dependencies to build the project, as stated in the [GLFW documentation](https://www.glfw.org/docs/latest/compile.html#compile_deps_wayland):
+If you are using a Linux desktop distribution, you must install the following dependencies to build the project, as stated in the [GLFW documentation](https://www.glfw.org/docs/latest/compile.html#compile_deps_wayland):
 
 * Debian-based:
 ```bash
@@ -34,7 +33,7 @@ sudo apt install libwayland-dev libxkbcommon-dev xorg-dev
 sudo dnf install wayland-devel libxkbcommon-devel libXcursor-devel libXi-devel libXinerama-devel libXrandr-devel
 ```
 
-Additionally, you may need to install the Mesa drivers:
+Additionally, you need to install the Mesa drivers (If you are using the OpenGL build):
 ```bash
 sudo dnf mesa-libGL mesa-libGL-devel
 ```
@@ -52,7 +51,7 @@ In Linux distributions, I suggest reading [this](https://vulkan.lunarg.com/doc/s
     git clone --recurse-submodules https://github.com/dat-alpaca/turnip-engine
     ```
 
-    In case you forget the `--recurse-submodules` option, just run `git submodule update --init --recursive`.
+    In case you forget the `--recurse-submodules` option, just run `git submodule update --init --recursive` afterwards.
     <br>
 
 2. **Generate the project**
@@ -69,6 +68,8 @@ In Linux distributions, I suggest reading [this](https://vulkan.lunarg.com/doc/s
     | -DTUR_USE_VULKAN        | Uses the Vulkan backend                  | OFF     |
 
     \*_This option is a lie. Turnip doesn't support other platforms yet._
+
+    You can also edit the [CMakePresets.json](https://github.com/dat-alpaca/turnip-engine/blob/main/CMakePresets.json) file directly.
     <br>
 
 4. **Compile the project**
@@ -81,21 +82,19 @@ In Linux distributions, I suggest reading [this](https://vulkan.lunarg.com/doc/s
     After that, you should have a working copy under `build/turnip-sandbox/` and `build/turnip-engine`.
 
 ## Configuration
-The engine requires a location file specified as its main constructor argument. A default file can be located under [`res/engine_config.json`](https://github.com/dat-alpaca/turnip-engine/blob/main/res/engine_config.json).
+The engine requires a location file specified as its main constructor argument. There is a default file here: [`res/engine_config.json`](https://github.com/dat-alpaca/turnip-engine/blob/main/res/engine_config.json).
 
 > [!WARNING]
-> Changing the graphics API string (`windowingCapabilities/api`) will not change the actual graphics API used.
-As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments in order to change its underlying RHI.
+> Changing the graphics API string (`windowingCapabilities/api`) will **not** change the actual graphics API used.
+As the TurnipRHI system uses static polymorphism, the engine has to be recompiled with the correct arguments in order to change its underlying RHI. This option exists because I'm too lazy to remove it. The graphics API version does matter, though.
 Check the options listed [here](#installation) for more information. 
 
 # Using
 Currently, there are no available examples nor documentation. The best you can do (which is highly discouraged) is to follow the `turnip-sandbox` project code source, and check the `project` folder.
 
-The engine does not provide a single entry point to the user, so you must declare an instance of the engine, and a conscrete implementation of a `tur::View`. 
+The engine does not provide a single entry point to the user, so you must declare an instance of the engine, and a conscrete implementation of a `tur::View`. However, the View is designed to be as bare-bones as possible. It does not provide a renderer system nor scenes, albeit those are readily available for use.
 
-However, the View is designed to be as bare-bones as possible. It does not provide a renderer system nor scenes, albeit those are readily available for use.
-
-With all being said, I would highly advise against using the engine for the moment. I will provide code examples and (probably) a proper documentation in the future.
+That being said, I would highly advise against using the engine for the moment. I will provide code examples and (probably) a proper documentation in the future. In case you decide to ignore all those warnigs, the sandbox application already supports scene and asset loading, with an immediate-mode quad renderer, tilemap renderer, cubemap (skybox) renderer, and a mesh renderer. Apart from that, it also supports scripting and audio loading, so you can technically make a proper game already by editing the `project` files.
 
 # License
 
