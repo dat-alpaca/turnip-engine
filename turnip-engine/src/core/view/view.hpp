@@ -16,6 +16,7 @@ namespace tur
 	public:
 		void set_engine(struct TurnipEngine* engine);
 		void set_handle(view_handle viewHandle);
+		void set_event_callback(const EventCallback& eventCallback);
 
 	public:
 		virtual void on_engine_startup(){};
@@ -36,6 +37,7 @@ namespace tur
 	protected:
 		NON_OWNING struct TurnipEngine* engine = nullptr;
 		view_handle viewHandle = invalid_handle;
+		EventCallback callback;
 	};
 }
 namespace tur
@@ -45,7 +47,9 @@ namespace tur
 	public:
 		view_handle add(tur_unique<View> view);
 		void remove(view_handle handle);
-		tur_unique<View>& get(view_handle handle);
+
+		template<typename ViewType>
+		inline ViewType* get(view_handle handle) { return static_cast<ViewType*>(mViews[handle].get()); }
 
 	public:
 		std::vector<tur_unique<View>>& get_views() { return mViews; }

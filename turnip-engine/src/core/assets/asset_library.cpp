@@ -35,6 +35,12 @@ namespace tur
 		Subscriber subscriber(event);
 		subscriber.subscribe<SceneSwitchedEvent>([&](const SceneSwitchedEvent& event){
 
+			if(mIsFirstSceneSwap)
+			{
+				mIsFirstSceneSwap = false;
+				return false;
+			}
+
 			for(auto textureHandle : mTextureRemoveOnSceneChange)
 				mTextureAssets.remove(textureHandle);
 

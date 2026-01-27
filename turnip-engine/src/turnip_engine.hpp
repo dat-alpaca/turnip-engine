@@ -1,22 +1,20 @@
 #pragma once
-#include "client/agents/event_consumer.hpp"
-#include "client/agents/event_emitter.hpp"
-#include "client/agents/physics_script_agent.hpp"
-#include "client/agents/asset_binder_system.hpp"
-
 #include "client/project/project.hpp"
 
-#include "client/system/camera_system.hpp"
-#include "client/system/imm_quad_system.hpp"
-#include "client/system/physics_system.hpp"
-#include "client/system/scene_signal_system.hpp"
-#include "client/system/scenegraph_system.hpp"
-#include "client/system/script_system.hpp"
-#include "client/system/tilemap_system.hpp"
+#include "client/views/camera_view.hpp"
+#include "client/views/cubemap_view.hpp"
+#include "client/views/imm_quad_view.hpp"
+#include "client/views/mesh_view.hpp"
+#include "client/views/physics_view.hpp"
+#include "client/views/scene_signal_view.hpp"
+#include "client/views/scenegraph_view.hpp"
+#include "client/views/script_view.hpp"
+#include "client/views/tilemap_view.hpp"
+#include "client/views/physics_script_view.hpp"
+#include "client/views/asset_binder_view.hpp"
 
 #include "client/asset_serialization.hpp"
 #include "client/scene_serialization.hpp"
-#include "client/scene_view.hpp"
 
 #include "core/assets/audio/audio_asset.hpp"
 #include "core/assets/audio/audio_loader.hpp"

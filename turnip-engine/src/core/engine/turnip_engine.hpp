@@ -24,7 +24,7 @@ namespace tur
 		void shutdown();
 
 	public:
-		void add_view(tur_unique<View> view);
+		view_handle add_view(tur_unique<View> view);
 		void remove_view(view_handle viewHandle);
 
 	public:

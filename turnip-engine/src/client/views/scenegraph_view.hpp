@@ -1,17 +1,26 @@
 #pragma once
+#include "event/subscriber.hpp"
+#include "memory/memory.hpp"
 #include "scene/scene.hpp"
 #include "scene/components.hpp"
-#include "client/system/system.hpp"
+#include "view/view.hpp"
+#include "event/events.hpp"
 
 namespace tur
 {
-	class ScenegraphSystem : public System
+	class ScenegraphView : public View
 	{
 	public:
-		void initialize(NON_OWNING Scene* scene) { set_scene(scene); }
+		void on_event(Event& event) override
+		{
+			Subscriber subscriber(event);
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				return false;
+			});
+		}
 
-	public:
-		void on_update()
+		void on_update(const Time&) override
 		{
 			auto& registry = rScene->get_registry();
 			auto view = registry.view<TransformComponent, const HierarchyComponent>();
@@ -30,5 +39,8 @@ namespace tur
 					transform.worldTransform = transform.transform;
 			}
 		}
+
+	private:
+		NON_OWNING Scene* rScene = nullptr;
 	};
 }

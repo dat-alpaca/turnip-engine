@@ -2,6 +2,7 @@
 #include "defines.hpp"
 #include "graphics/objects/texture.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+#include "vulkan/vulkan.hpp"
 #include <vk_mem_alloc.h>
 
 namespace tur::vulkan
@@ -472,13 +473,25 @@ namespace tur::vulkan
 		// TODO: prepare other image layouts
 		{
 			// TODO: proper masks
-			utils::transition_texture_layout_imm(*rRHI, texture, {.newLayout = vk::ImageLayout::eTransferDstOptimal});
+			utils::transition_texture_layout_imm(*rRHI, texture, {
+				.newLayout = vk::ImageLayout::eTransferDstOptimal,
+				.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+				.dstAccessMask = vk::AccessFlagBits2::eTransferWrite
+			});
 
 			copy_buffer_to_texture(stagingBufferHandle, textureHandle, width, height);
 
 			// TODO: proper masks
 			utils::transition_texture_layout_imm(
-				*rRHI, texture, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+				*rRHI, texture, {
+					.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+					.dstAccessMask = 
+						vk::AccessFlagBits2::eInputAttachmentRead | 
+						vk::AccessFlagBits2::eShaderRead |
+						vk::AccessFlagBits2::eColorAttachmentRead |
+						vk::AccessFlagBits2::eShaderSampledRead | 
+						vk::AccessFlagBits2::eShaderStorageRead
+				}
 			);
 		}
 

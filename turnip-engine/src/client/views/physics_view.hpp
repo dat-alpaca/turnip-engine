@@ -1,9 +1,10 @@
 #pragma once
-#include "box2d/box2d.h"
-#include "box2d/id.h"
-#include "box2d/types.h"
-#include "client/system/system.hpp"
+#include <box2d/box2d.h>
+#include "assert/assert.hpp"
+#include "view/view.hpp"
 #include "entt/entity/fwd.hpp"
+#include "event/events.hpp"
+#include "scene/components.hpp"
 
 #include "event/physics_events/contact_event.hpp"
 #include "event/scene_events/scene_switched_event.hpp"
@@ -12,13 +13,9 @@
 #include "physics/physics_components.hpp"
 #include "physics/physics_handler.hpp"
 
-#include "scene/entity.hpp"
 #include "scene/scene.hpp"
 
-#include "client/agents/event_emitter.hpp"
-
 #include <unordered_map>
-#include <unordered_set>
 
 inline bool operator==(const b2ShapeId& lhs, const b2ShapeId& rhs)
 {
@@ -38,13 +35,12 @@ namespace tur
 
 namespace tur
 {
-	class PhysicsSystem : public IEventEmitter, public System
+	class PhysicsView : public View
 	{
 	public:
-		void initialize(NON_OWNING Scene* scene, NON_OWNING PhysicsHandler* physicsHandler)
+		PhysicsView(NON_OWNING PhysicsHandler* physicsHandler)
 		{
 			rPhysicsHandler = physicsHandler;
-			set_scene(scene);
 		}
 
 	public:
@@ -52,33 +48,22 @@ namespace tur
 		{
 			Subscriber subscriber(event);
 
-			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
-				if(!rPhysicsHandler)
-					return false;
+			subscriber.subscribe<SceneCreatedEvent>([this](const SceneCreatedEvent& event) -> bool {
+				auto& registry = event.scene->get_registry();
+				registry.on_construct<Body2DComponent>().connect<&PhysicsView::on_body2d_added>(this);
+				registry.on_construct<RectCollider2D>().connect<&PhysicsView::on_rect2d_added>(this);
 
+				return false;
+			});
+
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				
 				// Destroy previous scene bodies and rects.
 				destroy_physics_components_for_scene(event.previousScene);
 
 				// Create current scene bodies and rects.
 				create_physics_components_for_scene(event.currentScene);
-
-				return false;
-			});
-
-			subscriber.subscribe<ScenePreDeserializationEvent>([this](const ScenePreDeserializationEvent& event) -> bool {
-				auto& registry = event.scene->get_registry();
-				registry.on_construct<Body2DComponent>().connect<&PhysicsSystem::on_body2d_added>(this);
-				registry.on_construct<RectCollider2D>().connect<&PhysicsSystem::on_rect2d_added>(this);
-
-				return false;
-			});
-
-			subscriber.subscribe<SceneDeserializedEvent>([this](const SceneDeserializedEvent& event) -> bool {
-				if(mIsPrimaryWorld)
-				{
-					create_physics_components_for_scene(event.scene);
-					mIsPrimaryWorld = false;
-				}
 
 				return false;
 			});
@@ -212,6 +197,8 @@ namespace tur
 
 		void create_physics_components_for_scene(Scene* scene)
 		{
+			TUR_ASS(scene);
+
 			auto bodyView = scene->get_registry().view<Body2DComponent>();
 			for(auto entity : bodyView)
 			{
@@ -231,6 +218,9 @@ namespace tur
 
 		void destroy_physics_components_for_scene(Scene* scene)
 		{
+			if(!scene)
+				return;
+
 			auto bodyView = scene->get_registry().view<Body2DComponent>();
 			for(auto entity : bodyView)
 			{
@@ -241,6 +231,7 @@ namespace tur
 
 	private:
 		NON_OWNING PhysicsHandler* rPhysicsHandler = nullptr;
+		NON_OWNING Scene* rScene = nullptr;
 
 	private:
 		std::unordered_map<b2ShapeId, entt::entity, ShapeIdHash> mShapeMap;

@@ -11,6 +11,8 @@ namespace tur
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
+		set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
+
 		rRHI = rhi;
 		initialize_resources();
 	}

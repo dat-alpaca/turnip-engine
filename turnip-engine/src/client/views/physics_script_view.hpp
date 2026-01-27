@@ -1,7 +1,7 @@
 #pragma once
-#include "client/agents/event_consumer.hpp"
-#include "client/system/physics_system.hpp"
-#include "client/system/script_system.hpp"
+#include "client/views/physics_view.hpp"
+#include "view/view.hpp"
+#include "client/views/script_view.hpp"
 
 #include "entt/entity/fwd.hpp"
 #include "event/physics_events/contact_event.hpp"
@@ -15,25 +15,27 @@
 
 namespace tur
 {
-	class PhysicsScriptAgent : public IEventConsumer
+	class PhysicsScriptView : public View
 	{
 	public:
-		void initialize(NON_OWNING Scene* scene, NON_OWNING PhysicsSystem* physics, NON_OWNING ScriptSystem* script)
+		PhysicsScriptView(NON_OWNING PhysicsView* physics, NON_OWNING ScriptView* script)
 		{
             TUR_ASSERT(physics, "Invalid physics system pointer");
             TUR_ASSERT(script, "Invalid script system pointer");
 
-			rPhysicsSystem = physics;
-			rScriptSystem = script;
-
-			set_scene(scene);
+			rPhysicsView = physics;
+			rScriptView = script;
 		}
-		void set_scene(NON_OWNING Scene* scene) { rScene = scene; }
 
     public:
-        void on_event(Event& event)
+        void on_event(Event& event) override
         {
             Subscriber subscriber(event);
+            subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				return false;
+			});
+
             subscriber.subscribe<OnContactEvent>([&](const OnContactEvent& contactEvent) -> bool {
                 switch(contactEvent.type)
                 {
@@ -57,8 +59,8 @@ namespace tur
     private:
         void handle_begin_event(entt::entity entityA, entt::entity entityB)
         {
-            Entity A { entityA, rScriptSystem->get_scene() };
-            Entity B { entityB, rScriptSystem->get_scene() };
+            Entity A { entityA, rScriptView->get_scene() };
+            Entity B { entityB, rScriptView->get_scene() };
        
             if(A.has_component<ScriptComponent>())
             {
@@ -79,8 +81,8 @@ namespace tur
 
         void handle_end_event(entt::entity entityA, entt::entity entityB)
         {
-            Entity A { entityA, rScriptSystem->get_scene() };
-            Entity B { entityB, rScriptSystem->get_scene() };
+            Entity A { entityA, rScriptView->get_scene() };
+            Entity B { entityB, rScriptView->get_scene() };
        
             if(A.has_component<ScriptComponent>())
             {
@@ -101,8 +103,8 @@ namespace tur
 
         void handle_hit_event(entt::entity entityA, entt::entity entityB, float approachSpeed)
         {
-            Entity A { entityA, rScriptSystem->get_scene() };
-            Entity B { entityB, rScriptSystem->get_scene() };
+            Entity A { entityA, rScriptView->get_scene() };
+            Entity B { entityB, rScriptView->get_scene() };
        
             if(A.has_component<ScriptComponent>())
             {
@@ -122,8 +124,8 @@ namespace tur
         }
 
     private:
-        NON_OWNING PhysicsSystem* rPhysicsSystem = nullptr; // TODO: remove
-        NON_OWNING ScriptSystem* rScriptSystem = nullptr;
+        NON_OWNING PhysicsView* rPhysicsView = nullptr; // TODO: remove
+        NON_OWNING ScriptView* rScriptView = nullptr;
         NON_OWNING Scene* rScene = nullptr;
     };
 }

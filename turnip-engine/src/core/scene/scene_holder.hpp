@@ -18,6 +18,9 @@ namespace tur
 		scene_handle create_scene(bool setAsCurrent = false)
 		{
 			mScenes.push_back(tur::make_unique<Scene>());
+			
+			SceneCreatedEvent createdEvent(mScenes.back().get());
+			mEventCallback(createdEvent);
 
 			if (setAsCurrent)
 				set_current_scene(mScenes.back().get());

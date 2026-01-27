@@ -105,5 +105,8 @@ namespace tur
 		std::vector<asset_handle> mAudioRemoveOnSceneChange;
 		std::vector<asset_handle> mMeshRemoveOnSceneChange;
 		std::vector<asset_handle> mCubemapRemoveOnSceneChange;
+
+	private:
+		bool mIsFirstSceneSwap = true;
 	};
 }

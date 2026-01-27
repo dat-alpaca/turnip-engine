@@ -10,29 +10,31 @@
 #include "graphics/objects/texture.hpp"
 #include "assets/asset.hpp"
 #include "event/events.hpp"
-#include "event_consumer.hpp"
-#include "event_emitter.hpp"
 #include "rhi/rhi.hpp"
+#include "scene/components.hpp"
 
 #include "scene/components.hpp"
 #include "assets/asset_library.hpp"
-#include "client/system/system.hpp"
+#include "view/view.hpp"
 
 namespace tur
 {
-	class AssetBinderSystem : public IEventConsumer, public IEventEmitter, public System
+	class AssetBinderView : public View
 	{
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING AssetLibrary* library)
-		{
-			rRHI = rhi;
-			rLibrary = library;
-		}
+		AssetBinderView(NON_OWNING RenderInterface* rhi, NON_OWNING AssetLibrary* library)
+			: rRHI(rhi)
+			, rLibrary(library) { }
 
 	public:
-		void on_event(Event& event)
+		void on_event(Event& event) override
 		{
 			Subscriber subscriber(event);
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				return false;
+			});
+
 			subscriber.subscribe<AssetLoadedEvent>(
 				[&](const AssetLoadedEvent& assetLoadedEvent) -> bool
 				{
@@ -347,5 +349,6 @@ namespace tur
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
 		NON_OWNING AssetLibrary* rLibrary = nullptr;
+		NON_OWNING Scene* rScene = nullptr;
 	};
 }

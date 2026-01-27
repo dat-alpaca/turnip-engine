@@ -1,36 +1,46 @@
 #pragma once
-#include "client/system/system.hpp"
 #include "defines.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/renderer/cubemap_renderer.hpp"
+#include "memory/memory.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "utils/color.hpp"
+#include "view/view.hpp"
 
 namespace tur
 {
-	class CubemapSystem : public System
+	class CubemapView : public View
 	{
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
+		CubemapView(NON_OWNING RenderInterface* rhi)
 		{
 			mCubemapRenderer.initialize(rhi);
 			mCubemapRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
-			mCubemapRenderer.set_camera(camera);
-			set_scene(scene);
-
-			setup_registry_events();
 		}
-		void set_camera(Camera* camera) { mCubemapRenderer.set_camera(camera); }
+	
+	public:
+		void render_deferred()
+		{ 
+			mCubemapRenderer.render(); 
+		}
 
 	public:
-		void render() { mCubemapRenderer.render(); }
-
-		void on_event(Event& event)
+		void on_event(Event& event) override
 		{
 			Subscriber subscriber(event);
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				return false;
+			});
+
+			subscriber.subscribe<CameraSwitchedEvent>([this](const CameraSwitchedEvent& event) -> bool {
+				mCubemapRenderer.set_camera(event.camera);
+				return false;
+			});
+
 			subscriber.subscribe<WindowFramebufferEvent>(
 				[&](const WindowFramebufferEvent& resizeEvent) -> bool
 				{
@@ -42,7 +52,7 @@ namespace tur
 			);
 		}
 
-		void on_update()
+		void on_update(const Time&) override
 		{
 			auto view = rScene->get_registry().view<CubemapComponent>();
 			for (auto [e, cubemap] : view.each())
@@ -56,17 +66,14 @@ namespace tur
             }
 		}
 
-	private:
-		void setup_registry_events()
-		{
-            /* Blank */
-		}
-
 	public:
 		CubemapRenderer& renderer() { return mCubemapRenderer; }
 
 	private:
 		CubemapRenderer mCubemapRenderer;
         bool cubemapSet = false;
+	
+	private:
+		NON_OWNING Scene* rScene = nullptr;
 	};
 }

@@ -189,7 +189,7 @@ namespace tur
 	{
 		rAudioHandler = audioHandler;
 	}
-	void ScriptHandler::initialize_scene(NON_OWNING SceneHolder* sceneHolder)
+	void ScriptHandler::initialize_scene_holder(NON_OWNING SceneHolder* sceneHolder)
 	{
 		rSceneHolder = sceneHolder;
 

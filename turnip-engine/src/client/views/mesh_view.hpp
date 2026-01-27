@@ -1,5 +1,5 @@
 #pragma once
-#include "client/system/system.hpp"
+#include "view/view.hpp"
 #include "defines.hpp"
 #include "graphics/components.hpp"
 #include "graphics/renderer/mesh_renderer.hpp"
@@ -11,24 +11,23 @@
 
 namespace tur
 {
-	class MeshSystem : public System
+	class MeshView : public View
 	{
 	public:
-		void initialize(NON_OWNING RenderInterface* rhi, NON_OWNING Scene* scene, NON_OWNING Camera* camera)
+		MeshView(NON_OWNING RenderInterface* rhi)
 		{
 			mRenderer.initialize(rhi);
 			mRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
-			mRenderer.set_camera(camera);
-			set_scene(scene);
-
-			setup_registry_events();
 		}
-		void set_camera(Camera* camera) { mRenderer.set_camera(camera); }
 
 	public:
-		void render() { mRenderer.render(); }
-
-		void on_event(Event& event)
+		void render_deferred()
+		{ 
+			mRenderer.render(); 
+		}
+	
+	public:
+		void on_event(Event& event) override
 		{
 			Subscriber subscriber(event);
 			subscriber.subscribe<WindowFramebufferEvent>(
@@ -40,9 +39,25 @@ namespace tur
 					return false;
 				}
 			);
+
+			subscriber.subscribe<SceneCreatedEvent>([this](const SceneCreatedEvent& event) -> bool {
+				auto& registry = event.scene->get_registry();
+				registry.on_construct<MeshComponent>().connect<&MeshView::on_mesh_component_added>(this);
+				return false;
+			});
+
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				return false;
+			});
+			
+			subscriber.subscribe<CameraSwitchedEvent>([this](const CameraSwitchedEvent& event) -> bool {
+				mRenderer.set_camera(event.camera);
+				return false;
+			});
 		}
 
-		void on_update()
+		void on_update(const Time&) override
 		{
             auto view = rScene->get_registry().view<TransformComponent, MeshComponent, const CullingComponent>();
 			for (auto [e, transform, mesh, culling] : view.each())
@@ -80,21 +95,13 @@ namespace tur
 		}
 
 	private:
-		void setup_registry_events()
-		{
-			auto& registry = rScene->get_registry();
-			registry.on_construct<MeshComponent>().connect<&MeshSystem::on_mesh_component_added>(this);
-		}
-
 		void on_mesh_component_added(entt::registry& registry, entt::entity entity)
 		{
-			Entity sceneEntity { entity, rScene };
-
-			if(!sceneEntity.has_component<TransformComponent>())
-				sceneEntity.add_component<TransformComponent>();
+			if(!registry.all_of<TransformComponent>(entity))
+				registry.emplace<TransformComponent>(entity);
 			
-			if(!sceneEntity.has_component<CullingComponent>())	
-				sceneEntity.add_component<CullingComponent>();
+			if(!registry.all_of<CullingComponent>(entity))
+				registry.emplace<CullingComponent>(entity);
         }
 
 	public:
@@ -102,7 +109,9 @@ namespace tur
 
 	private:
         NON_OWNING RenderInterface* rRHI = nullptr;
-        std::unordered_map<entt::entity, handle_type> mMeshCache;
+		NON_OWNING Scene* rScene = nullptr;
+
+		std::unordered_map<entt::entity, handle_type> mMeshCache;
 		MeshRenderer mRenderer;
 	};
 }

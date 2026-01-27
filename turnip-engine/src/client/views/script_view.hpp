@@ -1,5 +1,5 @@
 #pragma once
-#include "client/system/system.hpp"
+#include "view/view.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/event.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
@@ -12,13 +12,12 @@
 
 namespace tur
 {
-	class ScriptSystem : public System
+	class ScriptView : public View
 	{
 	public:
-		void initialize(NON_OWNING Scene* scene, NON_OWNING ScriptHandler* scriptHandler)
+		ScriptView(NON_OWNING ScriptHandler* scriptHandler)
+			: rScriptHandler(scriptHandler)
 		{
-			rScriptHandler = scriptHandler;
-			set_scene(scene);
 		}
 
 	public:
@@ -35,7 +34,7 @@ namespace tur
 				call_expected_function(script.instance, "on_wake");
 		}
 
-		void on_event(Event& event)
+		void on_event(Event& event) override
 		{
 			Subscriber subscriber(event);
 			subscriber.subscribe<WindowFramebufferEvent>(
@@ -46,7 +45,9 @@ namespace tur
 				}
 			);
 
-			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent&) -> bool {
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+				
 				if(!rScriptHandler)
 					return false;
 				
@@ -55,7 +56,7 @@ namespace tur
 			});
 		}
 
-		void on_fixed_update()
+		void on_fixed_update() override
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
@@ -67,7 +68,7 @@ namespace tur
 			}
 		}
 
-		void on_update(const Time& time)
+		void on_update(const Time& time) override
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
@@ -79,7 +80,7 @@ namespace tur
 			}
 		}
 
-		void on_post_update(const Time& time)
+		void on_post_update(const Time& time) override
 		{
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
@@ -91,7 +92,7 @@ namespace tur
 			}
 		}
 
-		private:
+	private:
 		void initialize_registry()
 		{
 			TUR_ASSERT(rScriptHandler, "Script Handler not bound.");
@@ -150,6 +151,9 @@ namespace tur
 	private:
 		void on_resize_event(float width, float height)
 		{
+			if(!rScene)
+				return;
+
 			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
 			{
 				if(!has_function(script.instance, "on_window_resize"))
@@ -159,7 +163,11 @@ namespace tur
 			}
 		}
 		
+    public:
+		Scene* get_scene() const { return rScene; }
+
 	private:
+		NON_OWNING Scene* rScene = nullptr;
 		NON_OWNING ScriptHandler* rScriptHandler = nullptr;
 	};
 }

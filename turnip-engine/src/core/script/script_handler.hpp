@@ -24,7 +24,7 @@ namespace tur
 		void initialize_input();
 		void initialize_physics(NON_OWNING PhysicsHandler* physicsHandler);
 		void initialize_audio(NON_OWNING AudioHandler* audioHandler);
-		void initialize_scene(NON_OWNING SceneHolder* sceneHolder);
+		void initialize_scene_holder(NON_OWNING SceneHolder* sceneHolder);
 
 	public:
 		sol::object find_component(Entity entity, const std::string& componentName);

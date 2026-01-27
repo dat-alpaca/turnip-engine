@@ -1,4 +1,5 @@
 #pragma once
+#include "view/view.hpp"
 #include "assert/assert.hpp"
 #include "assets/asset_library.hpp"
 #include "assets/cubemap/cubemap_asset.hpp"
@@ -14,15 +15,16 @@
 
 namespace tur
 {
-	class SceneSignalSystem
+	class SceneSignalView : public View
 	{
 	public:
-		void initialize(NON_OWNING AssetLibrary* library)
-		{
-            rLibrary = library;
+		SceneSignalView(NON_OWNING AssetLibrary* library)
+            : rLibrary(library)
+        {
 		}
 
-		void on_event(Event& event)
+    public:
+		void on_event(Event& event) override
 		{
 			Subscriber subscriber(event);
 			subscriber.subscribe<SceneDeserializedEvent>(
@@ -118,5 +120,5 @@ namespace tur
 
 	private:
 		NON_OWNING AssetLibrary* rLibrary = nullptr;
-	};
+    };
 }

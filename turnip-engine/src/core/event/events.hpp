@@ -26,6 +26,6 @@
 #include "asset_events/mesh_uploaded_event.hpp"
 
 #include "scene_events/scene_switched_event.hpp"
-
+#include "scene_events/camera_switched_event.hpp"
 
 #include "physics_events/contact_event.hpp"

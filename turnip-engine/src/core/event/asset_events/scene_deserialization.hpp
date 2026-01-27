@@ -5,6 +5,20 @@
 
 namespace tur
 {
+	struct SceneCreatedEvent : public Event
+	{
+		DEFINE_EVENT(EventType::SCENE_CREATED);
+
+	public:
+		SceneCreatedEvent(NON_OWNING Scene* scene)
+			: scene(scene)
+		{
+		}
+
+	public:
+		NON_OWNING Scene* scene = nullptr;
+	};
+
 	struct ScenePreDeserializationEvent : public Event
 	{
 		DEFINE_EVENT(EventType::SCENE_PRE_DESERIALIZED);

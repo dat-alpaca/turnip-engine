@@ -1,27 +1,109 @@
-#include "assets/asset.hpp"
-#include "assets/cubemap/cubemap_asset.hpp"
-#include "assets/mesh/mesh_asset.hpp"
-#include "graphics/components.hpp"
-#include "scene/common_components.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
 
-class MainSceneView final : public SceneView
+class MainSceneView final : public View
 {
 public:
 	void on_view_added() final
 	{
-		SceneView::on_view_added();
+		initialize_views();
+
+		// Windowing:
+		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
+		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
+		engine->get_event_callback()(initialSizeEvent);
+
 		mProject.initialize("project");
 
 		initialize_resources();
 		initialize_entities();
 
-		wake_scene();
+		// Windowing:
+		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
+		WindowFramebufferEvent initialSizeEvent0(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
+		engine->get_event_callback()(initialSizeEvent0);
+	}
+
+	void on_render() final
+	{
+		auto& rhi = engine->get_render_interface();
+		
+		CommandBuffer commandBuffer = rhi.create_command_buffer();
+		commandBuffer.reset(rhi.get_current_command_buffer());
+		commandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
+
+		commandBuffer.begin();
+		commandBuffer.begin_rendering();
+
+		rQuadView->render_deferred();
+		rTilemapView->render_deferred();
+		rMeshView->render_deferred();
+		rCubemapView->render_deferred();
+		
+		std::vector<CommandBuffer::BufferType> commandBuffers;
+		{
+			commandBuffers.reserve(4);
+
+			commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
+
+			if (!rTilemapView->renderer().is_empty())
+				commandBuffers.push_back(rTilemapView->renderer().get_command_buffer().get_buffer());
+
+			if (rMeshView->renderer().mesh_count() > 0)
+				commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
+
+			if (rCubemapView->renderer().is_valid())
+				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
+		}
+
+		commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});
+
+		commandBuffer.end_rendering();
+		commandBuffer.blit();
+		commandBuffer.end();
 	}
 
 private:
+	void initialize_views()
+	{
+		auto& views = engine->get_view_handler();
+		auto& rhi = engine->get_render_interface();
+		auto& library = engine->get_asset_library();
+		auto& physics = engine->get_physics_handler();
+		auto& scriptHandler = engine->get_script_handler();
+
+		// Final touches:
+		engine->get_asset_library().create_default_texture();
+		engine->get_script_handler().initialize_scene_holder(&mSceneHolder);
+
+		mSceneHolder.set_event_callback(engine->get_event_callback());
+
+		// Views:
+		assetBinderView 	= engine->add_view(tur::make_unique<AssetBinderView>(&rhi, &library));
+
+		immQuadView 		= engine->add_view(tur::make_unique<ImmQuadView>(&rhi));
+		cubemapView 		= engine->add_view(tur::make_unique<CubemapView>(&rhi));
+		tilemapView 		= engine->add_view(tur::make_unique<TilemapView>(&rhi));
+		meshView 			= engine->add_view(tur::make_unique<MeshView>(&rhi));
+		scenegraphView 		= engine->add_view(tur::make_unique<ScenegraphView>());
+		cameraView 			= engine->add_view(tur::make_unique<CameraView>());
+		sceneSignalView 	= engine->add_view(tur::make_unique<SceneSignalView>(&library));
+		
+		physicsView 		= engine->add_view(tur::make_unique<PhysicsView>(&physics));
+		scriptView			= engine->add_view(tur::make_unique<ScriptView>(&scriptHandler));
+
+		auto* physicsPtr 	= views.get<PhysicsView>(physicsView);
+		auto* scriptPtr 	= views.get<ScriptView>(scriptView);
+		physicsScriptView 	= engine->add_view(tur::make_unique<PhysicsScriptView>(physicsPtr, scriptPtr));
+	
+		// Handles:
+		rQuadView 		= views.get<ImmQuadView>(immQuadView);
+		rCubemapView 	= views.get<CubemapView>(cubemapView);
+		rMeshView 		= views.get<MeshView>(meshView);
+		rTilemapView 	= views.get<TilemapView>(tilemapView);
+	}
+
 	void initialize_resources()
 	{
 		AssetLibrary& library = engine->get_asset_library();
@@ -49,20 +131,16 @@ private:
 		bool isMainSet = false;
 		for(const auto& sceneFilepath : mProject.get_scene_filepaths())
 		{
-			if(!isMainSet)
-			{
-				deserialize_scene_task(&get_current_scene(), sceneFilepath);
-				isMainSet = true;
-				continue;
-			}
-
-			scene_handle sceneHandle = add_scene();
-			Scene& scene = get_scene(sceneHandle);
-			deserialize_scene_task(&scene, sceneFilepath);
+			scene_handle sceneHandle = mSceneHolder.create_scene();
+			Scene* scene = mSceneHolder.get_scene(sceneHandle);
+			deserialize_scene_task(scene, sceneFilepath);
+			mSceneHolder.set_current_scene(sceneHandle);
+			return;
 		}
 	}
 
 private:
+	// TODO: move to engine
 	void deserialize_scene_task(Scene* scene, const std::filesystem::path& filepath)
 	{
 		ScenePreDeserializationEvent preDeserialization(scene);
@@ -75,8 +153,27 @@ private:
 	}
 
 private:
-	asset_handle meshHandle;
+	SceneHolder mSceneHolder;
 	Project mProject;
+
+private:
+	NON_OWNING ImmQuadView* rQuadView 		= nullptr;
+	NON_OWNING CubemapView* rCubemapView 	= nullptr;
+	NON_OWNING MeshView* 	rMeshView 		= nullptr;
+	NON_OWNING TilemapView* rTilemapView 	= nullptr;
+
+private:
+	view_handle assetBinderView 	= invalid_handle;
+	view_handle immQuadView 		= invalid_handle;
+	view_handle cubemapView 		= invalid_handle;
+	view_handle tilemapView		= invalid_handle;
+	view_handle meshView 			= invalid_handle;
+	view_handle scenegraphView 	= invalid_handle;
+	view_handle cameraView			= invalid_handle;
+	view_handle sceneSignalView 	= invalid_handle;
+	view_handle physicsView		= invalid_handle;
+	view_handle scriptView			= invalid_handle;
+	view_handle physicsScriptView  = invalid_handle;
 };
 
 int main()

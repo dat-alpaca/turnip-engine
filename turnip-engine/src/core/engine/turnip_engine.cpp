@@ -172,10 +172,13 @@ namespace tur
 		mShutdownRequested = true;
 	}
 
-	void TurnipEngine::add_view(tur_unique<View> view)
+	view_handle TurnipEngine::add_view(tur_unique<View> view)
 	{
 		view->set_engine(this);
-		mViewHandler.add(std::move(view));
+		view->set_event_callback(mMainEventCallback);
+		view_handle handle = mViewHandler.add(std::move(view));
+
+		return handle;
 	}
 	void TurnipEngine::remove_view(view_handle viewHandle)
 	{

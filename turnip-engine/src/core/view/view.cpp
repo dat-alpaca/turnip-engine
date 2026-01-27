@@ -1,5 +1,6 @@
 #include "view.hpp"
 #include "engine/turnip_engine.hpp"
+#include "event/event.hpp"
 
 namespace tur
 {
@@ -10,6 +11,10 @@ namespace tur
 	void View::set_handle(view_handle viewHandle)
 	{
 		viewHandle = viewHandle;
+	}
+	void View::set_event_callback(const EventCallback& eventCallback)
+	{
+		callback = eventCallback;
 	}
 }
 
@@ -31,9 +36,5 @@ namespace tur
 		viewHandlerIterator->get()->on_view_removed();
 
 		mViews.erase(viewHandlerIterator);
-	}
-	tur_unique<View>& ViewHandler::get(view_handle handle)
-	{
-		return mViews[handle];
 	}
 }

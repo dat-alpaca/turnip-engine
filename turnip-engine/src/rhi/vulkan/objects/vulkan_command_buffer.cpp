@@ -293,7 +293,7 @@ namespace tur::vulkan
 			*rRHI, swapchainTexture, {
 				.newLayout = vk::ImageLayout::eTransferDstOptimal,
 				.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands,
-				.srcAccessMask = vk::AccessFlagBits2::eMemoryRead | vk::AccessFlagBits2::eMemoryWrite,
+				.srcAccessMask = vk::AccessFlagBits2::eMemoryWrite,
 				.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
 				.dstAccessMask = vk::AccessFlagBits2::eTransferWrite
 			}

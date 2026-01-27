@@ -1,50 +1,49 @@
 #pragma once
-#include "client/system/system.hpp"
+#include "event/asset_events/scene_deserialization.hpp"
+#include "event/scene_events/camera_switched_event.hpp"
 #include "graphics/camera.hpp"
 #include "graphics/components.hpp"
+#include "memory/memory.hpp"
 #include "scene/entity.hpp"
+#include "event/events.hpp"
 #include "utils/aabb.hpp"
 #include "utils/extent.hpp"
+#include "view/view.hpp"
 
 namespace tur
 {
-	class CameraSystem : public System
-	{
-	public:
-		void initialize(NON_OWNING Scene* scene)
-		{
-			set_scene(scene);
-            setup_registry_events();
-		}
-	
+	class CameraView : public View
+	{	
     public:
-        void on_update()
+        void on_update(const Time&) override
 		{
             rCurrentCamera->update_view();
-
             cull_scene_orthographic();
 		}
 
-        void on_scene_switched()
-        {
-            
+        void on_event(Event& event) override
+		{
+			Subscriber subscriber(event);
+
+            subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
+				rScene = event.currentScene;
+                fetch_main_camera(event.currentScene);
+				return false;
+			});
         }
 
     private:
-        void setup_registry_events()
+        void fetch_main_camera(Scene* scene)
         {
-            auto& registry = rScene->get_registry();
-			registry.on_construct<CameraComponent>().connect<&CameraSystem::on_camera_added_or_updated>(this);
-            registry.on_update<CameraComponent>().connect<&CameraSystem::on_camera_added_or_updated>(this);
-        }
+            auto view = scene->get_registry().view<CameraComponent>();
+            for(auto [entity, camera] : view.each())
+            {
+                if(camera.mainCamera)
+                    rCurrentCamera = &camera.camera;
+            }
 
-        void on_camera_added_or_updated(entt::registry& registry, entt::entity entity)
-        {
-            Entity sceneEntity { entity, rScene };
-			auto& camera = sceneEntity.get_component<CameraComponent>();
-
-            if(camera.mainCamera)
-                rCurrentCamera = &camera.camera;
+            CameraSwitchedEvent switchEvent(rCurrentCamera);
+            callback(switchEvent);
         }
 
         void cull_scene_orthographic()
@@ -87,5 +86,6 @@ namespace tur
 
 	private:
         NON_OWNING Camera* rCurrentCamera = nullptr;
+        NON_OWNING Scene* rScene = nullptr;
 	};
 }
