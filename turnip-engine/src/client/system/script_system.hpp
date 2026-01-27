@@ -1,6 +1,7 @@
 #pragma once
 #include "client/system/system.hpp"
 #include "entt/entity/fwd.hpp"
+#include "event/event.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -32,6 +33,26 @@ namespace tur
 		{
 			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
 				call_expected_function(script.instance, "on_wake");
+		}
+
+		void on_event(Event& event)
+		{
+			Subscriber subscriber(event);
+			subscriber.subscribe<WindowFramebufferEvent>(
+				[&](const WindowFramebufferEvent& resizeEvent) -> bool
+				{
+					on_resize_event(resizeEvent.width, resizeEvent.height);
+					return false;
+				}
+			);
+
+			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent&) -> bool {
+				if(!rScriptHandler)
+					return false;
+				
+				wake_up();
+				return false;
+			});
 		}
 
 		void on_fixed_update()
@@ -70,20 +91,7 @@ namespace tur
 			}
 		}
 
-	public:
-		void on_event(Event& event)
-		{
-			Subscriber subscriber(event);
-			subscriber.subscribe<WindowFramebufferEvent>(
-				[&](const WindowFramebufferEvent& resizeEvent) -> bool
-				{
-					on_resize_event(resizeEvent.width, resizeEvent.height);
-					return false;
-				}
-			);
-		}
-
-	private:
+		private:
 		void initialize_registry()
 		{
 			TUR_ASSERT(rScriptHandler, "Script Handler not bound.");

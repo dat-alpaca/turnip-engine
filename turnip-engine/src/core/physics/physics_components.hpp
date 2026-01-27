@@ -14,7 +14,7 @@ namespace tur
 	public:
 		BodyType type = BodyType::STATIC;
 		b2BodyDef bodyDef;
-		b2BodyId bodyID;
+		b2BodyId bodyID = b2_nullBodyId;
 		bool isBullet = false;
 	};
 
@@ -32,6 +32,6 @@ namespace tur
 
 		b2Polygon polygon;
 		b2ShapeDef shapeDef;
-		b2ShapeId shapeID;
+		b2ShapeId shapeID = b2_nullShapeId;
 	};
 }

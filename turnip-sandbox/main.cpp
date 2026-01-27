@@ -51,22 +51,27 @@ private:
 		{
 			if(!isMainSet)
 			{
-				deserialize_scene(&get_current_scene(), mProject, sceneFilepath);
-				
-				SceneDeserializedEvent deserializeEvent(&get_current_scene(), mProject);
-				engine->get_event_callback()(deserializeEvent);
-				
+				deserialize_scene_task(&get_current_scene(), sceneFilepath);
 				isMainSet = true;
 				continue;
 			}
 
 			scene_handle sceneHandle = add_scene();
 			Scene& scene = get_scene(sceneHandle);
-			deserialize_scene(&scene, mProject, sceneFilepath);
-
-			SceneDeserializedEvent deserializeEvent(&scene, mProject);
-			engine->get_event_callback()(deserializeEvent);
+			deserialize_scene_task(&scene, sceneFilepath);
 		}
+	}
+
+private:
+	void deserialize_scene_task(Scene* scene, const std::filesystem::path& filepath)
+	{
+		ScenePreDeserializationEvent preDeserialization(scene);
+		engine->get_event_callback()(preDeserialization);
+
+		deserialize_scene(scene, mProject, filepath);
+
+		SceneDeserializedEvent deserializeEvent(scene, mProject);
+		engine->get_event_callback()(deserializeEvent);
 	}
 
 private:

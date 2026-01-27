@@ -150,6 +150,7 @@ namespace tur
 		);
 
 		signalSystem.on_event(event);
+		physicsSystem.on_event(event);
 		mPhysicsScriptAgent.on_event(event);
 		mAssetBinderSystem.on_event(event);
 		quadSystem.on_event(event);

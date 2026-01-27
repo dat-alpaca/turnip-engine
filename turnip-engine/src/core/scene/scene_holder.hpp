@@ -27,17 +27,19 @@ namespace tur
 		void set_current_scene(Scene* scene)
 		{
 			TUR_ASSERT(scene, "Invalid scene provided");
+			Scene* previous = mCurrentScene;
 			mCurrentScene = scene;
 
-			SceneSwitchedEvent sceneSwitchedEvent(mCurrentScene);
+			SceneSwitchedEvent sceneSwitchedEvent(mCurrentScene, previous);
 			mEventCallback(sceneSwitchedEvent);
 		}
 		void set_current_scene(scene_handle handle)
 		{
 			TUR_ASSERT(handle >= 0 && handle < mScenes.size(), "Invalid scene handle provided");
+			Scene* previous = mCurrentScene;
 			mCurrentScene = mScenes[handle].get();
 
-			SceneSwitchedEvent sceneSwitchedEvent(mCurrentScene);
+			SceneSwitchedEvent sceneSwitchedEvent(mCurrentScene, previous);
 			mEventCallback(sceneSwitchedEvent);
 		}
 
