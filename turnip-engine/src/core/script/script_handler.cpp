@@ -2,6 +2,7 @@
 #include "audio/audio_handler.hpp"
 #include "box2d/box2d.h"
 #include "box2d/math_functions.h"
+#include "engine/turnip_engine.hpp"
 #include "entt/entity/fwd.hpp"
 #include "glm/matrix.hpp"
 #include "graphics/components.hpp"
@@ -11,6 +12,9 @@
 #include "scene/scene.hpp"
 #include "scene/scene_holder.hpp"
 #include "utils/time/time.hpp"
+#include "utils/uuid/uuid.hpp"
+#include "engine/turnip_engine.hpp"
+
 #include <sol/raii.hpp>
 
 namespace tur
@@ -196,6 +200,8 @@ namespace tur
 		mLua["Scene"] = mLua.create_table();
 		mLua["Scene"]["switch"] = [&](scene_handle handle){
 			rSceneHolder->set_current_scene(handle);
+		};
+		mLua["Scene"]["load"] = [&](const std::string& sceneName){
 		};
 	}
 	void ScriptHandler::initialize_logging()

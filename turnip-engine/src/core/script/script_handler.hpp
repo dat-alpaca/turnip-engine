@@ -1,4 +1,5 @@
 #pragma once
+#include "assets/asset_library.hpp"
 #include "common.hpp"
 #include "memory/memory.hpp"
 #include "physics/physics_handler.hpp"
@@ -16,6 +17,7 @@ namespace tur
 {
 	class AudioHandler;
 	class PhysicsHandler;
+	class TurnipEngine;
 
 	class ScriptHandler
 	{
@@ -40,7 +42,10 @@ namespace tur
 	private:
 		NON_OWNING AudioHandler* rAudioHandler = nullptr;
 		NON_OWNING Window* rWindow = nullptr;
+		NON_OWNING AssetLibrary* rLibrary = nullptr;
 		NON_OWNING SceneHolder* rSceneHolder = nullptr;
+
+	private:
 		sol::state mLua;
 	};
 }

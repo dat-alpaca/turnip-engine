@@ -28,6 +28,9 @@ namespace tur
 		void remove_view(view_handle viewHandle);
 
 	public:
+		void load_scene(const std::filesystem::path& filepath, const Project& project, Scene* scene);
+
+	public:
 		RenderInterface& get_render_interface() { return mRenderInterface; }
 		ViewHandler& get_view_handler() { return mViewHandler; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }

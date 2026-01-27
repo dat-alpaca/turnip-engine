@@ -133,23 +133,10 @@ private:
 		{
 			scene_handle sceneHandle = mSceneHolder.create_scene();
 			Scene* scene = mSceneHolder.get_scene(sceneHandle);
-			deserialize_scene_task(scene, sceneFilepath);
+			engine->load_scene(sceneFilepath, mProject, scene);
 			mSceneHolder.set_current_scene(sceneHandle);
 			return;
 		}
-	}
-
-private:
-	// TODO: move to engine
-	void deserialize_scene_task(Scene* scene, const std::filesystem::path& filepath)
-	{
-		ScenePreDeserializationEvent preDeserialization(scene);
-		engine->get_event_callback()(preDeserialization);
-
-		deserialize_scene(scene, mProject, filepath);
-
-		SceneDeserializedEvent deserializeEvent(scene, mProject);
-		engine->get_event_callback()(deserializeEvent);
 	}
 
 private:
@@ -166,14 +153,14 @@ private:
 	view_handle assetBinderView 	= invalid_handle;
 	view_handle immQuadView 		= invalid_handle;
 	view_handle cubemapView 		= invalid_handle;
-	view_handle tilemapView		= invalid_handle;
+	view_handle tilemapView			= invalid_handle;
 	view_handle meshView 			= invalid_handle;
-	view_handle scenegraphView 	= invalid_handle;
+	view_handle scenegraphView 		= invalid_handle;
 	view_handle cameraView			= invalid_handle;
 	view_handle sceneSignalView 	= invalid_handle;
-	view_handle physicsView		= invalid_handle;
+	view_handle physicsView			= invalid_handle;
 	view_handle scriptView			= invalid_handle;
-	view_handle physicsScriptView  = invalid_handle;
+	view_handle physicsScriptView   = invalid_handle;
 };
 
 int main()

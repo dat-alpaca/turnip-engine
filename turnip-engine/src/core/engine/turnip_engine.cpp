@@ -1,12 +1,12 @@
 #include "turnip_engine.hpp"
-#include "GLFW/glfw3.h"
 #include "assets/asset_library.hpp"
 #include "core/config/config_data.hpp"
 #include "defines.hpp"
+
+#include "client/scene_serialization.hpp"
 #include "graphics/constants.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/types/queue_operations.hpp"
-#include "logging/logging.hpp"
 
 namespace tur::engine
 {
@@ -183,5 +183,16 @@ namespace tur
 	void TurnipEngine::remove_view(view_handle viewHandle)
 	{
 		mViewHandler.remove(viewHandle);
+	}
+
+	void TurnipEngine::load_scene(const std::filesystem::path& filepath, const Project& project, Scene* scene)
+	{
+		ScenePreDeserializationEvent preDeserialization(scene);
+		mMainEventCallback(preDeserialization);
+
+		deserialize_scene(scene, project, filepath);
+
+		SceneDeserializedEvent deserializeEvent(scene, project);
+		mMainEventCallback(deserializeEvent);
 	}
 }

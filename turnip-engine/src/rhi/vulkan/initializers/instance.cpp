@@ -158,8 +158,6 @@ namespace tur::vulkan
 			TUR_LOG_ERROR("[Vulkan]: Unsupported instance layers:");
 			for (const auto& layer : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", layer);
-
-			// TUR_LOG_CRITICAL("Gracefully handling unsupported layers.");
 		}
 
 		validationResults = validate_extensions(supportedExtensions, extensions);
@@ -168,8 +166,6 @@ namespace tur::vulkan
 			TUR_LOG_ERROR("[Vulkan]: Unsupported instance extensions:");
 			for (const auto& extension : validationResults.unsupported)
 				TUR_LOG_ERROR(" * {}", extension);
-
-			// TUR_LOG_CRITICAL("Gracefully handling unsupported extensions.");
 		}
 
 		// Instance:
@@ -184,6 +180,7 @@ namespace tur::vulkan
 		if (!state.validationEnabled)
 			return;
 
+		// TODO: fix
 		vk::DebugUtilsMessengerCreateInfoEXT debugCreateInfo = {};
 		{
 			debugCreateInfo.flags = {};
