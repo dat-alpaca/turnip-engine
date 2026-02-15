@@ -93,6 +93,23 @@ namespace tur
 		UUID uuid; // texture UUID
 	};
 
+	struct TextComponent
+	{
+	public:
+		TextComponent() = default;
+		TextComponent(asset_handle assetHandle)
+			: assetHandle(assetHandle)
+		{
+		}
+
+	public:
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
+
+		std::string text;
+		UUID uuid; // font UUID
+	};
+
 	struct MeshComponent
 	{
 	public:

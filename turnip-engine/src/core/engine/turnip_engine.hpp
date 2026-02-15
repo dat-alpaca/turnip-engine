@@ -2,6 +2,7 @@
 #include "assets/asset_library.hpp"
 #include "audio/audio_handler.hpp"
 #include "config/config_data.hpp"
+#include "font/font_handler.hpp"
 #include "physics/physics_handler.hpp"
 #include "script/script_handler.hpp"
 #include "view/view.hpp"
@@ -35,6 +36,7 @@ namespace tur
 		ViewHandler& get_view_handler() { return mViewHandler; }
 		WorkerPool& get_worker_pool() { return mWorkerPool; }
 		PhysicsHandler& get_physics_handler() { return mPhysicsHandler; }
+		FontHandler& get_font_handler() { return mFontHandler; }
 		AssetLibrary& get_asset_library() { return mAssetLibrary; }
 		ScriptHandler& get_script_handler() { return mScriptHandler; }
 
@@ -51,6 +53,7 @@ namespace tur
 		WorkerPool mWorkerPool;
 		AudioHandler mAudioHandler;
 		PhysicsHandler mPhysicsHandler;
+		FontHandler mFontHandler;
 		tur_unique<Window> mWindow;
 
 	private:
@@ -59,7 +62,7 @@ namespace tur
 	private:
 		ConfigData mConfigData;
 		Time mTime;
-		
+
 		f64 mFixedUpdateTimer = 0.0f;
 
 		EventCallback mMainEventCallback;

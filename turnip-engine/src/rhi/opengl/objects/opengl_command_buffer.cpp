@@ -131,7 +131,7 @@ namespace tur::gl
 		
 		glDepthMask(mPipeline.depthDescriptor.depthWriteEnable);
 		glDepthFunc(get_compare_op(mPipeline.depthDescriptor.compareOp));
-			
+
 		// Setup vertex input bindings & attributes:
 		for (const auto& binding : mPipeline.vertexInputStage.vertexBindings)
 		{

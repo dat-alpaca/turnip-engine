@@ -71,6 +71,15 @@ namespace tur
 
                 cubemap.assetHandle = rLibrary->get_asset_handle(cubemap.uuid);
             }
+
+            auto viewFont = scene->get_registry().view<TextComponent>();
+            for (auto [e, text] : viewFont.each())
+            {
+                if(text.assetHandle != invalid_handle)
+                    continue;
+
+                text.assetHandle = rLibrary->get_asset_handle(text.uuid);
+            }
         }
 
         void handle_audio(NON_OWNING Scene* scene, const Project& project)

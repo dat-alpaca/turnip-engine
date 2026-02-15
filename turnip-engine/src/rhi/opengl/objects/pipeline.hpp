@@ -89,11 +89,11 @@ namespace tur::gl
 
 			case PolygonMode::POINT:
 				return GL_POINT;
+
+			default:
+				TUR_LOG_ERROR("Invalid Polygon Mode: {}. Default: GL_FILL", static_cast<int>(polygonMode));
+				return GL_FILL;
 		}
-
-		TUR_LOG_ERROR("Invalid Polygon Mode: {}. Default: GL_FILL", static_cast<int>(polygonMode));
-
-		return GL_FILL;
 	}
 
 	constexpr inline gl_handle get_primitive_topology(PrimitiveTopology topology)
@@ -156,10 +156,11 @@ namespace tur::gl
 
 			case DescriptorType::COMBINED_IMAGE_SAMPLER:
 				return GL_UNIFORM_BUFFER;
-		}
 
-		TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
-		return invalid_handle;
+			default:
+				TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
+				return invalid_handle;
+		}
 	}
 
 	constexpr inline gl_handle get_attribute_format(AttributeFormat format)
@@ -219,10 +220,11 @@ namespace tur::gl
 
 			case AttributeFormat::R32G32B32A32_UINT:
 				return 4;
-		}
 
-		TUR_LOG_CRITICAL("Invalid Attribute Format [Size]: {}", static_cast<u64>(format));
-		return invalid_handle;
+			default:
+				TUR_LOG_CRITICAL("Invalid Attribute Format [Size]: {}", static_cast<u64>(format));
+				return invalid_handle;
+		}
 	}
 }
 

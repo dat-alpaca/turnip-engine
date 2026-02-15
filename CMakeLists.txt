@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.20)
 project(turnip LANGUAGES C CXX)
 
+set(CMAKE_C_STANDARD 11)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
@@ -27,6 +28,7 @@ add_subdirectory(extern/spdlog)
 add_subdirectory(extern/SPIRV-Cross)
 add_subdirectory(extern/miniaudio)
 add_subdirectory(extern/tinygltf)
+add_subdirectory(extern/freetype)
 add_compile_definitions(MA_NO_PULSEAUDIO)
 
 add_library(box2dinclude INTERFACE)

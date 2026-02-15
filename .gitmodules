@@ -50,3 +50,9 @@
 [submodule "vendor/tinygltf"]
 	path = extern/tinygltf
 	url = https://github.com/syoyo/tinygltf
+[submodule "extern/wft"]
+	path = extern/wft
+	url = https://github.com/bigov/wft
+[submodule "extern/freetype"]
+	path = extern/freetype
+	url = https://github.com/freetype/freetype

@@ -76,6 +76,7 @@ namespace tur
 					internal.indexCount = mesh.indexCount;
 					internal.isVisible = culling.visible;
 					internal.indexType = mesh.indexType;
+					internal.transform = transform.worldTransform.transform();
 
 					internal.material = mesh.material;
 

@@ -123,11 +123,11 @@ namespace tur::gl
 
 			case TextureFormat::B8G8R8A8_UNORM:
 				return GL_BGRA;
+			
+			default:
+				TUR_LOG_ERROR("Invalid Texture Format: {}. Default: GL_RGBA", static_cast<int>(format));
+				return GL_RGBA;
 		}
-
-		TUR_LOG_ERROR("Invalid Texture Format: {}. Default: GL_RGBA", static_cast<int>(format));
-
-		return GL_RGBA;
 	}
 
 	constexpr static gl_handle get_texture_data_format(TextureDataFormat format)

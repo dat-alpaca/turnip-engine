@@ -1,10 +1,12 @@
 #pragma once
 #include "assets/cubemap/cubemap_asset.hpp"
+#include "assets/font/font_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 #include "defines.hpp"
 #include "event/asset_events/mesh_uploaded_event.hpp"
+#include "event/asset_events/texture_uploaded_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/texture.hpp"
@@ -16,6 +18,7 @@
 #include "scene/components.hpp"
 #include "assets/asset_library.hpp"
 #include "view/view.hpp"
+#include <cstring>
 
 namespace tur
 {
@@ -73,7 +76,7 @@ namespace tur
 					texture_handle textureHandle = create_texture_from_asset(event.assetHandle, isArray);
 					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
-					
+
 				} break;
 
 				case AssetType::CUBEMAP:
@@ -81,13 +84,20 @@ namespace tur
 					texture_handle textureHandle = create_cubemap_texture_from_asset(event.assetHandle);
 					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
-					
+
 				} break;
 
 				case AssetType::MESH:
 				{
 					auto data = create_mesh_from_asset(event.assetHandle);
 					MeshUploadedEvent uploadEvent(data);
+					callback(uploadEvent);
+				} break;
+
+				case AssetType::FONT:
+				{
+					texture_handle textureHandle = create_font_texture_from_asset(event.assetHandle);
+					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
 				} break;
 
@@ -109,7 +119,7 @@ namespace tur
 				case AssetType::TEXTURE:
 					update_texture_handle(textureUploaded);
 					break;
-					
+
 				case AssetType::TEXTURE_ARRAY:
 					update_texture_array_handle(textureUploaded);
 					break;
@@ -117,7 +127,11 @@ namespace tur
 				case AssetType::CUBEMAP:
 					update_cubemap_handle(textureUploaded);
 					break;
-				
+
+				case tur::AssetType::FONT:
+					update_font_handle(textureUploaded);
+					break;
+
 				default:
 					TUR_LOG_ERROR("Attempted to register an invalid asset type as texture.");
 			}
@@ -145,20 +159,20 @@ namespace tur
 		{
 			auto& resources = rRHI->get_resource_handler();
 			const MeshAsset& meshAsset = rLibrary->get_mesh_asset(assetHandle);
-			
+
 			// VBO:
 			BufferDescriptor bufferDescriptor;
 			bufferDescriptor.type = BufferType::VERTEX_BUFFER;
-			
+
 			buffer_handle vbo = resources.create_buffer(
-				bufferDescriptor, meshAsset.meshData.vertices.data(), 
+				bufferDescriptor, meshAsset.meshData.vertices.data(),
 				{ .size = meshAsset.meshData.vertices.size() }
 			);
 
 			// EBO:
 			bufferDescriptor.type = BufferType::INDEX_BUFFER;
 			buffer_handle ebo = resources.create_buffer(
-				bufferDescriptor, meshAsset.meshData.indices.data(), 
+				bufferDescriptor, meshAsset.meshData.indices.data(),
 				{ .size = meshAsset.meshData.indices.size() }
 			);
 
@@ -219,6 +233,12 @@ namespace tur
 			};
 		}
 
+		texture_handle create_font_texture_from_asset(asset_handle assetHandle)
+		{
+			const FontAsset& fontAsset = rLibrary->get_font_asset(assetHandle);
+			return upload_font_from_asset(fontAsset);
+		}
+
 	private:
 		void update_texture_handle(const TextureUploadedEvent& textureUploaded)
 		{
@@ -250,6 +270,16 @@ namespace tur
 			}
 		}
 
+		void update_font_handle(const TextureUploadedEvent& fontUploaded)
+		{
+			auto view = rScene->get_registry().view<TextComponent>();
+			for (auto [e, text] : view.each())
+			{
+				if (text.assetHandle == fontUploaded.assetHandle)
+					text.textureHandle = fontUploaded.textureHandle;
+			}
+		}
+
 		void update_mesh_handles(const MeshUploadedEvent& meshUploadedEvent)
 		{
 			auto view = rScene->get_registry().view<MeshComponent>();
@@ -259,13 +289,13 @@ namespace tur
 
 				if (mesh.assetHandle != meshUploadedEvent.data.meshAssetHandle)
 					continue;
-				
+
 				mesh.vbo = meshUploadedEvent.data.vbo;
 				mesh.ebo = meshUploadedEvent.data.ebo;
 				mesh.indexCount = meshUploadedEvent.data.indexCount;
 				mesh.indexType = meshUploadedEvent.data.indexType;
 
-				mesh.material = meshUploadedEvent.data.material; 
+				mesh.material = meshUploadedEvent.data.material;
 			}
 		}
 
@@ -300,7 +330,7 @@ namespace tur
 			}
 
 			auto& resources = rRHI->get_resource_handler();
-			return resources.create_texture(descriptor, textureAsset); 
+			return resources.create_texture(descriptor, textureAsset);
 		}
 
 		texture_handle upload_cubemap_from_asset(const CubemapAsset& cubemapAsset)
@@ -343,7 +373,56 @@ namespace tur
 				textureAsset.options = cubemapAsset.options;
 			}
 
-			return resources.create_texture(descriptor, textureAsset); 
+			return resources.create_texture(descriptor, textureAsset);
+		}
+
+		texture_handle upload_font_from_asset(const FontAsset& fontAsset)
+		{
+			auto& resources = rRHI->get_resource_handler();
+			const TextureOptions& options = fontAsset.options;
+			
+			TextureDescriptor descriptor;
+			{
+				descriptor.width = fontAsset.maxWidth * fontAsset.characters.size();
+				descriptor.height = fontAsset.maxHeight;
+				descriptor.layerWidth = fontAsset.maxWidth;
+				descriptor.layerHeight = fontAsset.maxHeight;
+				descriptor.depth = options.depth;
+				descriptor.mipLevels = options.mipLevels;
+				descriptor.samples = options.samples;
+				descriptor.arrayLayers = fontAsset.characters.size();
+
+				descriptor.format = TextureFormat::R8_UNORM;
+				descriptor.type = TextureType::ARRAY_TEXTURE_2D;
+
+				descriptor.generateMipmaps = options.generateMipmaps;
+
+				descriptor.wrapS = options.wrapS;
+				descriptor.wrapT = options.wrapT;
+				descriptor.wrapR = options.wrapR;
+				descriptor.minFilter = options.minFilter;
+				descriptor.magFilter = options.magFilter;
+
+				descriptor.tiling = options.tiling;
+			}
+
+			texture_handle texture = resources.create_empty_texture(descriptor);
+
+			for(const auto& [id, character] : fontAsset.characters)
+			{
+				TextureAsset asset;
+				{
+					asset.options.dataFormat = TextureDataFormat::RED;
+					asset.width = fontAsset.maxWidth * fontAsset.characters.size();
+					asset.options.layerWidth = character.size.x; 
+					asset.options.layerHeight = character.size.y;
+					asset.data = character.buffer;
+				}
+
+				resources.update_array_texture_layer(texture, asset, character.layer);
+			}
+		
+			return texture;
 		}
 
 	private:

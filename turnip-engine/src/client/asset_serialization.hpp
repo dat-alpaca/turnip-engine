@@ -27,6 +27,8 @@ namespace tur
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CubemapAsset, metadata, filepaths, width, height, channels, options);
     
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(FontAsset, metadata, height, options, isSDF);
+    
     inline nlohmann::json serialize_asset_library(NON_OWNING AssetLibrary* library)
     {
         nlohmann::json object;

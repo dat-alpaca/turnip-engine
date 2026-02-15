@@ -44,6 +44,9 @@ namespace tur
 
 			case ShaderType::COMPUTE:
 				return "COMPUTE";
+
+			default:
+				return "UNKNOWN";
 		}
 
 		return "UNKNOWN";

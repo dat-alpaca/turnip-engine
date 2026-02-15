@@ -109,12 +109,15 @@ namespace tur
 		// Audio:
 		mAudioHandler.initialize(&mAssetLibrary);
 
+		// Font:
+		mFontHandler.initialize(&mAssetLibrary);
+
 		// Asset Library:
-		mAssetLibrary.initialize(&mWorkerPool, &mAudioHandler);
+		mAssetLibrary.initialize(&mWorkerPool, &mAudioHandler, &mFontHandler);
 		mAssetLibrary.set_event_callback(mMainEventCallback);
 
 		{
-			// Default texture:	
+			// Default texture:
 			const auto& asset = mAssetLibrary.get_texture_asset(AssetLibrary::DefaultTextureHandle);
 			TextureDescriptor descriptor;
 			{
@@ -150,7 +153,7 @@ namespace tur
 				engine::on_fixed_update(mViewHandler);
 				mFixedUpdateTimer = 0.0f;
 			}
-			
+
 			engine::on_update(mViewHandler, mTime);
 
 			engine::on_render(mRenderInterface, mViewHandler);

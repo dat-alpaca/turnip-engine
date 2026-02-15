@@ -72,6 +72,7 @@ namespace tur::gl
 		texture_handle create_texture(const TextureDescriptor& descriptor, const TextureAsset& asset);
 		texture_handle create_empty_texture(const TextureDescriptor& descriptor);
 		void update_texture(texture_handle textureHandle, const TextureAsset& asset);
+		void update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, u32 layer);
 		void destroy_texture(texture_handle textureHandle);
 
 	public:

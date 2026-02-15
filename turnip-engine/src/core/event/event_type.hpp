@@ -38,6 +38,7 @@ namespace tur
 
 		TEXTURE_UPLOADED,
 		MESH_UPLOADED,
+		FONT_UPLOADED,
 		AMOUNT
 	};
 

@@ -64,6 +64,11 @@ namespace tur::vulkan
 		renderTarget.depthStencilAttachment.loadOp = descriptor.depthStencilAttachment.loadOp;
 		renderTarget.depthStencilAttachment.storeOp = descriptor.depthStencilAttachment.storeOp;
 		renderTarget.depthStencilAttachment.textureHandle = create_empty_texture(descriptor.depthStencilAttachment.textureDescriptor);
+		
+		Texture& depthTexture = mTextures.get(renderTarget.depthStencilAttachment.textureHandle);
+		utils::transition_texture_layout_imm(
+			*rRHI, depthTexture, { .newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal }
+		);		
 
 		return mRenderTargets.add(renderTarget);
 	}
@@ -450,6 +455,10 @@ namespace tur::vulkan
 		
 		if(!textureResult.has_value())
 			return invalid_handle;
+
+		utils::transition_texture_layout_imm(
+			*rRHI, *textureResult, {.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal}
+		);
 
 		return mTextures.add(*textureResult);
 	}

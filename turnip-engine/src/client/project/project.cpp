@@ -3,6 +3,7 @@
 #include <filesystem>
 #include <vector>
 
+#include "assets/font/font_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "client/asset_serialization.hpp"
 #include "client/scene_serialization.hpp"
@@ -25,7 +26,7 @@ namespace tur
 
         if(!std::filesystem::is_directory(folderPath))
             TUR_LOG_CRITICAL("Invalid folderpath passed to Project");
-    
+
         name = folderPath.filename();
         mainFilepath = get_project_filepath(name + Project::ProjectFileExtension);
 
@@ -36,12 +37,12 @@ namespace tur
     {
         nlohmann::json projectObject;
         projectObject["name"] = name;
-            
+
         // Scenes:
         projectObject["scenes"] = nlohmann::json::array();
         for(const auto& scene : mSceneFilepaths)
             projectObject["scenes"].push_back(scene.string());
-        
+
         std::filesystem::path filepath = get_project_filepath(name + Project::ProjectFileExtension);
         json_write_file(filepath, projectObject);
 
@@ -69,34 +70,39 @@ namespace tur
         return assetLibraryObject["textures"];
     }
 
-    std::vector<AudioAsset> Project::get_audios() const 
-    { 
-        return assetLibraryObject["audios"]; 
+    std::vector<AudioAsset> Project::get_audios() const
+    {
+        return assetLibraryObject["audios"];
     }
 
-    std::vector<MeshAsset> Project::get_meshes() const 
-    { 
-        return assetLibraryObject["meshes"]; 
+    std::vector<MeshAsset> Project::get_meshes() const
+    {
+        return assetLibraryObject["meshes"];
     }
 
-    std::vector<CubemapAsset> Project::get_cubemaps() const 
-    { 
-        return assetLibraryObject["cubemaps"]; 
+    std::vector<CubemapAsset> Project::get_cubemaps() const
+    {
+        return assetLibraryObject["cubemaps"];
+    }
+
+    std::vector<FontAsset> Project::get_fonts() const
+    {
+        return assetLibraryObject["fonts"];
     }
 }
 
-namespace tur 
+namespace tur
 {
     void Project::read_project()
     {
         std::filesystem::path mainFilepath = get_project_filepath(folderPath.filename().string() + Project::ProjectFileExtension);
-            
+
         if(!std::filesystem::exists(mainFilepath))
         {
             json_write_file(mainFilepath, {});
             return;
         }
-        
+
         // Main project:
         nlohmann::json projectObject = json_parse_file(mainFilepath);
         name = projectObject["name"];
@@ -104,7 +110,7 @@ namespace tur
         // Assets:
         std::filesystem::path assetLibraryFilepath = get_project_filepath(std::string("asset_library.asses"));
         assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
-        
+
         // Scenes:
         if(projectObject.contains("scenes") && projectObject["scenes"].is_array())
         {

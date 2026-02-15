@@ -8,7 +8,7 @@
             "name": "Launch",
             "program": "${workspaceFolder}/build/turnip-sandbox/turnip-sandbox",
             "args": [],
-            "cwd": "${workspaceFolder}"
+            "cwd": "${workspaceFolder}",
         }
     ]
 }
