@@ -22,13 +22,13 @@ layout(location = 0) out vec2 v_uvs;
 layout(location = 1) flat out uint v_layer;
 
 const vec2 c_quad_vertex[6] = vec2[](
-	vec2(0.0, 0.0),
-	vec2(1.0, 0.0),
-	vec2(1.0, 1.0),
+	vec2(-0.5, -0.5),
+	vec2( 0.5, -0.5),
+	vec2( 0.5,  0.5),
 
-	vec2(1.0, 1.0),
-	vec2(0.0, 1.0),
-	vec2(0.0, 0.0)
+	vec2( 0.5,  0.5),
+	vec2(-0.5,  0.5),
+	vec2(-0.5, -0.5)
 );
 
 const vec2 c_quad_uvs[6] = vec2[](
@@ -48,7 +48,7 @@ void main()
 
 	Character currentCharacter = b_characters.characters[currentQuad];
 
-	vec2 scaled = c_quad_vertex[currentVertex];
+	vec2 scaled = c_quad_vertex[currentVertex] * currentCharacter.dimensions;
 	vec3 worldPosition = currentCharacter.position + vec3(scaled, 0.0);
 
 	gl_Position = u_world.projection * u_world.view * vec4(worldPosition, 1.0);

@@ -12,12 +12,12 @@
     "fonts": [
         {
             "metadata": {
-                "filepath": "fonts/dogica/TTF/dogica.ttf",
+                "filepath": "fonts/roboto/roboto-regular.ttf",
                 "type": 4,
                 "uuid": 232924622933348284,
                 "lifetime": 1
             },
-            "height": 24,
+            "height": 48,
             "isSDF": false,
             "options": {
                 "arrayLayers": 0,
@@ -117,7 +117,7 @@
         {
             "channels": 4,
             "width": 160,
-            "height": 8,
+            "height": 32,
             "metadata": {
                 "filepath": "textures/face_sheet.png",
                 "type": 1,

@@ -87,7 +87,7 @@ namespace tur
                 {
                     if(c == ' ')
                     {
-                        currentX += 10.0f;
+                        currentX += 0.0f;
                         continue;
                     }
 
@@ -95,9 +95,8 @@ namespace tur
 					if(!character)
 						continue;
 
-					float x = currentX /*+ character->bearing.x * worldScale.x*/;
-					//float y = baselineY - (character->bearing.y - character->size.y) * worldScale.y;
-					float y = 0.0f;
+					float x = currentX + character->bearing.x * worldScale.x;
+					float y = baselineY - (character->size.y - character->bearing.y) * worldScale.y;
 
 					float w = character->size.x  * worldScale.x;
     				float h = character->size.y * worldScale.y;
