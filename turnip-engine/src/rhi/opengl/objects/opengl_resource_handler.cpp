@@ -327,12 +327,12 @@ namespace tur::gl
 	{
 		Texture& texture = mTextures.get(textureHandle);
 		TUR_ASSERT(texture.descriptor.type == TextureType::ARRAY_TEXTURE_2D, "Updating layers of textures that are not array_textures is not supported.");
+		TUR_ASSERT(asset.data.size(), "Attempted to update layer with empty data.");
 
 		gl_handle dataFormat = get_texture_data_format(asset.options.dataFormat);
 		gl_handle dataType = !asset.options.floatTexture ? GL_UNSIGNED_BYTE : GL_FLOAT;
 		
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-
 		glTextureSubImage3D(
 			texture.handle,
 			0,
