@@ -17,7 +17,7 @@ namespace tur
 		TilemapView(NON_OWNING RenderInterface* rhi)
 		{
 			mTilemapRenderer.initialize(rhi);
-			mTilemapRenderer.set_clear_color({}, ClearFlags::COLOR);
+			// mTilemapRenderer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 
 	public:

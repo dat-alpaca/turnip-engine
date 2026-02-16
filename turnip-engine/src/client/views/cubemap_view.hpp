@@ -4,6 +4,7 @@
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "graphics/components.hpp"
 #include "graphics/renderer/cubemap_renderer.hpp"
+#include "graphics/types/clear_color.hpp"
 #include "memory/memory.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
@@ -18,7 +19,7 @@ namespace tur
 		CubemapView(NON_OWNING RenderInterface* rhi)
 		{
 			mCubemapRenderer.initialize(rhi);
-			mCubemapRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
+			// mCubemapRenderer.set_clear_color(color::Blue, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 	
 	public:

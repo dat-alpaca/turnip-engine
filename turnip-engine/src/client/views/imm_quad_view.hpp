@@ -17,7 +17,7 @@ namespace tur
 		ImmQuadView(NON_OWNING RenderInterface* rhi)
 		{
 			mQuadRenderer.initialize(rhi);
-			mQuadRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
+			// mQuadRenderer.set_clear_color(color::Blue, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 
 	public:

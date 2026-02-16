@@ -38,7 +38,6 @@ namespace tur::gl
 		else
 			glBindFramebuffer(GL_FRAMEBUFFER, resources.get_render_targets().get(renderTarget).handle);
 
-		glEnable(GL_DEPTH_TEST);
 		glDepthRange(0.0, 1.0);
 	}
 	void CommandBufferGL::begin_rendering()
@@ -124,13 +123,45 @@ namespace tur::gl
 		mPipeline = resources.get_pipelines().get(pipelineHandle);
 
 		glUseProgram(mPipeline.handle);
-
 		glFrontFace(get_front_face(mPipeline.rasterizerStage.frontFace));
 		glPolygonMode(GL_FRONT_AND_BACK, get_polygon_mode(mPipeline.rasterizerStage.polygonMode));
-		glCullFace(get_cull_mode(mPipeline.rasterizerStage.cullMode));
 		
-		glDepthMask(mPipeline.depthDescriptor.depthWriteEnable);
-		glDepthFunc(get_compare_op(mPipeline.depthDescriptor.compareOp));
+		if(mPipeline.depthDescriptor.depthTestEnable)
+		{
+			glEnable(GL_DEPTH_TEST);
+			glDepthMask(mPipeline.depthDescriptor.depthWriteEnable);
+			glDepthFunc(get_compare_op(mPipeline.depthDescriptor.compareOp));
+		}
+		else
+			glDisable(GL_DEPTH_TEST);
+
+		gl_handle cullMode = get_cull_mode(mPipeline.rasterizerStage.cullMode);
+		if(cullMode != GL_NONE)
+		{
+			glCullFace(cullMode);
+			glEnable(GL_CULL_FACE);
+		}
+		else 
+			glDisable(GL_CULL_FACE);
+
+		if(mPipeline.blendDescriptor.enable)
+		{
+			glEnable(GL_BLEND);
+
+			auto colorFunction = get_blend_func(mPipeline.blendDescriptor.colorBlendFunc);
+			auto alphaFunction = get_blend_func(mPipeline.blendDescriptor.alphaBlendFunc);
+
+			auto srcColorFactor = get_blend_factor(mPipeline.blendDescriptor.srcColorBlendFactor);
+			auto dstColorFactor = get_blend_factor(mPipeline.blendDescriptor.dstColorBlendFactor);
+			
+			auto srcAlphaFactor = get_blend_factor(mPipeline.blendDescriptor.srcAlphaBlendFactor);
+			auto dstAlphaFactor = get_blend_factor(mPipeline.blendDescriptor.dstAlphaBlendFactor);
+
+			glBlendFuncSeparate(srcColorFactor, dstColorFactor, srcAlphaFactor, dstAlphaFactor);
+			glBlendEquationSeparate(colorFunction, alphaFunction);
+		}
+		else
+			glDisable(GL_BLEND);
 
 		// Setup vertex input bindings & attributes:
 		for (const auto& binding : mPipeline.vertexInputStage.vertexBindings)

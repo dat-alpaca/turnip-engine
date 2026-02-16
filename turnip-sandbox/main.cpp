@@ -40,15 +40,18 @@ public:
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
 
+		rCubemapView->render_deferred();
 		rQuadView->render_deferred();
 		rTilemapView->render_deferred();
-		rFontView->render_deferred();
 		rMeshView->render_deferred();
-		rCubemapView->render_deferred();
+		rFontView->render_deferred();
 
 		std::vector<CommandBuffer::BufferType> commandBuffers;
 		{
 			commandBuffers.reserve(4);
+
+			if (rCubemapView->renderer().is_valid())
+				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
 
 			commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
 
@@ -57,9 +60,6 @@ public:
 
 			if (rMeshView->renderer().mesh_count() > 0)
 				commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
-
-			if (rCubemapView->renderer().is_valid())
-				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
 
 			if (!rFontView->renderer().is_empty())
 				commandBuffers.push_back(rFontView->renderer().get_command_buffer().get_buffer());

@@ -4,6 +4,7 @@
 
 #include "graphics/camera.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/pipeline.hpp"
 #include "graphics/renderer/font_renderer.hpp"
 
 namespace tur
@@ -13,18 +14,12 @@ namespace tur
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
-		set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
-
 		rRHI = rhi;
 		initialize_resources();
 	}
 	void FontRenderer::set_camera(NON_OWNING Camera* camera)
 	{
 		rCamera = camera;
-	}
-	void FontRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
-	{
-		commandBuffer.set_clear_color(color, flags);
 	}
 
 	void FontRenderer::render()
@@ -168,7 +163,16 @@ namespace tur
 			.rasterizerStage = 
 			{
 				.frontFace = FrontFace::COUNTER_CLOCKWISE,
-				.cullMode = CullMode::FRONT,
+				.cullMode = CullMode::NONE,
+			},
+			.depthDescriptor =
+			{
+				.depthTestEnable = true,
+				.depthWriteEnable = true,
+				.compareOp = DepthCompareOp::LESS_OR_EQUAL
+			},
+			.blendDescriptor = {
+				.enable = true
 			},
 			.setLayout = setLayout,
 			.viewports = Viewports,

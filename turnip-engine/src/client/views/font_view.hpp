@@ -24,7 +24,7 @@ namespace tur
             : rLibrary(library)
 		{
 			mFontRenderer.initialize(rhi);
-			mFontRenderer.set_clear_color({}, ClearFlags::COLOR);
+			// mFontRenderer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 
 	public:

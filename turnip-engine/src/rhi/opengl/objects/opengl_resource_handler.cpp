@@ -196,9 +196,10 @@ namespace tur::gl
 		{
 			pipeline.inputAssemblyStage = descriptor.inputAssemblyStage;
 			pipeline.vertexInputStage = descriptor.vertexInputStage;
-
 			pipeline.depthDescriptor = descriptor.depthDescriptor;
+			pipeline.blendDescriptor = descriptor.blendDescriptor;
 			pipeline.rasterizerStage = descriptor.rasterizerStage;
+
 			pipeline.setLayout = descriptor.setLayout;
 			pipeline.handle = pipelineID;
 		}

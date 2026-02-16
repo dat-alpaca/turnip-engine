@@ -333,11 +333,12 @@ namespace tur::vulkan
 	static vk::PipelineColorBlendAttachmentState create_color_blend_attachment()
 	{
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {};
-		// TODO: use descriptor parameters
 
 		vk::ColorComponentFlags colorComponentFlags(
-			vk::ColorComponentFlagBits::eR | vk::ColorComponentFlagBits::eG | vk::ColorComponentFlagBits::eB
-			| vk::ColorComponentFlagBits::eA
+			 vk::ColorComponentFlagBits::eR | 
+			 vk::ColorComponentFlagBits::eG |
+			 vk::ColorComponentFlagBits::eB |
+			 vk::ColorComponentFlagBits::eA
 		);
 
 		colorBlendAttachmentState.blendEnable = false;
@@ -421,7 +422,7 @@ namespace tur::vulkan
 		vk::PipelineRasterizationStateCreateInfo rasterizer = create_rasterizer(descriptor);
 		vk::PipelineMultisampleStateCreateInfo multisample = create_multisample();
 
-		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment();
+		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment(descriptor.blend);
 		vk::PipelineColorBlendStateCreateInfo colorBlending = create_color_blend_state(colorAttachment);
 
 		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects(descriptor.depthDescriptor);
