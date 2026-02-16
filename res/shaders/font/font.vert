@@ -4,6 +4,7 @@ struct Character
 {
 	vec3 position;
 	vec2 dimensions;
+	vec2 uvSize;
 	uint layer;
 };
 
@@ -14,22 +15,13 @@ layout(std430, binding = 0) restrict readonly buffer Characters
 
 layout(std140, binding = 1) uniform World
 {
+	mat4 model;
 	mat4 view;
 	mat4 projection;
 } u_world;
 
 layout(location = 0) out vec2 v_uvs;
 layout(location = 1) flat out uint v_layer;
-
-const vec2 c_quad_vertex[6] = vec2[](
-	vec2(-0.5, -0.5),
-	vec2( 0.5, -0.5),
-	vec2( 0.5,  0.5),
-
-	vec2( 0.5,  0.5),
-	vec2(-0.5,  0.5),
-	vec2(-0.5, -0.5)
-);
 
 const vec2 c_quad_uvs[6] = vec2[](
 	vec2(0.0, 0.0),
@@ -48,10 +40,22 @@ void main()
 
 	Character currentCharacter = b_characters.characters[currentQuad];
 
-	vec2 scaled = c_quad_vertex[currentVertex] * currentCharacter.dimensions;
-	vec3 worldPosition = currentCharacter.position + vec3(scaled, 0.0);
+	float halfWidth = currentCharacter.dimensions.x * 0.5;
+	float halfHeight = currentCharacter.dimensions.y * 0.5;
 
-	gl_Position = u_world.projection * u_world.view * vec4(worldPosition, 1.0);
+	vec2 c_quad_vertex[6] = vec2[](
+		vec2(-halfWidth, -halfHeight),
+		vec2( halfWidth, -halfHeight),
+		vec2( halfWidth,  halfHeight),
+
+		vec2( halfWidth,  halfHeight),
+		vec2(-halfWidth,  halfHeight),
+		vec2(-halfWidth, -halfHeight)
+	);
+
+	vec3 localPos = currentCharacter.position + vec3(c_quad_vertex[currentVertex], 0.0);
+
+	gl_Position = u_world.projection * u_world.view * u_world.model * vec4(localPos, 1.0);
 	v_layer = currentCharacter.layer;
-	v_uvs = c_quad_uvs[currentVertex];
+	v_uvs = c_quad_uvs[currentVertex] * currentCharacter.uvSize;
 }

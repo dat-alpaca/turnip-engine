@@ -39,6 +39,7 @@ namespace tur
 		// World data:
 		{
 			WorldUBO ubo;
+			ubo.model = mModel;
 			ubo.view = rCamera->view();
 			ubo.projection = rCamera->projection();
 			
@@ -66,6 +67,10 @@ namespace tur
 		commandBuffer.end();
 	}
 
+	void FontRenderer::set_model(const glm::mat4& model)
+	{
+		mModel = model;
+	}
 	void FontRenderer::set_font_texture(texture_handle textureHandle)
 	{
 		fontAtlasHandle = textureHandle;

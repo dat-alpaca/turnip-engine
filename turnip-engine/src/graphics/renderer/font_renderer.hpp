@@ -15,10 +15,12 @@ namespace tur
 	{
 		glm::vec3 position;
 		float __pad0;
-
+		
 		glm::vec2 dimensions;
+		glm::vec2 uvSize;
+		
 		u32 layer;
-		u32 __pad1;
+		u32 __pad[3];
 	};
 
 	class FontRenderer : public Renderer
@@ -26,6 +28,7 @@ namespace tur
 	public:
 		struct WorldUBO
 		{
+			alignas(16) glm::mat4 model;
 			alignas(16) glm::mat4 view;
 			alignas(16) glm::mat4 projection;
 		};
@@ -36,6 +39,7 @@ namespace tur
 		void render();
 
     public:
+		void set_model(const glm::mat4& model);
 		void set_font_texture(texture_handle textureHandle);
         void set_character_data(const std::vector<CharacterEntry>& character);
 
@@ -54,7 +58,8 @@ namespace tur
 	
 	private:
 		std::vector<CharacterEntry> mCharacterEntries;
-		
+		glm::mat4 mModel;
+
 		descriptor_set_layout_handle setLayout;
 		descriptor_set_handle mainSet;
 

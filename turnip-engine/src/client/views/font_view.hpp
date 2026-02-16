@@ -77,39 +77,41 @@ namespace tur
 
                 const FontAsset& fontAsset = rLibrary->get_font_asset(text.assetHandle);
                 const auto& worldPosition = transform.worldTransform.position;
-                const auto& worldScale = transform.worldTransform.scale;
 
 				std::vector<CharacterEntry> flattenedMap;
-                float currentX = worldPosition.x;
-				float baselineY = worldPosition.y;
-				
+				flattenedMap.reserve(text.text.size());	
+
+				float nextX = 0.0f;
 				for(char c : text.text)
                 {
-                    if(c == ' ')
-                    {
-                        currentX += 0.0f;
-                        continue;
-                    }
-
-                    auto character = fontAsset.get_character(c);
+					auto character = fontAsset.get_character(c);
 					if(!character)
 						continue;
 
-					float x = currentX + character->bearing.x * worldScale.x;
-					float y = baselineY - (character->size.y - character->bearing.y) * worldScale.y;
+					float width = character->size.x;
+					float height = character->size.y;
 
-					float w = character->size.x  * worldScale.x;
-    				float h = character->size.y * worldScale.y;
+					float x = nextX + character->bearing.x + width * 0.5f;
+					float y = worldPosition.y - character->bearing.y + height * 0.5f;
 
                     flattenedMap.push_back({
-                        .position = { x, y, worldPosition.z },
-						.dimensions = { w, h },
-                        .layer = character->layer
+                        .position = { x, y, 0.0f },
+						.dimensions = { width, height },
+						.uvSize = {
+							character->size.x / fontAsset.maxWidth,
+							character->size.y / fontAsset.maxHeight,
+						},
+                        .layer = character->layer,
                     });
 
-                    currentX += (character->advance >> 6) * worldScale.x;
+                    nextX += character->advance >> 6;
                 }
 
+				glm::mat4 model =
+					glm::translate(glm::mat4(1.0f), worldPosition) *
+					glm::scale(glm::mat4(1.0f), transform.worldTransform.scale);
+
+				mFontRenderer.set_model(model);
 				mFontRenderer.set_font_texture(text.textureHandle);
 				mFontRenderer.set_character_data(flattenedMap);
 			}

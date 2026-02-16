@@ -323,7 +323,7 @@ namespace tur::gl
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
 	}
-	void ResourceHandler::update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, u32 layer)
+	void ResourceHandler::update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
 	{
 		Texture& texture = mTextures.get(textureHandle);
 		TUR_ASSERT(texture.descriptor.type == TextureType::ARRAY_TEXTURE_2D, "Updating layers of textures that are not array_textures is not supported.");
@@ -332,12 +332,11 @@ namespace tur::gl
 		gl_handle dataType = !asset.options.floatTexture ? GL_UNSIGNED_BYTE : GL_FLOAT;
 		
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
-		// glPixelStorei(GL_UNPACK_ROW_LENGTH, asset.width);
 
 		glTextureSubImage3D(
 			texture.handle,
 			0,
-			0, 0, layer,
+			offset.x, offset.y, layer,
 			asset.options.layerWidth, asset.options.layerHeight, 1,
 			dataFormat,
 			dataType,

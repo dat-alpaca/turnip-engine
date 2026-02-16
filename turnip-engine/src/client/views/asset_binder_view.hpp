@@ -419,7 +419,7 @@ namespace tur
 					asset.data = character.buffer;
 				}
 
-				resources.update_array_texture_layer(texture, asset, character.layer);
+				resources.update_array_texture_layer(texture, asset, { 0.0f, 0.0f }, character.layer);
 			}
 		
 			return texture;

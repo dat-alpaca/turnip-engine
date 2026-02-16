@@ -8,6 +8,9 @@
 
 namespace tur
 {
+	constexpr inline char g_start_character = ' ';
+	constexpr inline char g_end_character = 127;
+
 	struct Character
 	{
 		std::vector<byte> buffer;
@@ -26,7 +29,7 @@ namespace tur
 	public:
 		inline std::optional<Character> get_character(char character) const 
 		{
-			if(characters.find('!') == characters.end())
+			if(characters.find(character) == characters.end())
 				return std::nullopt;
 
 			return characters.at(character);

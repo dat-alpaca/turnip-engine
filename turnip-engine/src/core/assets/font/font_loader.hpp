@@ -22,9 +22,9 @@ namespace tur
 
 		FT_Set_Pixel_Sizes(fontAsset.face, 0, height);
 
-		for(unsigned char character = '!'; character <= 'z'; ++character)
+		for(unsigned char character = g_start_character; character <= g_end_character; ++character)
 		{
-			u32 index = static_cast<u64>(character - '!');
+			u32 index = static_cast<u64>(character - g_start_character);
 
 			auto& face = fontAsset.face;
 			auto& glyph = face->glyph;
@@ -32,8 +32,8 @@ namespace tur
 			FT_Int32 loadFlags = !loadSDF ? FT_LOAD_RENDER : FT_LOAD_DEFAULT;
 			if (FT_Load_Char(face, character, loadFlags))
 			{
-				TUR_LOG_ERROR("Failed to load glyph.");
-				return std::nullopt;
+				TUR_LOG_ERROR("Failed to load glyph: {}", character);
+				continue;
 			}
 
 			if(loadSDF)

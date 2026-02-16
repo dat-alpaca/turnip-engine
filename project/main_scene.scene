@@ -296,8 +296,8 @@
                     "z": 0.0
                 },
                 "scale": {
-                    "x": 0.02,
-                    "y": 0.02,
+                    "x": 0.005,
+                    "y": 0.005,
                     "z": 1.0
                 }
             }
@@ -445,7 +445,7 @@
         1,
         9,
         {
-            "text": "turnip",
+            "text": "oh my fucking god it works and it's fast",
             "uuid": 232924622933348284
         }
     ],
