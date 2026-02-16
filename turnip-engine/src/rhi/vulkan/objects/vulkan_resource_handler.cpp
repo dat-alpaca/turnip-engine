@@ -421,6 +421,51 @@ namespace tur::vulkan
 			}
 		);
 	}
+	void ResourceHandler::copy_buffer_to_texture_layer(buffer_handle source, texture_handle destination, const glm::vec2 offset, u32 width, u32 height, u32 layer, u32 depth)
+	{
+		TUR_ASSERT(source != invalid_handle, "Invalid buffer_handle");
+		TUR_ASSERT(destination != invalid_handle, "Invalid texture_handle");
+		
+		const Buffer& buffer = mBuffers.get(source);
+		const Texture& texture = mTextures.get(destination);
+
+		TUR_ASSERT(layer < texture.descriptor.arrayLayers, "Layer out of bounds");
+
+		utils::submit_immediate_command(
+			*rRHI,
+			[&](vk::CommandBuffer commandBuffer)
+			{
+				vk::ImageAspectFlags aspectMask = vk::ImageAspectFlagBits::eColor;
+
+				auto formatSize = get_texture_format_byte_size(texture.descriptor.format);
+				vk::BufferImageCopy2 region = {};
+				{
+					region.bufferOffset = 0;
+					region.bufferRowLength = 0;
+        			region.bufferImageHeight = 0;
+
+					region.imageSubresource.aspectMask = aspectMask;
+					region.imageSubresource.mipLevel = 0;
+					region.imageSubresource.baseArrayLayer = layer;
+					region.imageSubresource.layerCount = 1;
+
+					region.imageOffset = vk::Offset3D(offset.x, offset.y, 0);
+					region.imageExtent = vk::Extent3D(width, height, depth);
+				}
+				
+				vk::CopyBufferToImageInfo2 copyInfo = {};
+				{
+					copyInfo.srcBuffer = buffer.buffer;
+					copyInfo.dstImage = texture.image;
+					copyInfo.dstImageLayout = vk::ImageLayout::eTransferDstOptimal;
+					copyInfo.regionCount = 1;
+					copyInfo.pRegions = &region;
+				}
+
+				commandBuffer.copyBufferToImage2(copyInfo);
+			}
+		);
+	}
 	void ResourceHandler::destroy_buffer(buffer_handle bufferHandle)
 	{
 		TUR_ASSERT(bufferHandle != invalid_handle, "Invalid buffer_handle");
@@ -491,6 +536,47 @@ namespace tur::vulkan
 			copy_buffer_to_texture(stagingBufferHandle, textureHandle, width, height);
 
 			// TODO: proper masks
+			utils::transition_texture_layout_imm(
+				*rRHI, texture, {
+					.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,
+					.dstAccessMask = 
+						vk::AccessFlagBits2::eInputAttachmentRead | 
+						vk::AccessFlagBits2::eShaderRead |
+						vk::AccessFlagBits2::eColorAttachmentRead |
+						vk::AccessFlagBits2::eShaderSampledRead | 
+						vk::AccessFlagBits2::eShaderStorageRead
+				}
+			);
+		}
+
+		destroy_buffer(stagingBufferHandle);
+	}
+	void ResourceHandler::update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
+	{
+		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
+
+		Texture& texture = mTextures.get(textureHandle);
+		BufferDescriptor stagingDescriptor = {};
+		{
+			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
+			stagingDescriptor.type = BufferType::TRANSFER_SRC | BufferType::TRANSFER_DST;
+		}
+
+		auto width = texture.descriptor.layerWidth;
+		auto height = texture.descriptor.layerHeight;
+
+		buffer_handle stagingBufferHandle =
+			create_buffer(stagingDescriptor, asset.data.data(), {.size = asset.data.size()});
+
+		{
+			utils::transition_texture_layout_imm(*rRHI, texture, {
+				.newLayout = vk::ImageLayout::eTransferDstOptimal,
+				.dstStageMask = vk::PipelineStageFlagBits2::eTransfer,
+				.dstAccessMask = vk::AccessFlagBits2::eTransferWrite
+			});
+
+			copy_buffer_to_texture_layer(stagingBufferHandle, textureHandle, offset, width, height, layer);
+
 			utils::transition_texture_layout_imm(
 				*rRHI, texture, {
 					.newLayout = vk::ImageLayout::eShaderReadOnlyOptimal,

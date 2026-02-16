@@ -410,6 +410,9 @@ namespace tur
 
 			for(const auto& [id, character] : fontAsset.characters)
 			{
+				if(!character.buffer.size())
+					continue;
+
 				TextureAsset asset;
 				{
 					asset.options.dataFormat = TextureDataFormat::RED;
