@@ -2,7 +2,7 @@
 #include "assets/asset_library.hpp"
 #include "assets/font/font_asset.hpp"
 #include "defines.hpp"
-#include "graphics/renderer/font_renderer.hpp"
+#include "graphics/renderer/text_renderer.hpp"
 #include "memory/memory.hpp"
 #include "utils/transform.hpp"
 #include "view/view.hpp"
@@ -17,20 +17,19 @@
 
 namespace tur
 {
-	class FontView : public View
+	class TextView : public View
 	{
 	public:
-		FontView(NON_OWNING RenderInterface* rhi, NON_OWNING AssetLibrary* library)
+		TextView(NON_OWNING RenderInterface* rhi, NON_OWNING AssetLibrary* library)
             : rLibrary(library)
 		{
-			mFontRenderer.initialize(rhi);
-			// mFontRenderer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
+			mTextRenderer.initialize(rhi);
 		}
 
 	public:
 		void render_deferred()
 		{ 
-			mFontRenderer.render();
+			mTextRenderer.render();
 		}
     
     public:
@@ -39,7 +38,7 @@ namespace tur
 			Subscriber subscriber(event);
 			subscriber.subscribe<SceneCreatedEvent>([this](const SceneCreatedEvent& event) -> bool {
 				auto& registry = event.scene->get_registry();
-				registry.on_construct<TextComponent>().connect<&FontView::on_text_component_added>(this);
+				registry.on_construct<TextComponent>().connect<&TextView::on_text_component_added>(this);
 				return false;
 			});
 
@@ -49,15 +48,15 @@ namespace tur
 			});
 
 			subscriber.subscribe<CameraSwitchedEvent>([this](const CameraSwitchedEvent& event) -> bool {
-				mFontRenderer.set_camera(event.camera);
+				mTextRenderer.set_camera(event.camera);
 				return false;
 			});
 
 			subscriber.subscribe<WindowFramebufferEvent>(
 				[&](const WindowFramebufferEvent& resizeEvent) -> bool
 				{
-					mFontRenderer.set_viewport({0.f, 0.f, (f32)resizeEvent.width, (f32)resizeEvent.height});
-					mFontRenderer.set_scissor({0, 0, resizeEvent.width, resizeEvent.height});
+					mTextRenderer.set_viewport({0.f, 0.f, (f32)resizeEvent.width, (f32)resizeEvent.height});
+					mTextRenderer.set_scissor({0, 0, resizeEvent.width, resizeEvent.height});
 
 					return false;
 				}
@@ -111,9 +110,10 @@ namespace tur
 					glm::translate(glm::mat4(1.0f), worldPosition) *
 					glm::scale(glm::mat4(1.0f), transform.worldTransform.scale);
 
-				mFontRenderer.set_model(model);
-				mFontRenderer.set_font_texture(text.textureHandle);
-				mFontRenderer.set_character_data(flattenedMap);
+				mTextRenderer.set_color(text.color);
+				mTextRenderer.set_model(model);
+				mTextRenderer.set_font_texture(text.textureHandle);
+				mTextRenderer.set_character_data(flattenedMap);
 			}
 		}
 
@@ -127,11 +127,11 @@ namespace tur
 		}
 
 	public:
-		FontRenderer& renderer() { return mFontRenderer; }
+		TextRenderer& renderer() { return mTextRenderer; }
 
 	private:
         NON_OWNING AssetLibrary* rLibrary = nullptr;
 		NON_OWNING Scene* rScene = nullptr; 
-		FontRenderer mFontRenderer;
+		TextRenderer mTextRenderer;
 	};
 }

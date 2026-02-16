@@ -1,15 +1,15 @@
-#include "font_renderer.hpp"
+#include "text_renderer.hpp"
 #include "data-structures/range.hpp"
 #include "defines.hpp"
 
 #include "graphics/camera.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/pipeline.hpp"
-#include "graphics/renderer/font_renderer.hpp"
+#include "graphics/renderer/text_renderer.hpp"
 
 namespace tur
 {
-	void FontRenderer::initialize(NON_OWNING RenderInterface* rhi)
+	void TextRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
@@ -17,12 +17,12 @@ namespace tur
 		rRHI = rhi;
 		initialize_resources();
 	}
-	void FontRenderer::set_camera(NON_OWNING Camera* camera)
+	void TextRenderer::set_camera(NON_OWNING Camera* camera)
 	{
 		rCamera = camera;
 	}
 
-	void FontRenderer::render()
+	void TextRenderer::render()
 	{
 		auto& rhi = *rRHI;
 		auto& resources = rhi.get_resource_handler();
@@ -39,6 +39,7 @@ namespace tur
 		// World data:
 		{
 			WorldUBO ubo;
+			ubo.color = mColor;
 			ubo.model = mModel;
 			ubo.view = rCamera->view();
 			ubo.projection = rCamera->projection();
@@ -67,26 +68,30 @@ namespace tur
 		commandBuffer.end();
 	}
 
-	void FontRenderer::set_model(const glm::mat4& model)
+	void TextRenderer::set_color(const glm::vec4& color)
+	{
+		mColor = color;
+	}
+	void TextRenderer::set_model(const glm::mat4& model)
 	{
 		mModel = model;
 	}
-	void FontRenderer::set_font_texture(texture_handle textureHandle)
+	void TextRenderer::set_font_texture(texture_handle textureHandle)
 	{
 		fontAtlasHandle = textureHandle;
 	}
-	void FontRenderer::set_character_data(const std::vector<CharacterEntry>& characters)
+	void TextRenderer::set_character_data(const std::vector<CharacterEntry>& characters)
 	{
 		mCharacterEntries = characters;
 	}
 
-	void FontRenderer::initialize_resources()
+	void TextRenderer::initialize_resources()
 	{
 		initialize_buffers();
 		initialize_descriptors();
 		initialize_pipeline();
 	}
-	void FontRenderer::initialize_buffers()
+	void TextRenderer::initialize_buffers()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
@@ -106,7 +111,7 @@ namespace tur
 			worldUBO = resources.create_empty_buffer(descriptor, sizeof(WorldUBO));
 		}
 	}
-	void FontRenderer::initialize_descriptors()
+	void TextRenderer::initialize_descriptors()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
@@ -135,7 +140,7 @@ namespace tur
 		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
 		mainSet = rRHI->get_resource_handler().create_descriptor_set(setLayout);
 	}
-	void FontRenderer::initialize_pipeline()
+	void TextRenderer::initialize_pipeline()
 	{
 		auto& resources = rRHI->get_resource_handler();
 

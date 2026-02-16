@@ -11,14 +11,14 @@
     ],
     "fonts": [
         {
+            "height": 128,
+            "isSDF": false,
             "metadata": {
                 "filepath": "fonts/roboto/roboto-regular.ttf",
                 "type": 4,
                 "uuid": 232924622933348284,
                 "lifetime": 1
             },
-            "height": 128,
-            "isSDF": false,
             "options": {
                 "arrayLayers": 0,
                 "dataFormat": 3,

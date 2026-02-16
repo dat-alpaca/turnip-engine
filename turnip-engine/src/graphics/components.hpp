@@ -2,14 +2,13 @@
 #include <vector>
 
 #include "assets/asset.hpp"
+#include "glm/fwd.hpp"
 #include "graphics/camera.hpp"
 #include "defines.hpp"
 #include "graphics/objects/material.hpp"
 #include "graphics/objects/tile.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/objects/buffer.hpp"
-
-#define FIELD_SET_INTERNALLY
 
 namespace tur
 {
@@ -106,6 +105,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 
+		glm::vec4 color;
 		std::string text;
 		UUID uuid; // font UUID
 	};

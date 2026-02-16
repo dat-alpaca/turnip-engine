@@ -445,7 +445,13 @@
         1,
         9,
         {
-            "text": "oh my fucking god it works and it's fast",
+            "text": "agora tem texto",
+            "color": {
+                "x": 0.0,
+                "y": 1.0,
+                "z": 0.4,
+                "w": 1.0
+            },
             "uuid": 232924622933348284
         }
     ],

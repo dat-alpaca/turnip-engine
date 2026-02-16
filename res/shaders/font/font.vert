@@ -18,10 +18,12 @@ layout(std140, binding = 1) uniform World
 	mat4 model;
 	mat4 view;
 	mat4 projection;
+	vec4 color;
 } u_world;
 
 layout(location = 0) out vec2 v_uvs;
 layout(location = 1) flat out uint v_layer;
+layout(location = 2) out vec4 v_color;
 
 const vec2 c_quad_uvs[6] = vec2[](
 	vec2(0.0, 0.0),
@@ -58,4 +60,5 @@ void main()
 	gl_Position = u_world.projection * u_world.view * u_world.model * vec4(localPos, 1.0);
 	v_layer = currentCharacter.layer;
 	v_uvs = c_quad_uvs[currentVertex] * currentCharacter.uvSize;
+	v_color = u_world.color;
 }

@@ -5,6 +5,7 @@
 
 #include "assets/asset.hpp"
 #include "assets/texture/texture_options.hpp"
+#include "defines.hpp"
 
 namespace tur
 {
@@ -36,14 +37,13 @@ namespace tur
 		}
 	
     public:
-		std::filesystem::path filepath;
-        TextureOptions options;
-        FT_Face face;
-        u32 height;
-		bool isSDF;
-
-	public:
-		std::unordered_map<char, Character> characters;
-		u64 maxWidth = 0, maxHeight = 0;
+		FIELD_SET_INTERNALLY std::unordered_map<char, Character> characters;
+		FIELD_SET_INTERNALLY FT_Face face;
+		TextureOptions options;
+        
+		FIELD_SET_INTERNALLY u32 maxWidth = 0;
+		FIELD_SET_INTERNALLY u32 maxHeight = 0;
+        u32 height = 0;
+		bool isSDF = false;
 	};
 }

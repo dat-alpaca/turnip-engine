@@ -28,7 +28,7 @@ namespace tur
 		MeshAsset() { metadata.type = AssetType::MESH; }
 
 	public:
-		MeshData meshData;
-		MetallicRoughnessMaterialData meshMaterial;
+		FIELD_SET_INTERNALLY MeshData meshData;
+		FIELD_SET_INTERNALLY MetallicRoughnessMaterialData meshMaterial;
 	};
 }

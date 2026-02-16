@@ -1,5 +1,5 @@
 #include "assets/font/font_asset.hpp"
-#include "client/views/font_view.hpp"
+#include "client/views/text_view.hpp"
 #include <turnip_engine.hpp>
 #include <ft2build.h>
 #include <freetype/freetype.h>
@@ -93,7 +93,7 @@ private:
 		immQuadView 		= engine->add_view(tur::make_unique<ImmQuadView>(&rhi));
 		cubemapView 		= engine->add_view(tur::make_unique<CubemapView>(&rhi));
 		tilemapView 		= engine->add_view(tur::make_unique<TilemapView>(&rhi));
-		fontView 			= engine->add_view(tur::make_unique<FontView>(&rhi, &library));
+		fontView 			= engine->add_view(tur::make_unique<TextView>(&rhi, &library));
 		meshView 			= engine->add_view(tur::make_unique<MeshView>(&rhi));
 		scenegraphView 		= engine->add_view(tur::make_unique<ScenegraphView>());
 		cameraView 			= engine->add_view(tur::make_unique<CameraView>());
@@ -111,7 +111,7 @@ private:
 		rCubemapView 	= views.get<CubemapView>(cubemapView);
 		rMeshView 		= views.get<MeshView>(meshView);
 		rTilemapView 	= views.get<TilemapView>(tilemapView);
-		rFontView		= views.get<FontView>(fontView);
+		rFontView		= views.get<TextView>(fontView);
 	}
 
 	void initialize_resources()
@@ -161,7 +161,7 @@ private:
 	NON_OWNING CubemapView* rCubemapView 	= nullptr;
 	NON_OWNING MeshView* 	rMeshView 		= nullptr;
 	NON_OWNING TilemapView* rTilemapView 	= nullptr;
-	NON_OWNING FontView* 	rFontView		= nullptr;
+	NON_OWNING TextView* 	rFontView		= nullptr;
 
 private:
 	view_handle assetBinderView 	= invalid_handle;
