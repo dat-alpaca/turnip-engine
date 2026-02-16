@@ -1,6 +1,7 @@
 #pragma once
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/types/pipeline_stage.hpp"
+#include "vulkan/vulkan.hpp"
 #include <vulkan/vulkan.hpp>
 
 namespace tur::vulkan
@@ -172,6 +173,92 @@ namespace tur::vulkan
 			flags |= vk::ShaderStageFlagBits::eAllGraphics;
 
 		return flags;
+	}
+}
+
+namespace tur::vulkan
+{
+	constexpr inline vk::BlendOp get_blend_op(BlendFunc blendFunction)
+	{
+		switch (blendFunction)
+		{
+			case BlendFunc::ADD:
+				return vk::BlendOp::eAdd;
+				
+			case BlendFunc::SUBTRACT:
+				return vk::BlendOp::eSubtract;
+
+			default:
+				TUR_LOG_ERROR("Invalid Blend Function: {}. Default: Add", static_cast<int>(blendFunction));
+				return vk::BlendOp::eAdd;
+		}
+	}
+
+	constexpr inline vk::BlendFactor get_blend_factor(BlendFactor blendFactor)
+	{
+		switch (blendFactor)
+		{
+			case BlendFactor::ZERO:
+				return vk::BlendFactor::eZero;
+
+			case BlendFactor::ONE:
+				return vk::BlendFactor::eOne;
+
+			case BlendFactor::SRC_COLOR:
+				return vk::BlendFactor::eSrcColor;
+				
+			case BlendFactor::ONE_MINUS_SRC_COLOR:
+				return vk::BlendFactor::eOneMinusSrcColor;
+
+			case BlendFactor::DST_COLOR:
+				return vk::BlendFactor::eDstColor;
+
+			case BlendFactor::ONE_MINUS_DST_COLOR:
+				return vk::BlendFactor::eOneMinusDstColor;
+
+			case BlendFactor::SRC_ALPHA:
+				return vk::BlendFactor::eSrcAlpha;
+
+			case BlendFactor::ONE_MINUS_SRC_ALPHA:
+				return vk::BlendFactor::eOneMinusSrcAlpha;
+
+			case BlendFactor::DST_ALPHA:
+				return vk::BlendFactor::eDstAlpha;
+
+			case BlendFactor::ONE_MINUS_DST_ALPHA:
+				return vk::BlendFactor::eOneMinusDstAlpha;
+
+			case BlendFactor::CONSTANT_COLOR:
+				return vk::BlendFactor::eConstantColor;
+
+			case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+				return vk::BlendFactor::eOneMinusConstantColor;
+
+			case BlendFactor::CONSTANT_ALPHA:
+				return vk::BlendFactor::eConstantAlpha;
+
+			case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+				return vk::BlendFactor::eOneMinusConstantAlpha;
+
+			case BlendFactor::SRC_ALPHA_SATURATE:
+				return vk::BlendFactor::eSrcAlphaSaturate;
+
+			case BlendFactor::SRC1_COLOR:
+				return vk::BlendFactor::eSrc1Color;
+
+			case BlendFactor::ONE_MINUS_SRC1_COLOR:
+				return vk::BlendFactor::eOneMinusSrc1Color;
+
+			case BlendFactor::SRC1_ALPHA:
+				return vk::BlendFactor::eSrc1Alpha;
+
+			case BlendFactor::ONE_MINUS_SRC1_ALPHA:
+				return vk::BlendFactor::eOneMinusSrc1Alpha;
+
+			default:
+				TUR_LOG_ERROR("Invalid Blender Factor: {}. Default: Zero", static_cast<int>(blendFactor));
+				return vk::BlendFactor::eZero;
+		}
 	}
 }
 

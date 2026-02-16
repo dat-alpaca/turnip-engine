@@ -1,5 +1,6 @@
 #include "pipeline.hpp"
 #include "graphics/objects/pipeline.hpp"
+#include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/vulkan_resource_handler.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 
@@ -330,7 +331,7 @@ namespace tur::vulkan
 // Color blending:
 namespace tur::vulkan
 {
-	static vk::PipelineColorBlendAttachmentState create_color_blend_attachment()
+	static vk::PipelineColorBlendAttachmentState create_color_blend_attachment(const BlendDescriptor& descriptor)
 	{
 		vk::PipelineColorBlendAttachmentState colorBlendAttachmentState = {};
 
@@ -340,17 +341,16 @@ namespace tur::vulkan
 			 vk::ColorComponentFlagBits::eB |
 			 vk::ColorComponentFlagBits::eA
 		);
+		
+		colorBlendAttachmentState.blendEnable = descriptor.enable;
+		colorBlendAttachmentState.srcColorBlendFactor = get_blend_factor(descriptor.srcColorBlendFactor);
+		colorBlendAttachmentState.dstColorBlendFactor = get_blend_factor(descriptor.dstColorBlendFactor);
+		colorBlendAttachmentState.colorBlendOp = get_blend_op(descriptor.colorBlendFunc);
 
-		colorBlendAttachmentState.blendEnable = false;
-		colorBlendAttachmentState.srcColorBlendFactor = vk::BlendFactor::eOne;
-		colorBlendAttachmentState.dstColorBlendFactor = vk::BlendFactor::eZero;
+		colorBlendAttachmentState.srcAlphaBlendFactor = get_blend_factor(descriptor.srcAlphaBlendFactor);
+		colorBlendAttachmentState.dstAlphaBlendFactor = get_blend_factor(descriptor.dstAlphaBlendFactor);
+		colorBlendAttachmentState.alphaBlendOp = get_blend_op(descriptor.alphaBlendFunc);
 
-		colorBlendAttachmentState.colorBlendOp = vk::BlendOp::eAdd;
-
-		colorBlendAttachmentState.srcAlphaBlendFactor = vk::BlendFactor::eOne;
-		colorBlendAttachmentState.dstAlphaBlendFactor = vk::BlendFactor::eZero;
-
-		colorBlendAttachmentState.alphaBlendOp = vk::BlendOp::eAdd;
 		colorBlendAttachmentState.colorWriteMask = colorComponentFlags;
 
 		return colorBlendAttachmentState;
@@ -422,7 +422,7 @@ namespace tur::vulkan
 		vk::PipelineRasterizationStateCreateInfo rasterizer = create_rasterizer(descriptor);
 		vk::PipelineMultisampleStateCreateInfo multisample = create_multisample();
 
-		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment(descriptor.blend);
+		vk::PipelineColorBlendAttachmentState colorAttachment = create_color_blend_attachment(descriptor.blendDescriptor);
 		vk::PipelineColorBlendStateCreateInfo colorBlending = create_color_blend_state(colorAttachment);
 
 		vk::PipelineDepthStencilStateCreateInfo depthStencil = create_depth_stencil_objects(descriptor.depthDescriptor);
