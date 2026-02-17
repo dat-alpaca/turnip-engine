@@ -1,31 +1,49 @@
 {
-  "version": 8,
-  "configurePresets": [
-    {
-      "name": "turnip",
-      "generator": "Ninja",
-      "binaryDir": "${sourceDir}/build/",
-      "cacheVariables": {
-        "CMAKE_C_COMPILER": "/usr/bin/clang",
-        "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
-        "CMAKE_BUILD_TYPE": "Debug",
-        "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
-        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
-        "TUR_BUILD_SANDBOX": "ON",
-        "TUR_BUILD_ENGINE": "ON",
-        "TUR_USE_GLFW": "ON",
-        "TUR_USE_VULKAN": "OFF",
-        "TUR_USE_OPENGL": "ON"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "turnip-build",
-      "displayName": "Turnip Build",
-      "description": "Build Turnip",
-      "configurePreset": "turnip",
-      "jobs": 6
-    }
-  ]
+    "version": 8,
+    "configurePresets": [
+        {
+            "name": "turnip",
+            "hidden": true,
+            "generator": "Ninja",
+            "binaryDir": "${sourceDir}/build/${presetName}",
+            "cacheVariables": {
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
+                "CMAKE_BUILD_TYPE": "Debug",
+                "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
+                "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+                "TUR_BUILD_SANDBOX": "ON",
+                "TUR_BUILD_ENGINE": "ON",
+                "TUR_USE_GLFW": "ON"
+            }
+        },
+        {
+            "name": "turnip-gl",
+            "inherits": "turnip",
+            "cacheVariables": {
+                "TUR_USE_VULKAN": "OFF",
+                "TUR_USE_OPENGL": "ON"
+            }
+        },
+        {
+            "name": "turnip-vk",
+            "inherits": "turnip",
+            "cacheVariables": {
+                "TUR_USE_VULKAN": "ON",
+                "TUR_USE_OPENGL": "OFF"
+            }
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "turnip-gl-build",
+            "configurePreset": "turnip-gl",
+            "jobs": 12
+        },
+        {
+            "name": "turnip-vk-build",
+            "configurePreset": "turnip-vk",
+            "jobs": 12
+        }
+    ]
 }
