@@ -554,16 +554,13 @@ namespace tur::vulkan
 	void ResourceHandler::update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
 	{
 		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
-
+		
 		Texture& texture = mTextures.get(textureHandle);
 		BufferDescriptor stagingDescriptor = {};
 		{
 			stagingDescriptor.memoryUsage = BufferMemoryUsage::CPU_ONLY;
 			stagingDescriptor.type = BufferType::TRANSFER_SRC | BufferType::TRANSFER_DST;
 		}
-
-		auto width = texture.descriptor.layerWidth;
-		auto height = texture.descriptor.layerHeight;
 
 		buffer_handle stagingBufferHandle =
 			create_buffer(stagingDescriptor, asset.data.data(), {.size = asset.data.size()});
@@ -575,6 +572,8 @@ namespace tur::vulkan
 				.dstAccessMask = vk::AccessFlagBits2::eTransferWrite
 			});
 
+			auto width = asset.options.layerWidth;
+			auto height = asset.options.layerHeight;
 			copy_buffer_to_texture_layer(stagingBufferHandle, textureHandle, offset, width, height, layer);
 
 			utils::transition_texture_layout_imm(

@@ -21,6 +21,23 @@ namespace tur::vulkan
 		return vk::FrontFace::eCounterClockwise;
 	}
 
+	constexpr inline vk::FrontFace get_inverse_front_face(FrontFace frontFace)
+	{
+		// In order to standardize coordinates, vulkan follows the opengl winding.
+			
+		switch (frontFace)
+		{
+			case FrontFace::COUNTER_CLOCKWISE:
+				return vk::FrontFace::eClockwise;
+
+			case FrontFace::CLOCKWISE:
+				return vk::FrontFace::eCounterClockwise;
+		}
+
+		TUR_LOG_ERROR("Invalid Front Face: {}. Default: eCounterClockwise", static_cast<int>(frontFace));
+		return vk::FrontFace::eClockwise;
+	}
+
 	constexpr inline vk::CullModeFlags get_cull_mode(CullMode cullMode)
 	{
 		switch (cullMode)

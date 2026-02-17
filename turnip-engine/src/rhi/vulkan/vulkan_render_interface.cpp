@@ -365,10 +365,21 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
-			else
-				aspectMask = vk::ImageAspectFlagBits::eColor;
+
+			switch(texture.descriptor.format)
+			{
+				case TextureFormat::DEPTH_16_UNORM:
+					aspectMask = vk::ImageAspectFlagBits::eDepth;
+					break;
+				
+				case TextureFormat::DEPTH_STENCIL24_S8U_INT:
+					aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+					break;
+
+				default:
+					aspectMask = vk::ImageAspectFlagBits::eColor;
+					break;
+			}
 
 			subresourceRange.aspectMask = aspectMask;
 			subresourceRange.baseMipLevel = 0;
@@ -408,10 +419,20 @@ namespace tur::vulkan::utils
 			imageBarrier.oldLayout = texture.layout;
 			imageBarrier.newLayout = description.newLayout;
 
-			if (description.newLayout == vk::ImageLayout::eDepthStencilAttachmentOptimal)
-				aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
-			else
-				aspectMask = vk::ImageAspectFlagBits::eColor;
+			switch(texture.descriptor.format)
+			{
+				case TextureFormat::DEPTH_16_UNORM:
+					aspectMask = vk::ImageAspectFlagBits::eDepth;
+					break;
+				
+				case TextureFormat::DEPTH_STENCIL24_S8U_INT:
+					aspectMask = vk::ImageAspectFlagBits::eDepth | vk::ImageAspectFlagBits::eStencil;
+					break;
+
+				default:
+					aspectMask = vk::ImageAspectFlagBits::eColor;
+					break;
+			}
 
 			subresourceRange.aspectMask = aspectMask;
 			subresourceRange.baseMipLevel = 0;

@@ -287,7 +287,7 @@ namespace tur::vulkan
 		rasterizerCreateInfo.rasterizerDiscardEnable = rasterizer.discardFragments;
 
 		rasterizerCreateInfo.cullMode = get_cull_mode(rasterizer.cullMode);
-		rasterizerCreateInfo.frontFace = get_front_face(rasterizer.frontFace);
+		rasterizerCreateInfo.frontFace = get_inverse_front_face(rasterizer.frontFace);
 		rasterizerCreateInfo.depthBiasConstantFactor = 0.0f;
 		rasterizerCreateInfo.depthBiasClamp = 0.0f;
 		rasterizerCreateInfo.depthBiasSlopeFactor = 0.0f;
