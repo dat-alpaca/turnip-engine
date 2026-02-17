@@ -141,9 +141,10 @@ namespace tur::gl
 			glCullFace(cullMode);
 			glEnable(GL_CULL_FACE);
 		}
-		else 
+		else
 			glDisable(GL_CULL_FACE);
 
+		std::vector<int>A;
 		if(mPipeline.blendDescriptor.enable)
 		{
 			glEnable(GL_BLEND);
