@@ -17,7 +17,7 @@ namespace tur
 		MeshView(NON_OWNING RenderInterface* rhi)
 		{
 			mRenderer.initialize(rhi);
-			mRenderer.set_clear_color(color::Blue, ClearFlags::COLOR);
+			// mRenderer.set_clear_color(color::Blue, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 
 	public:
@@ -76,6 +76,7 @@ namespace tur
 					internal.indexCount = mesh.indexCount;
 					internal.isVisible = culling.visible;
 					internal.indexType = mesh.indexType;
+					internal.transform = transform.worldTransform.transform();
 
 					internal.material = mesh.material;
 

@@ -14,18 +14,12 @@ namespace tur
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
-		set_clear_color(ClearColor(color::Black), ClearFlags::COLOR | ClearFlags::DEPTH);
-
 		rRHI = rhi;
 		initialize_resources();
 	}
 	void TilemapRenderer::set_camera(NON_OWNING Camera* camera)
 	{
 		rCamera = camera;
-	}
-	void TilemapRenderer::set_clear_color(const ClearColor& color, ClearFlags flags)
-	{
-		commandBuffer.set_clear_color(color, flags);
 	}
 
 	void TilemapRenderer::render()

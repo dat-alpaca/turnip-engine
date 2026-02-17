@@ -3,17 +3,32 @@
     "configurePresets": [
         {
             "name": "turnip",
+            "hidden": true,
             "generator": "Ninja",
-            "binaryDir": "${sourceDir}/build/",
+            "binaryDir": "${sourceDir}/build/${presetName}",
             "cacheVariables": {
-                "CMAKE_C_COMPILER": "/usr/bin/gcc",
-                "CMAKE_CXX_COMPILER": "/usr/bin/g++",
+                "CMAKE_C_COMPILER": "/usr/bin/clang",
+                "CMAKE_CXX_COMPILER": "/usr/bin/clang++",
                 "CMAKE_BUILD_TYPE": "Debug",
                 "CMAKE_POLICY_VERSION_MINIMUM": "3.5",
                 "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
                 "TUR_BUILD_SANDBOX": "ON",
                 "TUR_BUILD_ENGINE": "ON",
-                "TUR_USE_GLFW": "ON",
+                "TUR_USE_GLFW": "ON"
+            }
+        },
+        {
+            "name": "turnip-gl",
+            "inherits": "turnip",
+            "cacheVariables": {
+                "TUR_USE_VULKAN": "OFF",
+                "TUR_USE_OPENGL": "ON"
+            }
+        },
+        {
+            "name": "turnip-vk",
+            "inherits": "turnip",
+            "cacheVariables": {
                 "TUR_USE_VULKAN": "ON",
                 "TUR_USE_OPENGL": "OFF"
             }
@@ -21,11 +36,14 @@
     ],
     "buildPresets": [
         {
-            "name": "turnip-build",
-            "displayName": "Turnip Build",
-            "description": "Build Turnip",
-            "configurePreset": "turnip",
-            "jobs": 6
+            "name": "turnip-gl-build",
+            "configurePreset": "turnip-gl",
+            "jobs": 12
+        },
+        {
+            "name": "turnip-vk-build",
+            "configurePreset": "turnip-vk",
+            "jobs": 12
         }
     ]
 }

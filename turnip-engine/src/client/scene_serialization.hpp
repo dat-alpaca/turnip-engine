@@ -26,6 +26,8 @@ namespace tur
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Tile, position, layer, flags);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TilemapChunk, chunks);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Tilemap2DComponent, worldData, tilesPerChunk, tilePixelSize, uuid);
+
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TextComponent, uuid, text, color);
     
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Body2DComponent, type, isBullet);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RectCollider2D, width, height, density, friction, restitution, rollingResistance);
@@ -153,6 +155,7 @@ namespace tur
             .get<CubemapComponent>(archive)
             .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
+            .get<TextComponent>(archive)
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive);
@@ -176,6 +179,7 @@ namespace tur
             .get<CubemapComponent>(archive)
             .get<MeshComponent>(archive)
             .get<Tilemap2DComponent>(archive)
+            .get<TextComponent>(archive)
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive)

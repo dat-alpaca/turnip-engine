@@ -35,22 +35,32 @@ namespace tur::gl
 
 		u32 index = 0;
 		u32 width, height;
-		for (const auto& attachment : descriptor.attachmentDescriptions)
+
+		// color attachment:
 		{
-			// TODO: check if all attachments are the same size.
+			width = descriptor.colorAttachment.textureDescriptor.width;
+			height = descriptor.colorAttachment.textureDescriptor.height;
 
-			attachment.loadOp;  // UNUSED
-			attachment.storeOp; // UNUSED
-
-			width = attachment.textureDescriptor.width;
-			height = attachment.textureDescriptor.height;
-
-			texture_handle attachTexture = create_empty_texture(attachment.textureDescriptor);
+			texture_handle attachTexture = create_empty_texture(descriptor.colorAttachment.textureDescriptor);
 			gl_handle glAttachTextureHandle = mTextures.get(attachTexture).handle;
 
 			glNamedFramebufferTexture(renderTarget.handle, GL_COLOR_ATTACHMENT0 + index, glAttachTextureHandle, 0);
 
 			renderTarget.colorAttachments.push_back(attachTexture);
+			++index;
+		}
+
+		// depth attachment:
+		{
+			width = descriptor.colorAttachment.textureDescriptor.width;
+			height = descriptor.colorAttachment.textureDescriptor.height;
+
+			texture_handle attachTexture = create_empty_texture(descriptor.colorAttachment.textureDescriptor);
+			gl_handle glAttachTextureHandle = mTextures.get(attachTexture).handle;
+
+			glNamedFramebufferTexture(renderTarget.handle, GL_DEPTH_ATTACHMENT, glAttachTextureHandle, 0);
+
+			renderTarget.depthAttachment = attachTexture;
 			++index;
 		}
 
@@ -70,6 +80,7 @@ namespace tur::gl
 		for (const auto& textureHandle : renderTarget.colorAttachments)
 			destroy_texture(textureHandle);
 
+		destroy_texture(renderTarget.depthAttachment);
 		glDeleteFramebuffers(1, &renderTarget.handle);
 	}
 
@@ -185,9 +196,10 @@ namespace tur::gl
 		{
 			pipeline.inputAssemblyStage = descriptor.inputAssemblyStage;
 			pipeline.vertexInputStage = descriptor.vertexInputStage;
-
 			pipeline.depthDescriptor = descriptor.depthDescriptor;
+			pipeline.blendDescriptor = descriptor.blendDescriptor;
 			pipeline.rasterizerStage = descriptor.rasterizerStage;
+
 			pipeline.setLayout = descriptor.setLayout;
 			pipeline.handle = pipelineID;
 		}
@@ -307,6 +319,29 @@ namespace tur::gl
 			default:
 				TUR_LOG_ERROR("Invalid texture descriptor type on update");
 		}
+
+		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);
+	}
+	void ResourceHandler::update_array_texture_layer(texture_handle textureHandle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
+	{
+		Texture& texture = mTextures.get(textureHandle);
+		TUR_ASSERT(texture.descriptor.type == TextureType::ARRAY_TEXTURE_2D, "Updating layers of textures that are not array_textures is not supported.");
+		TUR_ASSERT(asset.data.size(), "Attempted to update layer with empty data.");
+
+		gl_handle dataFormat = get_texture_data_format(asset.options.dataFormat);
+		gl_handle dataType = !asset.options.floatTexture ? GL_UNSIGNED_BYTE : GL_FLOAT;
+		
+		glPixelStorei(GL_UNPACK_ALIGNMENT, 1);
+		glTextureSubImage3D(
+			texture.handle,
+			0,
+			offset.x, offset.y, layer,
+			asset.options.layerWidth, asset.options.layerHeight, 1,
+			dataFormat,
+			dataType,
+			asset.data.data()
+		);
 
 		glPixelStorei(GL_UNPACK_ROW_LENGTH, 0);
 		glPixelStorei(GL_UNPACK_ALIGNMENT, 4);

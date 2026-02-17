@@ -1,4 +1,5 @@
 #include "asset_library.hpp"
+#include <filesystem>
 #include <miniaudio.h>
 #include <optional>
 #include <stb_image.h>
@@ -7,10 +8,12 @@
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/asset.hpp"
 
+#include "defines.hpp"
 #include "event/scene_events/scene_switched_event.hpp"
 #include "event/subscriber.hpp"
 #include "graphics/constants.hpp"
 
+#include "assets/font/font_loader.hpp"
 #include "graphics/objects/texture.hpp"
 #include "logging/logging.hpp"
 #include "texture/texture_loader.hpp"
@@ -20,13 +23,15 @@
 
 namespace tur
 {
-	void AssetLibrary::initialize(WorkerPool* workerPool, AudioHandler* audioHandler)
+	void AssetLibrary::initialize(WorkerPool* workerPool, AudioHandler* audioHandler, FontHandler* fontHandler)
 	{
 		TUR_ASSERT(workerPool, "Invalid WorkerPool handle passed");
 		TUR_ASSERT(audioHandler, "Invalid AudioHandler handle passed");
+		TUR_ASSERT(fontHandler, "Invalid FontHandler handle passed");
 
 		rAudioHandler = audioHandler;
 		rWorkerPool = workerPool;
+		rFontHandler = fontHandler;
 
 		create_default_texture();
 	}
@@ -246,6 +251,55 @@ namespace tur
 				}
 
 				AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::CUBEMAP);
+				mEventCallback(assetLoadedEvent);
+			}
+		);
+
+		return assetHandle;
+	}
+
+	asset_handle AssetLibrary::load_font_async(const std::filesystem::path& filepath, const AssetMetadata& metadata, const TextureOptions& options, u32 height, bool loadSDF)
+	{
+		if (mFilepathCache.find(filepath) != mFilepathCache.end())
+			return mFilepathCache[filepath];
+
+		auto& fonts = rFontHandler->get_font_library();
+
+		asset_handle assetHandle = mFontAssets.add({});
+		FontAsset& fontAsset = mFontAssets.get(assetHandle);
+		fontAsset.metadata = metadata;
+		fontAsset.options = options;
+
+		if(metadata.lifetime == AssetLifetime::SCENE_BOUND)
+			mFontRemoveOnSceneChange.push_back(assetHandle);
+
+		mFilepathCache[filepath] = assetHandle;
+		mUUIDCache[fontAsset.metadata.uuid] = assetHandle;
+
+		rWorkerPool->submit<std::optional<FontAsset>>(
+			[fonts, filepath, metadata, options, height, loadSDF]()
+			{
+				return load_font_task(filepath, fonts, metadata, options, height, loadSDF);
+			},
+			[this, assetHandle](const std::optional<FontAsset>& fontAsset)
+			{
+				if (!fontAsset.has_value())
+				{
+					TUR_LOG_ERROR("Failed to load font asset into the asset library.");
+					return;
+				}
+		
+				FontAsset& loadedFontAsset = mFontAssets.get(assetHandle);
+				{
+					loadedFontAsset.characters = fontAsset->characters;
+					loadedFontAsset.face = fontAsset->face;
+					loadedFontAsset.state = AssetState::READY;
+					loadedFontAsset.height = fontAsset->height;
+					loadedFontAsset.maxHeight = fontAsset->maxHeight;
+					loadedFontAsset.maxWidth = fontAsset->maxWidth;
+				}
+
+				AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::FONT);
 				mEventCallback(assetLoadedEvent);
 			}
 		);

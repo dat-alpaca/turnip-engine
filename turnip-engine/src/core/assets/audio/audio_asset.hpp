@@ -1,5 +1,6 @@
 #pragma once
 #include "assets/asset.hpp"
+#include "defines.hpp"
 #include <miniaudio.h>
 
 namespace tur
@@ -10,6 +11,6 @@ namespace tur
 		AudioAsset() { metadata.type = AssetType::AUDIO; }
 
 	public:
-		ma_sound sound;
+		FIELD_SET_INTERNALLY ma_sound sound;
 	};
 }

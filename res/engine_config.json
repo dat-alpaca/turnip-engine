@@ -66,11 +66,11 @@
     "windowingCapabilities": {
         "api": "OPENGL",
         "major": 1,
-        "minor": 4,
+        "minor": 3,
         "patch": 0,
         "variant": 0
     },
     "workerConfig": {
-        "threadAmount": 4
+        "threadAmount": 8
     }
 }

@@ -227,6 +227,9 @@ namespace tur::vulkan
 			case vk::Result::eIncompatibleShaderBinaryEXT:
 				TUR_LOG_CRITICAL("[Vulkan]: An error has occurred: {}", REMOVE_PREFIX(eIncompatibleShaderBinaryEXT, 1));
 				break;
+
+			default:
+				TUR_LOG_CRITICAL("[Vulkan]: An error has occurred.");
 		}
 
 		return {};

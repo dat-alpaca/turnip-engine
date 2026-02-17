@@ -118,7 +118,7 @@ namespace tur
 	struct RasterizerDescriptor
 	{
 		FrontFace frontFace = FrontFace::COUNTER_CLOCKWISE;
-		CullMode cullMode = CullMode::FRONT;
+		CullMode cullMode = CullMode::NONE;
 		PolygonMode polygonMode = PolygonMode::FILL;
 
 		float lineWidth = 1.0f;
@@ -153,6 +153,53 @@ namespace tur
 
 namespace tur
 {
+	enum class BlendFactor
+	{
+		ZERO = 0,
+		ONE,
+		SRC_COLOR,
+		ONE_MINUS_SRC_COLOR,
+		DST_COLOR,
+		ONE_MINUS_DST_COLOR,
+		SRC_ALPHA,
+		ONE_MINUS_SRC_ALPHA,
+		DST_ALPHA,
+		ONE_MINUS_DST_ALPHA,
+		CONSTANT_COLOR,
+		ONE_MINUS_CONSTANT_COLOR,
+		CONSTANT_ALPHA,
+		ONE_MINUS_CONSTANT_ALPHA,
+		SRC_ALPHA_SATURATE,
+		SRC1_COLOR,
+		ONE_MINUS_SRC1_COLOR,
+		SRC1_ALPHA,
+		ONE_MINUS_SRC1_ALPHA,
+	};
+
+	enum class BlendFunc
+	{
+		ADD = 0,
+    	SUBTRACT,
+		REVERSE_SUBTRACT,
+		MIN,
+		MAX
+	};
+
+	struct BlendDescriptor
+	{
+		bool enable = false;
+		BlendFactor srcColorBlendFactor = BlendFactor::SRC_ALPHA;
+		BlendFactor dstColorBlendFactor = BlendFactor::ONE_MINUS_SRC_ALPHA;
+		BlendFunc colorBlendFunc = BlendFunc::ADD;
+		
+		BlendFactor srcAlphaBlendFactor = BlendFactor::ONE;
+		BlendFactor dstAlphaBlendFactor = BlendFactor::ONE_MINUS_SRC_ALPHA;
+		BlendFunc alphaBlendFunc = BlendFunc::ADD;
+	};
+}
+
+namespace tur
+{
 	using pipeline_handle = handle_type;
 
 	enum class DynamicState
@@ -167,6 +214,7 @@ namespace tur
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
 		DepthDescriptor depthDescriptor;
+		BlendDescriptor blendDescriptor;
 
 		descriptor_set_layout_handle setLayout;
 

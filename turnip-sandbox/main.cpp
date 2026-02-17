@@ -1,4 +1,8 @@
+#include "assets/font/font_asset.hpp"
+#include "client/views/text_view.hpp"
 #include <turnip_engine.hpp>
+#include <ft2build.h>
+#include <freetype/freetype.h>
 
 using namespace tur;
 
@@ -28,7 +32,7 @@ public:
 	void on_render() final
 	{
 		auto& rhi = engine->get_render_interface();
-		
+
 		CommandBuffer commandBuffer = rhi.create_command_buffer();
 		commandBuffer.reset(rhi.get_current_command_buffer());
 		commandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
@@ -36,14 +40,18 @@ public:
 		commandBuffer.begin();
 		commandBuffer.begin_rendering();
 
+		rCubemapView->render_deferred();
 		rQuadView->render_deferred();
 		rTilemapView->render_deferred();
 		rMeshView->render_deferred();
-		rCubemapView->render_deferred();
-		
+		rFontView->render_deferred();
+
 		std::vector<CommandBuffer::BufferType> commandBuffers;
 		{
 			commandBuffers.reserve(4);
+
+			if (rCubemapView->renderer().is_valid())
+				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
 
 			commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
 
@@ -53,8 +61,8 @@ public:
 			if (rMeshView->renderer().mesh_count() > 0)
 				commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
 
-			if (rCubemapView->renderer().is_valid())
-				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
+			if (!rFontView->renderer().is_empty())
+				commandBuffers.push_back(rFontView->renderer().get_command_buffer().get_buffer());
 		}
 
 		commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});
@@ -85,23 +93,25 @@ private:
 		immQuadView 		= engine->add_view(tur::make_unique<ImmQuadView>(&rhi));
 		cubemapView 		= engine->add_view(tur::make_unique<CubemapView>(&rhi));
 		tilemapView 		= engine->add_view(tur::make_unique<TilemapView>(&rhi));
+		fontView 			= engine->add_view(tur::make_unique<TextView>(&rhi, &library));
 		meshView 			= engine->add_view(tur::make_unique<MeshView>(&rhi));
 		scenegraphView 		= engine->add_view(tur::make_unique<ScenegraphView>());
 		cameraView 			= engine->add_view(tur::make_unique<CameraView>());
 		sceneSignalView 	= engine->add_view(tur::make_unique<SceneSignalView>(&library));
-		
+
 		physicsView 		= engine->add_view(tur::make_unique<PhysicsView>(&physics));
 		scriptView			= engine->add_view(tur::make_unique<ScriptView>(&scriptHandler));
 
 		auto* physicsPtr 	= views.get<PhysicsView>(physicsView);
 		auto* scriptPtr 	= views.get<ScriptView>(scriptView);
 		physicsScriptView 	= engine->add_view(tur::make_unique<PhysicsScriptView>(physicsPtr, scriptPtr));
-	
+
 		// Handles:
 		rQuadView 		= views.get<ImmQuadView>(immQuadView);
 		rCubemapView 	= views.get<CubemapView>(cubemapView);
 		rMeshView 		= views.get<MeshView>(meshView);
 		rTilemapView 	= views.get<TilemapView>(tilemapView);
+		rFontView		= views.get<TextView>(fontView);
 	}
 
 	void initialize_resources()
@@ -124,6 +134,9 @@ private:
 
 			library.load_cubemap_async(filepaths, cubemap);
 		}
+
+		for(const FontAsset& font : mProject.get_fonts())
+			library.load_font_async(mProject.get_project_filepath(font.metadata.filepath), font.metadata, font.options, font.height, font.isSDF);
 	}
 
 	void initialize_entities()
@@ -148,6 +161,7 @@ private:
 	NON_OWNING CubemapView* rCubemapView 	= nullptr;
 	NON_OWNING MeshView* 	rMeshView 		= nullptr;
 	NON_OWNING TilemapView* rTilemapView 	= nullptr;
+	NON_OWNING TextView* 	rFontView		= nullptr;
 
 private:
 	view_handle assetBinderView 	= invalid_handle;
@@ -161,6 +175,7 @@ private:
 	view_handle physicsView			= invalid_handle;
 	view_handle scriptView			= invalid_handle;
 	view_handle physicsScriptView   = invalid_handle;
+	view_handle fontView			= invalid_handle;
 };
 
 int main()

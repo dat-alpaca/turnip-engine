@@ -21,7 +21,6 @@ namespace tur
         {
             this->scissor = scissor;
         }
-
         void set_render_target(render_target_handle renderTarget)
         {
             this->renderTarget = renderTarget;

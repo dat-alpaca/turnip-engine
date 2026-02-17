@@ -13,7 +13,8 @@ namespace tur
 		TEXTURE_ARRAY,
 		CUBEMAP,
 		AUDIO,
-		MESH
+		MESH,
+		FONT
 	};
 	static inline constexpr const char* get_asset_type_name(AssetType type)
 	{

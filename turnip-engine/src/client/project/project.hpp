@@ -5,6 +5,7 @@
 #include <string>
 
 #include "assets/cubemap/cubemap_asset.hpp"
+#include "assets/font/font_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "scene/scene.hpp"
 #include "assets/audio/audio_asset.hpp"
@@ -22,18 +23,19 @@ namespace tur
 
     public:
         void initialize(const std::filesystem::path& folderPath);
-    
+
     public:
         void save();
         void save_asset_library(NON_OWNING AssetLibrary* library);
         void add_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath);
-    
+
     public:
         std::vector<TextureAsset> get_textures() const;
         std::vector<AudioAsset> get_audios() const;
         std::vector<MeshAsset> get_meshes() const;
         std::vector<CubemapAsset> get_cubemaps() const;
-    
+        std::vector<FontAsset> get_fonts() const;
+
         inline std::filesystem::path get_project_filepath(const std::filesystem::path& filepath) const
         {
             return folderPath / filepath;

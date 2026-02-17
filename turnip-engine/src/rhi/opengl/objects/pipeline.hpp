@@ -7,6 +7,89 @@
 
 namespace tur::gl
 {
+	constexpr inline gl_handle get_blend_func(BlendFunc blendFunction)
+	{
+		switch (blendFunction)
+		{
+			case BlendFunc::ADD:
+				return GL_FUNC_ADD;
+				
+			case BlendFunc::SUBTRACT:
+				return GL_FUNC_SUBTRACT;
+
+			default:
+				TUR_LOG_ERROR("Invalid Blend Function: {}. Default: GL_FUNC_ADD", static_cast<int>(blendFunction));
+				return GL_FUNC_ADD;
+		}
+	}
+
+	constexpr inline gl_handle get_blend_factor(BlendFactor blendFactor)
+	{
+		switch (blendFactor)
+		{
+			case BlendFactor::ZERO:
+				return GL_ZERO;
+
+			case BlendFactor::ONE:
+				return GL_ONE;
+
+			case BlendFactor::SRC_COLOR:
+				return GL_SRC_COLOR;
+				
+			case BlendFactor::ONE_MINUS_SRC_COLOR:
+				return GL_ONE_MINUS_SRC_COLOR;
+
+			case BlendFactor::DST_COLOR:
+				return GL_DST_COLOR;
+
+			case BlendFactor::ONE_MINUS_DST_COLOR:
+				return GL_ONE_MINUS_DST_COLOR;
+
+			case BlendFactor::SRC_ALPHA:
+				return GL_SRC_ALPHA;
+
+			case BlendFactor::ONE_MINUS_SRC_ALPHA:
+				return GL_ONE_MINUS_SRC_ALPHA;
+
+			case BlendFactor::DST_ALPHA:
+				return GL_DST_ALPHA;
+
+			case BlendFactor::ONE_MINUS_DST_ALPHA:
+				return GL_ONE_MINUS_DST_ALPHA;
+
+			case BlendFactor::CONSTANT_COLOR:
+				return GL_CONSTANT_COLOR;
+
+			case BlendFactor::ONE_MINUS_CONSTANT_COLOR:
+				return GL_ONE_MINUS_CONSTANT_COLOR;
+
+			case BlendFactor::CONSTANT_ALPHA:
+				return GL_CONSTANT_ALPHA;
+
+			case BlendFactor::ONE_MINUS_CONSTANT_ALPHA:
+				return GL_ONE_MINUS_CONSTANT_ALPHA;
+
+			case BlendFactor::SRC_ALPHA_SATURATE:
+				return GL_SRC_ALPHA_SATURATE;
+
+			case BlendFactor::SRC1_COLOR:
+				return GL_SRC1_COLOR;
+
+			case BlendFactor::ONE_MINUS_SRC1_COLOR:
+				return GL_ONE_MINUS_SRC1_COLOR;
+
+			case BlendFactor::SRC1_ALPHA:
+				return GL_SRC1_ALPHA;
+
+			case BlendFactor::ONE_MINUS_SRC1_ALPHA:
+				return GL_ONE_MINUS_SRC1_ALPHA;
+
+			default:
+				TUR_LOG_ERROR("Invalid Blender Factor: {}. Default: GL_ZERO", static_cast<int>(blendFactor));
+				return GL_ZERO;
+		}
+	}
+
 	constexpr inline gl_handle get_front_face(FrontFace frontFace)
 	{
 		switch (frontFace)
@@ -89,11 +172,11 @@ namespace tur::gl
 
 			case PolygonMode::POINT:
 				return GL_POINT;
+
+			default:
+				TUR_LOG_ERROR("Invalid Polygon Mode: {}. Default: GL_FILL", static_cast<int>(polygonMode));
+				return GL_FILL;
 		}
-
-		TUR_LOG_ERROR("Invalid Polygon Mode: {}. Default: GL_FILL", static_cast<int>(polygonMode));
-
-		return GL_FILL;
 	}
 
 	constexpr inline gl_handle get_primitive_topology(PrimitiveTopology topology)
@@ -156,10 +239,11 @@ namespace tur::gl
 
 			case DescriptorType::COMBINED_IMAGE_SAMPLER:
 				return GL_UNIFORM_BUFFER;
-		}
 
-		TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
-		return invalid_handle;
+			default:
+				TUR_LOG_CRITICAL("Invalid Descriptor Type: {}", static_cast<u32>(type));
+				return invalid_handle;
+		}
 	}
 
 	constexpr inline gl_handle get_attribute_format(AttributeFormat format)
@@ -219,10 +303,11 @@ namespace tur::gl
 
 			case AttributeFormat::R32G32B32A32_UINT:
 				return 4;
-		}
 
-		TUR_LOG_CRITICAL("Invalid Attribute Format [Size]: {}", static_cast<u64>(format));
-		return invalid_handle;
+			default:
+				TUR_LOG_CRITICAL("Invalid Attribute Format [Size]: {}", static_cast<u64>(format));
+				return invalid_handle;
+		}
 	}
 }
 
@@ -252,6 +337,7 @@ namespace tur::gl
 		InputAssemblyDescriptor inputAssemblyStage;
 		RasterizerDescriptor rasterizerStage;
 		DepthDescriptor depthDescriptor;
+		BlendDescriptor blendDescriptor;
 
 		descriptor_set_layout_handle setLayout;
 		gl_handle handle = invalid_handle;

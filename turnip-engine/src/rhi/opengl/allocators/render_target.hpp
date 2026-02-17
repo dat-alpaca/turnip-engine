@@ -14,9 +14,8 @@ namespace tur::gl
 		glCreateFramebuffers(1, &framebufferID);
 
 		RenderTarget target;
-		{
-			target.handle = framebufferID;
-		}
+		target.handle = framebufferID;
+
 		return target;
 	}
 }

@@ -70,11 +70,12 @@ namespace tur
 		{ t.destroy_buffer(handle) };
 	} && 
 	
-	requires(T t, const TextureDescriptor& desc, texture_handle handle, const TextureAsset& asset)
+	requires(T t, const TextureDescriptor& desc, texture_handle handle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
 	{
         { t.create_texture(desc, asset) }							-> std::same_as<texture_handle>;
         { t.create_empty_texture(desc) }							-> std::same_as<texture_handle>;
 		{ t.update_texture(handle, asset) };
+		{ t.update_array_texture_layer(handle, asset, offset, layer) };
 		{ t.destroy_texture(handle) };
 	};
 

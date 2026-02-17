@@ -8,5 +8,6 @@ namespace tur::gl
 	{
 		render_target_handle handle;
 		std::vector<texture_handle> colorAttachments;
+		texture_handle depthAttachment;
 	};
 }

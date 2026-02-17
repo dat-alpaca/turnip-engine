@@ -25,7 +25,6 @@ namespace tur
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi);
 		void set_camera(NON_OWNING Camera* camera);
-		void set_clear_color(const ClearColor& color, ClearFlags flags);
 		void render();
 
     public:

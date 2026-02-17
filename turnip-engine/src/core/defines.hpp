@@ -32,6 +32,8 @@
 	#error Unsupported platform
 #endif
 
+#define FIELD_SET_INTERNALLY
+
 #define STRINGIFY(string) #string
 #define REMOVE_PREFIX(string, amount) std::string_view(STRINGIFY(string)).substr(amount)
 

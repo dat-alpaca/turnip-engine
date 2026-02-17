@@ -9,6 +9,38 @@
             }
         }
     ],
+    "fonts": [
+        {
+            "height": 128,
+            "isSDF": false,
+            "metadata": {
+                "filepath": "fonts/dogica/dogica.ttf",
+                "type": 4,
+                "uuid": 232924622933348284,
+                "lifetime": 1
+            },
+            "options": {
+                "arrayLayers": 0,
+                "dataFormat": 3,
+                "depth": 1,
+                "floatTexture": false,
+                "format": 3,
+                "generateMipmaps": false,
+                "isTextureArray": true,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": 3,
+                "wrapS": 3,
+                "wrapT": 3
+            }
+        }
+    ],
     "meshes": [
         {
             "metadata": {
@@ -84,6 +116,7 @@
         },
         {
             "channels": 4,
+            "width": 160,
             "height": 32,
             "metadata": {
                 "filepath": "textures/face_sheet.png",
@@ -110,8 +143,7 @@
                 "wrapR": 3,
                 "wrapS": 3,
                 "wrapT": 3
-            },
-            "width": 160
+            }
         }
     ],
     "cubemaps": [
