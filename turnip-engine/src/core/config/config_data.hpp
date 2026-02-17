@@ -8,7 +8,6 @@
 #include "application_config.hpp"
 #include "engine_config.hpp"
 #include "physics_config.hpp"
-#include "scripting_data.hpp"
 #include "vulkan_config.hpp"
 #include "window_config.hpp"
 #include "worker_config.hpp"
@@ -23,13 +22,12 @@ namespace tur
 		ApplicationSpecification applicationSpecs;
 		WindowProperties windowProperties;
 		WindowingCapabilities windowingCapabilities;
-		ScriptingInfo scriptingInfo;
 		vulkan::VulkanConfig vulkanConfig;
 		WorkerConfig workerConfig;
 		PhysicsConfig physicsConfig;
 
 		NLOHMANN_DEFINE_TYPE_INTRUSIVE(
-			ConfigData, engineSpecs, applicationSpecs, windowProperties, windowingCapabilities, scriptingInfo,
+			ConfigData, engineSpecs, applicationSpecs, windowProperties, windowingCapabilities,
 			vulkanConfig, workerConfig, physicsConfig
 		);
 	};

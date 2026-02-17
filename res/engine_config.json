@@ -17,9 +17,6 @@
         "gravityAcceleration": 9.806699752807617,
         "substepCount": 4
     },
-    "scriptingInfo": {
-        "stubFilepath": "lib"
-    },
     "vulkanConfig": {
         "instanceRequirements": {
             "enableDrawing": true,
