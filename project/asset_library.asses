@@ -11,8 +11,8 @@
     ],
     "fonts": [
         {
-            "height": 128,
-            "isSDF": false,
+            "height": 24,
+            "isSDF": true,
             "metadata": {
                 "filepath": "fonts/dogica/dogica.ttf",
                 "type": 4,

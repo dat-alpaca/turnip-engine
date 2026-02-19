@@ -269,6 +269,7 @@ namespace tur
 		FontAsset& fontAsset = mFontAssets.get(assetHandle);
 		fontAsset.metadata = metadata;
 		fontAsset.options = options;
+		fontAsset.isSDF = loadSDF;
 
 		if(metadata.lifetime == AssetLifetime::SCENE_BOUND)
 			mFontRemoveOnSceneChange.push_back(assetHandle);

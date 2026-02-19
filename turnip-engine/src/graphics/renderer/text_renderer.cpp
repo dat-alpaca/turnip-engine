@@ -60,7 +60,12 @@ namespace tur
 		{
 			commandBuffer.set_viewport(viewport);
 			commandBuffer.set_scissor(scissor);
-			commandBuffer.bind_pipeline(pipeline);
+
+			if(!isRenderingSDF)
+				commandBuffer.bind_pipeline(pipeline);
+			else
+				commandBuffer.bind_pipeline(sdfPipeline);
+			
 			commandBuffer.bind_descriptor_set(mainSet);
 
 			commandBuffer.draw(6 * mCharacterEntries.size(), 1, 0, 0);
@@ -68,6 +73,10 @@ namespace tur
 		commandBuffer.end();
 	}
 
+	void TextRenderer::set_sdf(bool isSDF)
+	{
+		isRenderingSDF = isSDF;
+	}
 	void TextRenderer::set_color(const glm::vec4& color)
 	{
 		mColor = color;
@@ -149,7 +158,7 @@ namespace tur
 			resources.create_shader({"res/shaders/font/font_vert.spv", ShaderType::VERTEX});
 		shader_handle fragmentShader =
 			resources.create_shader({"res/shaders/font/font_frag.spv", ShaderType::FRAGMENT});
-	
+		
 		constexpr auto DynamicStates = std::to_array<DynamicState>({
 			DynamicState::VIEWPORT,
 			DynamicState::SCISSOR
@@ -193,5 +202,13 @@ namespace tur
 		};
 
 		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
+	
+		// SDF Pipeline:
+		shader_handle sdfVertShader = resources.create_shader({"res/shaders/font/font_vert.spv", ShaderType::VERTEX});
+		shader_handle sdfFragShader = resources.create_shader({"res/shaders/font/sdf_text_frag.spv", ShaderType::FRAGMENT});
+
+		pipelineDescriptor.fragmentShader = sdfFragShader;
+		pipelineDescriptor.vertexShader = sdfVertShader;
+		sdfPipeline = resources.create_graphics_pipeline(pipelineDescriptor);
 	}
 }

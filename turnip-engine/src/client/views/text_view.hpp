@@ -110,6 +110,7 @@ namespace tur
 					glm::translate(glm::mat4(1.0f), worldPosition) *
 					glm::scale(glm::mat4(1.0f), transform.worldTransform.scale);
 
+				mTextRenderer.set_sdf(fontAsset.isSDF);
 				mTextRenderer.set_color(text.color);
 				mTextRenderer.set_model(model);
 				mTextRenderer.set_font_texture(text.textureHandle);

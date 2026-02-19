@@ -6,7 +6,7 @@
             "type": "lldb",
             "request": "launch",
             "name": "Launch",
-            "program": "${workspaceFolder}/build/turnip-sandbox/turnip-sandbox",
+            "program": "${workspaceFolder}/build/turnip-vk/turnip-sandbox/turnip-sandbox",
             "args": [],
             "cwd": "${workspaceFolder}",
         }

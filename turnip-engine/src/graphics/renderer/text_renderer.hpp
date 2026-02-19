@@ -40,6 +40,7 @@ namespace tur
 		void render();
 
     public:
+		void set_sdf(bool isSDF);
 		void set_color(const glm::vec4& color);
 		void set_model(const glm::mat4& model);
 		void set_font_texture(texture_handle textureHandle);
@@ -67,8 +68,12 @@ namespace tur
 		descriptor_set_handle mainSet;
 
 		pipeline_handle pipeline;
+		pipeline_handle sdfPipeline;
+
 		buffer_handle worldUBO, ssbo;
 		texture_handle fontAtlasHandle = invalid_handle;
+
+		bool isRenderingSDF = false;
 
 	private:
 		static inline constexpr u32 MaxCharacterAmountSSBO = 1024;
