@@ -31,7 +31,16 @@ namespace tur
 		void on_wake()
 		{
 			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
+			{
+				if(!has_function(script.instance, "on_wake"))
+					continue;
+
 				call_expected_function(script.instance, "on_wake");
+			}
+
+			// this callback is also called on_wake since the view is not ready by the time
+			// the first camera switch event is called.
+			on_camera_switched_event();
 		}
 
 		void on_event(Event& event) override
@@ -52,6 +61,12 @@ namespace tur
 					return false;
 				
 				wake_up();
+				return false;
+			});
+
+			subscriber.subscribe<CameraSwitchedEvent>([this](const CameraSwitchedEvent& event) -> bool {
+				rCamera = event.camera;
+				on_camera_switched_event();
 				return false;
 			});
 		}
@@ -146,6 +161,15 @@ namespace tur
 					componentName
 				);
 			};
+
+			// Camera:
+			instance["get_main_camera"] = [&]() -> CameraComponent
+			{
+				CameraComponent component;
+				component.camera = *rCamera;
+				component.mainCamera = true;
+				return component;
+			};
 		}
 
 	private:
@@ -162,11 +186,26 @@ namespace tur
 				call_expected_function(script.instance, "on_window_resize", width, height);
 			}
 		}
+
+		void on_camera_switched_event()
+		{
+			if(!rScene)
+				return;
+
+			for (auto [entity, script] : rScene->get_registry().view<ScriptComponent>().each())
+			{
+				if(!has_function(script.instance, "on_camera_switched"))
+					continue;
+
+				call_expected_function(script.instance, "on_camera_switched");
+			}
+		}
 		
     public:
 		Scene* get_scene() const { return rScene; }
 
 	private:
+		NON_OWNING Camera* rCamera = nullptr; 
 		NON_OWNING Scene* rScene = nullptr;
 		NON_OWNING ScriptHandler* rScriptHandler = nullptr;
 	};

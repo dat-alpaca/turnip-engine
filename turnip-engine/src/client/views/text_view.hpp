@@ -1,7 +1,9 @@
 #pragma once
+#include "assets/asset.hpp"
 #include "assets/asset_library.hpp"
 #include "assets/font/font_asset.hpp"
 #include "defines.hpp"
+#include "graphics/objects/texture.hpp"
 #include "graphics/renderer/text_renderer.hpp"
 #include "memory/memory.hpp"
 #include "utils/transform.hpp"
@@ -14,6 +16,7 @@
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "utils/time/time.hpp"
+#include <unordered_set>
 
 namespace tur
 {
@@ -74,7 +77,17 @@ namespace tur
                 if(text.assetHandle == invalid_handle)
                     continue;
 
-                const FontAsset& fontAsset = rLibrary->get_font_asset(text.assetHandle);
+				// TODO: discover if the texture asset has been removed.
+				if(mFontCache.find(text.assetHandle) == mFontCache.end())
+				{
+					auto asset = rLibrary->get_font_asset(text.assetHandle);
+					if(asset.state != AssetState::READY)
+						continue;
+
+					mFontCache[text.assetHandle] = asset;
+				}
+
+                FontAsset fontAsset = mFontCache[text.assetHandle];
                 const auto& worldPosition = transform.worldTransform.position;
 
 				std::vector<CharacterEntry> flattenedMap;
@@ -133,6 +146,8 @@ namespace tur
 	private:
         NON_OWNING AssetLibrary* rLibrary = nullptr;
 		NON_OWNING Scene* rScene = nullptr; 
+		
+		std::unordered_map<texture_handle, FontAsset> mFontCache;
 		TextRenderer mTextRenderer;
 	};
 }

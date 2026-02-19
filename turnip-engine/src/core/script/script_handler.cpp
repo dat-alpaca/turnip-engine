@@ -355,23 +355,18 @@ namespace tur
 		// camera:
 		{
 			sol::usertype<CameraComponent> cameraType = mLua.new_usertype<CameraComponent>("camera");
-			cameraType["get_world_position"] = [&](CameraComponent& component, const glm::vec3& position) 
+			cameraType["get_world_position"] = [&](CameraComponent& component, const glm::vec3& position) -> glm::vec3
 			{
-				if(component.camera.is_orthographic())
-				{
-					auto& camera = component.camera;
-					glm::vec2 dimensions = rWindow->get_dimensions();
-					glm::vec2 inverseDimensions = glm::vec2(1.0f / dimensions.x, 1.0f / dimensions.y);
+				auto& camera = component.camera;
+				glm::vec2 dimensions = rWindow->get_dimensions();
+				glm::vec2 inverseDimensions = glm::vec2(1.0f / dimensions.x, 1.0f / dimensions.y);
 
-					float x = 2.0f * position.x * inverseDimensions.x - 1.0f;
-					float y = 2.0f * position.y * inverseDimensions.y - 1.0f;
+				float x = 2.0f * position.x * inverseDimensions.x - 1.0f;
+				float y = 2.0f * position.y * inverseDimensions.y - 1.0f;
 
-					glm::mat4 inverted = glm::inverse(camera.projection() * camera.view());
-					glm::vec4 worldPosition = inverted * glm::vec4(x, y, 0.0, 1.0f);
-					return glm::vec2(worldPosition);
-				}
-
-				return glm::vec2(0.0f);
+				glm::mat4 inverted = glm::inverse(camera.projection() * camera.view());
+				glm::vec4 worldPosition = inverted * glm::vec4(x, y, 0.0, 1.0f);
+				return glm::vec3(worldPosition.x, worldPosition.y, position.z);
 			};
 			cameraType["get_position"] = [&](CameraComponent& component) 
 			{
