@@ -29,7 +29,6 @@ end
 
 function player:on_update(time)
     local mouse_pos = Input.get_mouse_position()
-    do return end
 
     if Input.get_mouse_pressed(Input.MouseButton.MOUSE_LEFT) then
         local world_position = camera:get_world_position(vec3(mouse_pos.x, mouse_pos.y, 1))
@@ -40,7 +39,7 @@ function player:on_update(time)
         self.body2d_c:set_linear_velocity(zero)
     end
 
-    if Input.get_mouse_pressed(Input.MouseButton.MOUSE_RIGHT) then
+    if Input.get_key_pressed(Input.Key.H) then
         self.audio_c:play()
     end
 
