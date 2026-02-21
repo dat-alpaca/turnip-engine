@@ -35,6 +35,7 @@ target_link_libraries(turnip-core PUBLIC
     box2dinclude
     tinygltf
     freetype
+    yaml-cpp::yaml-cpp
 )
 
 # Platform & Graphics specific:

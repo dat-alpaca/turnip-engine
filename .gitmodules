@@ -56,3 +56,6 @@
 [submodule "extern/freetype"]
 	path = extern/freetype
 	url = https://github.com/freetype/freetype
+[submodule "extern/yaml-cpp"]
+	path = extern/yaml-cpp
+	url = https://github.com/jbeder/yaml-cpp

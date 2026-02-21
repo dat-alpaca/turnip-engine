@@ -29,6 +29,7 @@ add_subdirectory(extern/SPIRV-Cross)
 add_subdirectory(extern/miniaudio)
 add_subdirectory(extern/tinygltf)
 add_subdirectory(extern/freetype)
+add_subdirectory(extern/yaml-cpp)
 add_compile_definitions(MA_NO_PULSEAUDIO)
 
 add_library(box2dinclude INTERFACE)
