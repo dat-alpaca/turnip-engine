@@ -1,0 +1,62 @@
+[applicationSpecs]
+applicationName = "Default Application"
+major = 1
+minor = 0
+patch = 0
+variant = 0
+
+[engineSpecs]
+major = 1
+minor = 1
+patch = 0
+variant = 0
+
+[physicsConfig]
+fixedTimeStep = 0.0166666666667
+gravityAcceleration = 9.806699752807617
+substepCount = 4
+
+[vulkanConfig.instanceRequirements]
+enableDrawing = true
+enableValidationLayers = false
+extensions = [ ]
+layers = [ ]
+
+[vulkanConfig.logicalDeviceRequirements]
+customQueueRequirements = false
+requiredQueueOperations = [ "graphics", "present" ]
+extensions = [ ]
+
+[vulkanConfig.physicalDeviceRequirements]
+extensions = [ "VK_KHR_dynamic_rendering", "VK_KHR_synchronization2" ]
+preferDiscrete = true
+
+[windowProperties]
+startsMaximized = false
+title = "TurnipEngine v1.1"
+
+  [windowProperties.dimensions]
+  x = 640
+  y = 480
+
+  [windowProperties.maxSize]
+  x = 640
+  y = 480
+
+  [windowProperties.minSize]
+  x = 0
+  y = 0
+
+  [windowProperties.position]
+  x = "default"
+  y = "default"
+
+[windowingCapabilities]
+api = "OPENGL"
+major = 1
+minor = 3
+patch = 0
+variant = 0
+
+[workerConfig]
+threadAmount = 8

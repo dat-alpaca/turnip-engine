@@ -24,7 +24,6 @@ target_link_libraries(turnip-core PUBLIC
     # imguizmo::imguizmo
     glm::glm-header-only
     EnTT::EnTT
-    nlohmann_json::nlohmann_json
     spdlog::spdlog
     lua::lua
     sol2::sol2

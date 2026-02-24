@@ -504,19 +504,19 @@
         4,
         0,
         {
-            "filepath": "player.lua"
+            "filepath": "scripts/player.lua"
         },
         4,
         {
-            "filepath": "camera.lua"
+            "filepath": "scripts/camera.lua"
         },
         6,
         {
-            "filepath": "m9.lua"
+            "filepath": "scripts/m9.lua"
         },
         8,
         {
-            "filepath": "controller.lua"
+            "filepath": "scripts/controller.lua"
         }
     ]
 ]

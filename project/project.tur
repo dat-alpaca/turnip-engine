@@ -1,7 +1,2 @@
-{
-    "name": "project",
-    "scenes": [
-        "main_scene.scene",
-        "another_scene.scene"
-    ]
-}
+name = "project"
+scenes = [ "main_scene.scene", "another_scene.scene" ]

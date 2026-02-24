@@ -6,7 +6,6 @@
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 
-#include "nlohmann/json_fwd.hpp"
 #include "utils/json/json_file.hpp"
 #include <filesystem>
 

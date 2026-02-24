@@ -1,0 +1,7 @@
+{
+  "files.associations": {
+    "*.tur": "toml",
+    "*.scene": "toml",
+    "*.asses": "toml"
+  }
+}

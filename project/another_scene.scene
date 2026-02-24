@@ -428,11 +428,11 @@
         2,
         4,
         {
-            "filepath": "camera.lua"
+            "filepath": "scripts/camera.lua"
         },
         6,
         {
-            "filepath": "m9.lua"
+            "filepath": "scripts/m9.lua"
         }
     ]
 ]

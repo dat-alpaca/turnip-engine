@@ -1,191 +1,175 @@
-{
-    "audios": [
-        {
-            "metadata": {
-                "filepath": "audio/sound.wav",
-                "type": 3,
-                "uuid": 162924625927748484,
-                "lifetime": 0
-            }
-        }
-    ],
-    "fonts": [
-        {
-            "height": 24,
-            "isSDF": true,
-            "metadata": {
-                "filepath": "fonts/dogica/dogica.ttf",
-                "type": 4,
-                "uuid": 232924622933348284,
-                "lifetime": 1
-            },
-            "options": {
-                "arrayLayers": 0,
-                "dataFormat": 3,
-                "depth": 1,
-                "floatTexture": false,
-                "format": 3,
-                "generateMipmaps": false,
-                "isTextureArray": true,
-                "layerHeight": 0,
-                "layerWidth": 0,
-                "magFilter": 0,
-                "minFilter": 0,
-                "mipLevels": 1,
-                "samples": 1,
-                "tiling": 0,
-                "type": 0,
-                "wrapR": 3,
-                "wrapS": 3,
-                "wrapT": 3
-            }
-        }
-    ],
-    "meshes": [
-        {
-            "metadata": {
-                "filepath": "models/beretta_m9/beretta.gltf",
-                "type": 4,
-                "uuid": 482924622923348484,
-                "lifetime": 1
-            }
-        }
-    ],
-    "textures": [
-        {
-            "channels": 4,
-            "height": 144,
-            "metadata": {
-                "filepath": "textures/face.png",
-                "type": 1,
-                "uuid": 444101566143258990,
-                "lifetime": 0
-            },
-            "options": {
-                "arrayLayers": 1,
-                "dataFormat": 3,
-                "depth": 1,
-                "floatTexture": false,
-                "format": 3,
-                "generateMipmaps": false,
-                "isTextureArray": false,
-                "layerHeight": 0,
-                "layerWidth": 0,
-                "magFilter": 0,
-                "minFilter": 0,
-                "mipLevels": 1,
-                "samples": 1,
-                "tiling": 0,
-                "type": 0,
-                "wrapR": 3,
-                "wrapS": 3,
-                "wrapT": 3
-            },
-            "width": 144
-        },
-        {
-            "channels": 4,
-            "height": 16,
-            "metadata": {
-                "filepath": "textures/floor0.png",
-                "type": 1,
-                "uuid": 444101512133258990,
-                "lifetime": 0
-            },
-            "options": {
-                "arrayLayers": 1,
-                "dataFormat": 3,
-                "depth": 1,
-                "floatTexture": false,
-                "format": 3,
-                "generateMipmaps": false,
-                "isTextureArray": false,
-                "layerHeight": 0,
-                "layerWidth": 0,
-                "magFilter": 0,
-                "minFilter": 0,
-                "mipLevels": 1,
-                "samples": 1,
-                "tiling": 0,
-                "type": 0,
-                "wrapR": 3,
-                "wrapS": 3,
-                "wrapT": 3
-            },
-            "width": 16
-        },
-        {
-            "channels": 4,
-            "width": 160,
-            "height": 32,
-            "metadata": {
-                "filepath": "textures/face_sheet.png",
-                "type": 1,
-                "uuid": 3047054274889524964,
-                "lifetime": 0
-            },
-            "options": {
-                "arrayLayers": 5,
-                "dataFormat": 3,
-                "depth": 1,
-                "floatTexture": false,
-                "format": 3,
-                "generateMipmaps": false,
-                "isTextureArray": true,
-                "layerHeight": 32,
-                "layerWidth": 32,
-                "magFilter": 0,
-                "minFilter": 0,
-                "mipLevels": 1,
-                "samples": 1,
-                "tiling": 0,
-                "type": 0,
-                "wrapR": 3,
-                "wrapS": 3,
-                "wrapT": 3
-            }
-        }
-    ],
-    "cubemaps": [
+[[audios]]
+[audios.metadata]
+filepath = "audio/sound.wav"
+type = 3
+uuid = 162_924_625_927_748_480
+lifetime = 0
 
-        {
-            "channels": 3,
-            "filepaths": [
-                "cubemaps/yokohama/posx.jpg",
-                "cubemaps/yokohama/negx.jpg",
-                "cubemaps/yokohama/negy.jpg",
-                "cubemaps/yokohama/posy.jpg",
-                "cubemaps/yokohama/posz.jpg",
-                "cubemaps/yokohama/negz.jpg"
-            ],
-            "metadata": {
-                "filepath": "cubemaps/posx.jpg",
-                "type": 3,
-                "uuid": 1147054274889511900,
-                "lifetime": 0
-            },
-            "options": {
-                "arrayLayers": 6,
-                "dataFormat": 3,
-                "depth": 1,
-                "floatTexture": false,
-                "format": 3,
-                "generateMipmaps": false,
-                "isTextureArray": false,
-                "layerHeight": 0,
-                "layerWidth": 0,
-                "magFilter": 0,
-                "minFilter": 0,
-                "mipLevels": 1,
-                "samples": 1,
-                "tiling": 0,
-                "type": 0,
-                "wrapR": 3,
-                "wrapS": 3,
-                "wrapT": 3
-            },
-            "width": 2048,
-            "height": 2048
-        }
-    ]
-}
+[[fonts]]
+height = 24
+isSDF = true
+
+  [fonts.metadata]
+  filepath = "fonts/dogica/dogica.ttf"
+  type = 4
+  uuid = 232_924_622_933_348_300
+  lifetime = 1
+
+  [fonts.options]
+  arrayLayers = 0
+  dataFormat = 3
+  depth = 1
+  floatTexture = false
+  format = 3
+  generateMipmaps = false
+  isTextureArray = true
+  layerHeight = 0
+  layerWidth = 0
+  magFilter = 0
+  minFilter = 0
+  mipLevels = 1
+  samples = 1
+  tiling = 0
+  type = 0
+  wrapR = 3
+  wrapS = 3
+  wrapT = 3
+
+[[meshes]]
+[meshes.metadata]
+filepath = "models/beretta_m9/beretta.gltf"
+type = 4
+uuid = 482_924_622_923_348_500
+lifetime = 1
+
+[[textures]]
+channels = 4
+height = 144
+width = 144
+
+  [textures.metadata]
+  filepath = "textures/face.png"
+  type = 1
+  uuid = 444_101_566_143_259_000
+  lifetime = 0
+
+  [textures.options]
+  arrayLayers = 1
+  dataFormat = 3
+  depth = 1
+  floatTexture = false
+  format = 3
+  generateMipmaps = false
+  isTextureArray = false
+  layerHeight = 0
+  layerWidth = 0
+  magFilter = 0
+  minFilter = 0
+  mipLevels = 1
+  samples = 1
+  tiling = 0
+  type = 0
+  wrapR = 3
+  wrapS = 3
+  wrapT = 3
+
+[[textures]]
+channels = 4
+height = 16
+width = 16
+
+  [textures.metadata]
+  filepath = "textures/floor0.png"
+  type = 1
+  uuid = 444_101_512_133_259_000
+  lifetime = 0
+
+  [textures.options]
+  arrayLayers = 1
+  dataFormat = 3
+  depth = 1
+  floatTexture = false
+  format = 3
+  generateMipmaps = false
+  isTextureArray = false
+  layerHeight = 0
+  layerWidth = 0
+  magFilter = 0
+  minFilter = 0
+  mipLevels = 1
+  samples = 1
+  tiling = 0
+  type = 0
+  wrapR = 3
+  wrapS = 3
+  wrapT = 3
+
+[[textures]]
+channels = 4
+width = 160
+height = 32
+
+  [textures.metadata]
+  filepath = "textures/face_sheet.png"
+  type = 1
+  uuid = 3_047_054_274_889_524_700
+  lifetime = 0
+
+  [textures.options]
+  arrayLayers = 5
+  dataFormat = 3
+  depth = 1
+  floatTexture = false
+  format = 3
+  generateMipmaps = false
+  isTextureArray = true
+  layerHeight = 32
+  layerWidth = 32
+  magFilter = 0
+  minFilter = 0
+  mipLevels = 1
+  samples = 1
+  tiling = 0
+  type = 0
+  wrapR = 3
+  wrapS = 3
+  wrapT = 3
+
+[[cubemaps]]
+channels = 3
+filepaths = [
+  "cubemaps/yokohama/posx.jpg",
+  "cubemaps/yokohama/negx.jpg",
+  "cubemaps/yokohama/negy.jpg",
+  "cubemaps/yokohama/posy.jpg",
+  "cubemaps/yokohama/posz.jpg",
+  "cubemaps/yokohama/negz.jpg"
+]
+width = 2_048
+height = 2_048
+
+  [cubemaps.metadata]
+  filepath = "cubemaps/posx.jpg"
+  type = 3
+  uuid = 1_147_054_274_889_512_000
+  lifetime = 0
+
+  [cubemaps.options]
+  arrayLayers = 6
+  dataFormat = 3
+  depth = 1
+  floatTexture = false
+  format = 3
+  generateMipmaps = false
+  isTextureArray = false
+  layerHeight = 0
+  layerWidth = 0
+  magFilter = 0
+  minFilter = 0
+  mipLevels = 1
+  samples = 1
+  tiling = 0
+  type = 0
+  wrapR = 3
+  wrapS = 3
+  wrapT = 3
