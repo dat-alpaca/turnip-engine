@@ -17,10 +17,10 @@ option(TUR_USE_OPENGL "Uses the OpenGL backend" OFF)
 option(TUR_USE_VULKAN "Uses the Vulkan backend" ON)
 
 # Core Dependencies:
+add_subdirectory(extern/toml++)
 add_subdirectory(extern/lua)
 add_subdirectory(extern/entt)
 add_subdirectory(extern/glm)
-add_subdirectory(extern/json)
 add_subdirectory(extern/pfd)
 add_subdirectory(extern/sol2)
 add_subdirectory(extern/box2d)
@@ -49,6 +49,7 @@ if(${TUR_USE_GLFW})
     add_compile_definitions(GLFW_STATIC)
     add_compile_definitions(GLFW_VULKAN_STATIC)
     add_compile_definitions(TUR_WINDOWING_GLFW)
+    add_compile_definitions(TOML_HEADER_ONLY=0)
 endif()
 
 # Graphics Options:
