@@ -59,6 +59,9 @@ namespace tur
 
 		void on_update(const Time& time) override
 		{
+			if(!rScene)
+				return;
+			
 			auto view = rScene->get_registry().view<Tilemap2DComponent, const CullingComponent>();
 			for (auto [e, tilemap, culling] : view.each())
 			{

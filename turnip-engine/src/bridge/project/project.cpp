@@ -123,9 +123,9 @@ namespace tur
         // Assets:
         std::filesystem::path assetLibraryFilepath = get_project_filepath(std::string("asset_library.asses"));
         if(!std::filesystem::exists(assetLibraryFilepath))
-            assetLibraryObject = {};
-
-        assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
+            assetLibraryObject = nlohmann::json::object();
+        else
+            assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
 
         // Scenes:
         if(projectObject.contains("scenes") && projectObject.at("scenes").is_array())

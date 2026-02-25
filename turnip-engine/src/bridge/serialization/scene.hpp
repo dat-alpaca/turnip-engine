@@ -73,64 +73,61 @@ namespace tur
         std::unordered_map<entt::entity, std::vector<nlohmann::json>> mEntityMap;
     };
 
-    /*
-    TODO:
-    class JSONInputArchive 
+    class JSONInputArchive
     {
     public:
-        JSONInputArchive(const toml::value& object)
+        JSONInputArchive(const nlohmann::json& object)
         {
-            mObject = object;
-        };
+            mEntityList = object["entities"].get<std::vector<entt::entity>>();
+            mEntityCount = static_cast<u32>(mEntityList.size());
 
-    public:
+            const auto& components = object["components"];
+            for (auto& [key, value] : components.items())
+            {
+                entt::entity entity = static_cast<entt::entity>(std::stoul(key));
+                mEntityMap[entity] = value.get<std::vector<nlohmann::json>>();
+            }
+        }
+
         void operator()(std::underlying_type_t<entt::entity>& size)
         {
-            fetch_next_node();
-            
-            int currentSize = mCurrent[0].get<int>();
-            ++mCurrentIndex;
-
-            size = (std::underlying_type_t<entt::entity>)currentSize;
+            size = mEntityCount;
         }
 
         void operator()(entt::entity& entity)
         {
-            entity = entt::entity(mCurrent[mCurrentIndex].get<uint32_t>());
-            ++mCurrentIndex;
+            if (mEntityIndex < mEntityList.size())
+            {
+                entity = mEntityList[mEntityIndex++];
+                mCurrentEntity = entity;
+                mComponentIndex = 0;
+                return;
+            }
+
+            mCurrentEntity = entity;
+            mComponentIndex = 0;
         }
 
         template<typename T>
         void operator()(T& component)
         {
-            nlohmann::json componentData = mCurrent[mCurrentIndex];
-            component = componentData.get<T>();
-            ++mCurrentIndex;
-        }
+            auto& componentArray = mEntityMap[mCurrentEntity];
 
-    public:
-        void fetch_next_node()
-        {
-            ++mObjectIndex;
-
-            if (mObjectIndex >= mObject.size())
-            {
-                TUR_LOG_CRITICAL("Failed to parse json as entt::archive. Calculated index is greater than storage capacity");
+            if (mComponentIndex >= componentArray.size())
                 return;
-            }
 
-            mCurrent = mObject[mObjectIndex];
-            mCurrentIndex = 0;
+            component = componentArray[mComponentIndex++].get<T>();
         }
 
     private:
-        toml::value mObject;
-        toml::value mCurrent;
-
-        int mObjectIndex = -1;
-        int mCurrentIndex = 0;
+        std::vector<entt::entity> mEntityList;
+        std::unordered_map<entt::entity, std::vector<nlohmann::json>> mEntityMap;
+    
+        u32 mEntityCount = 0;
+        u32 mEntityIndex = 0;
+        u32 mComponentIndex = 0;
+        entt::entity mCurrentEntity = entt::null;
     };
-    */
 
     inline void serialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
     {
@@ -157,9 +154,7 @@ namespace tur
 
     inline void deserialize_scene(NON_OWNING Scene* scene, const Project& project, const std::filesystem::path& sceneFilename)
     {
-        return;
-
-        /*TOMLInputArchive archive(read_toml(project.get_project_filepath(sceneFilename)));
+        JSONInputArchive archive(read_json(project.get_project_filepath(sceneFilename)));
         
         entt::snapshot_loader{scene->get_registry()}
             .get<entt::entity>(archive)
@@ -177,6 +172,6 @@ namespace tur
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive)
-            .orphans();*/
+            .orphans();
     }
 }

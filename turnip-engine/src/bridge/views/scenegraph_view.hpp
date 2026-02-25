@@ -22,6 +22,9 @@ namespace tur
 
 		void on_update(const Time&) override
 		{
+			if(!rScene)
+				return;
+
 			auto& registry = rScene->get_registry();
 			auto view = registry.view<TransformComponent, const HierarchyComponent>();
 			view.use<HierarchyComponent>();

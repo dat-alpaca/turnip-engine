@@ -73,6 +73,9 @@ namespace tur
 
 		void on_fixed_update() override
 		{
+			if(!rScene)
+				return;
+
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{
@@ -85,6 +88,9 @@ namespace tur
 
 		void on_update(const Time& time) override
 		{
+			if(!rScene)
+				return;
+
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{
@@ -97,6 +103,9 @@ namespace tur
 
 		void on_post_update(const Time& time) override
 		{
+			if(!rScene)
+				return;
+			
 			auto view = rScene->get_registry().view<ScriptComponent>();
 			for (auto [e, script] : view.each())
 			{

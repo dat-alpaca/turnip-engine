@@ -55,6 +55,9 @@ namespace tur
 
 		void on_update(const Time&) override
 		{
+			if(!rScene)
+				return;
+
 			auto view = rScene->get_registry().view<CubemapComponent>();
 			for (auto [e, cubemap] : view.each())
             {

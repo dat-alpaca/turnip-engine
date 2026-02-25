@@ -17,6 +17,9 @@ namespace tur
     public:
         void on_update(const Time&) override
 		{
+            if(!rCurrentCamera)
+                return;
+
             rCurrentCamera->update_view();
             cull_scene_orthographic();
 		}

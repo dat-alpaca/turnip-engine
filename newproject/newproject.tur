@@ -1,4 +1,6 @@
 {
     "name": "newproject",
-    "scenes": []
+    "scenes": [
+        "scene.json"
+    ]
 }

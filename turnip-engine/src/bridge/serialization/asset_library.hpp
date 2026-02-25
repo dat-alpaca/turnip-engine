@@ -9,7 +9,7 @@ namespace tur
 {
     inline nlohmann::json serialize_asset_library(NON_OWNING AssetLibrary* library)
     {
-        nlohmann::json object;
+        nlohmann::json object = nlohmann::json::object();
 
         object["textures"] = nlohmann::json::array();
         for(const auto& texture : library->get_texture_assets())

@@ -71,6 +71,9 @@ namespace tur
 
 		void on_fixed_update()
 		{
+			if(!rScene)
+				return;
+
 			if (mEnableTransformSync)
 				synchronize_physics_world();
 

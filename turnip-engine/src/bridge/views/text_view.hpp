@@ -68,6 +68,9 @@ namespace tur
 
 		void on_update(const Time& time) override
 		{
+			if(!rScene)
+				return;
+			
 			auto view = rScene->get_registry().view<TextComponent, const CullingComponent, const TransformComponent>();
 			for (auto [e, text, culling, transform] : view.each())
 			{
