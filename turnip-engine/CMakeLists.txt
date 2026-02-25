@@ -34,7 +34,7 @@ target_link_libraries(turnip-core PUBLIC
     box2dinclude
     tinygltf
     freetype
-    tomlplusplus::tomlplusplus
+    nlohmann_json::nlohmann_json
 )
 
 # Platform & Graphics specific:

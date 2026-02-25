@@ -1,7 +1,7 @@
 #pragma once
 #include "event/event.hpp"
 #include "scene/scene.hpp"
-#include "client/project/project.hpp"
+#include "bridge/project/project.hpp"
 
 namespace tur
 {

@@ -1,5 +1,6 @@
 #pragma once
 #include "assets/asset.hpp"
+#include "defines.hpp"
 
 namespace tur
 {
@@ -13,7 +14,7 @@ namespace tur
 		}
 
 	public:
-		asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		UUID uuid;
 	};
 }

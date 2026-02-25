@@ -1,8 +1,6 @@
 #pragma once
-#include <nlohmann/json.hpp>
+#include <json.hpp>
 #include <filesystem>
-#include <vector>
-#include <string>
 
 #include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/font/font_asset.hpp"
@@ -47,6 +45,8 @@ namespace tur
 
     private:
         void read_project();
+        void create_default_project();
+        void create_default_asset_library();
 
     public:
         std::filesystem::path mainFilepath;

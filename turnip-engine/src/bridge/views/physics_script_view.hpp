@@ -1,7 +1,7 @@
 #pragma once
-#include "client/views/physics_view.hpp"
+#include "bridge/views/physics_view.hpp"
 #include "view/view.hpp"
-#include "client/views/script_view.hpp"
+#include "bridge/views/script_view.hpp"
 
 #include "entt/entity/fwd.hpp"
 #include "event/physics_events/contact_event.hpp"

@@ -1,7 +1,7 @@
 #pragma once
+#include "bridge/serialization/config.hpp"
 #include "assets/asset_library.hpp"
 #include "audio/audio_handler.hpp"
-#include "config/config_data.hpp"
 #include "font/font_handler.hpp"
 #include "physics/physics_handler.hpp"
 #include "script/script_handler.hpp"

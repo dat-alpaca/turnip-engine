@@ -1,7 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
-#include "rhi/vulkan/requirements/physical_device.hpp"
+#include "config/vulkan_config.hpp"
 #include "rhi/vulkan/vulkan_state.hpp"
 
 namespace tur::vulkan

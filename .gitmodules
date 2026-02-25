@@ -53,6 +53,6 @@
 [submodule "extern/freetype"]
 	path = extern/freetype
 	url = https://github.com/freetype/freetype
-[submodule "extern/toml++"]
-	path = extern/toml++
-	url = https://github.com/marzer/tomlplusplus
+[submodule "extern/json"]
+	path = extern/json
+	url = https://github.com/nlohmann/json

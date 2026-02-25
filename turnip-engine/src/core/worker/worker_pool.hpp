@@ -1,17 +1,13 @@
 #pragma once
-#include <atomic>
 #include <condition_variable>
 #include <functional>
-#include <future>
-#include <mutex>
-#include <queue>
 #include <thread>
-#include <tuple>
 #include <vector>
+#include <deque>
+#include <mutex>
 
 #include "common.hpp"
 #include "config/worker_config.hpp"
-#include "logging/logging.hpp"
 
 namespace tur
 {

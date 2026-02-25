@@ -1,5 +1,10 @@
 #include "assets/font/font_asset.hpp"
-#include "client/views/text_view.hpp"
+#include "bridge/views/text_view.hpp"
+#include "entt/entity/fwd.hpp"
+#include "graphics/components.hpp"
+#include "scene/common_components.hpp"
+#include "script/script_components.hpp"
+
 #include <turnip_engine.hpp>
 #include <ft2build.h>
 #include <freetype/freetype.h>
@@ -18,7 +23,7 @@ public:
 		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent);
 
-		mProject.initialize("project");
+		mProject.initialize("newproject");
 
 		initialize_resources();
 		initialize_entities();
@@ -27,6 +32,16 @@ public:
 		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
 		WindowFramebufferEvent initialSizeEvent0(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent0);
+
+		Scene scene;
+		auto e = scene.get_registry().create();
+		scene.get_registry().emplace<TransformComponent>(e);
+		scene.get_registry().emplace<Sprite2DComponent>(e);
+		scene.get_registry().emplace<MeshComponent>(e);
+		scene.get_registry().emplace<ScriptComponent>(e);
+		
+		mProject.add_scene(&scene, "scene.json");
+		mProject.save();
 	}
 
 	void on_render() final
@@ -141,6 +156,7 @@ private:
 
 	void initialize_entities()
 	{
+		return;
 		bool isMainSet = false;
 		for(const auto& sceneFilepath : mProject.get_scene_filepaths())
 		{

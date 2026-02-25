@@ -1,12 +1,13 @@
-#include "client/project/project.hpp"
+#include "bridge/project/project.hpp"
 #include "assets/asset_library.hpp"
 #include <filesystem>
 #include <vector>
 
 #include "assets/font/font_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
-#include "client/asset_serialization.hpp"
-#include "client/scene_serialization.hpp"
+#include "bridge/serialization/asset_library.hpp"
+#include "bridge/serialization/scene.hpp"
+
 #include "utils/json/json_file.hpp"
 
 namespace tur
@@ -44,11 +45,11 @@ namespace tur
             projectObject["scenes"].push_back(scene.string());
 
         std::filesystem::path filepath = get_project_filepath(name + Project::ProjectFileExtension);
-        json_write_file(filepath, projectObject);
+        write_json(filepath, projectObject);
 
         // Assets:
         filepath = get_project_filepath("asset_library.asses");
-        json_write_file(filepath, assetLibraryObject);
+        write_json(filepath, assetLibraryObject);
     }
 
     void Project::save_asset_library(NON_OWNING AssetLibrary* library)
@@ -67,27 +68,42 @@ namespace tur
 {
     std::vector<TextureAsset> Project::get_textures() const
     {
-        return assetLibraryObject["textures"];
+        if(assetLibraryObject.contains("textures"))
+            return assetLibraryObject["textures"];
+    
+        return {};
     }
 
     std::vector<AudioAsset> Project::get_audios() const
     {
-        return assetLibraryObject["audios"];
+        if(assetLibraryObject.contains("audios"))
+            return assetLibraryObject["audios"];
+    
+        return {};
     }
 
     std::vector<MeshAsset> Project::get_meshes() const
     {
-        return assetLibraryObject["meshes"];
+        if(assetLibraryObject.contains("meshes"))
+            return assetLibraryObject["meshes"];
+    
+        return {};
     }
 
     std::vector<CubemapAsset> Project::get_cubemaps() const
     {
-        return assetLibraryObject["cubemaps"];
+        if(assetLibraryObject.contains("cubemaps"))
+            return assetLibraryObject["cubemaps"];
+    
+        return {};
     }
 
     std::vector<FontAsset> Project::get_fonts() const
     {
-        return assetLibraryObject["fonts"];
+        if(assetLibraryObject.contains("fonts"))
+            return assetLibraryObject["fonts"];
+    
+        return {};
     }
 }
 
@@ -98,21 +114,21 @@ namespace tur
         std::filesystem::path mainFilepath = get_project_filepath(folderPath.filename().string() + Project::ProjectFileExtension);
 
         if(!std::filesystem::exists(mainFilepath))
-        {
-            json_write_file(mainFilepath, {});
-            return;
-        }
+            return create_default_project();
 
         // Main project:
-        nlohmann::json projectObject = json_parse_file(mainFilepath);
-        name = projectObject["name"];
+        nlohmann::json projectObject = read_json(mainFilepath);
+        name = projectObject.at("name");
 
         // Assets:
         std::filesystem::path assetLibraryFilepath = get_project_filepath(std::string("asset_library.asses"));
+        if(!std::filesystem::exists(assetLibraryFilepath))
+            assetLibraryObject = {};
+
         assetLibraryObject = deserialize_asset_library(assetLibraryFilepath);
 
         // Scenes:
-        if(projectObject.contains("scenes") && projectObject["scenes"].is_array())
+        if(projectObject.contains("scenes") && projectObject.at("scenes").is_array())
         {
             for(const auto& object : projectObject["scenes"])
             {
@@ -120,5 +136,14 @@ namespace tur
                     mSceneFilepaths.push_back(object);
             }
         }
+    }
+
+    void Project::create_default_project()
+    {
+        nlohmann::json project;
+        project["name"] = name;
+        project["scenes"] = nlohmann::json::array();
+
+        write_json(mainFilepath, project);
     }
 }

@@ -1,93 +1,84 @@
 #pragma once
-#include <filesystem>
-#include <nlohmann/json.hpp>
+#include <json.hpp>
+#include <type_traits>
+#include <unordered_map>
 
-#include "graphics/components.hpp"
-#include "project/project.hpp"
-#include "scene/components.hpp"
-#include "scene/scene.hpp"
+#include "defines.hpp"
+#include "components.hpp"
 #include "utils/json/json_file.hpp"
-#include "utils/json/json_common.hpp"
+#include "bridge/project/project.hpp"
 
 namespace tur
 {
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AudioSourceComponent, uuid);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(HierarchyComponent, parent, level);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(UUIDComponent, uuid);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(NameComponent, name);
-    
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Transform, position, rotation, scale);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TransformComponent, transform);
-    
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Sprite2DComponent, uuid);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(CubemapComponent, uuid);
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TileFlags, data);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Tile, position, layer, flags);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(TilemapChunk, chunks);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Tilemap2DComponent, worldData, tilesPerChunk, tilePixelSize, uuid);
-
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(TextComponent, uuid, text, color);
-    
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(Body2DComponent, type, isBullet);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(RectCollider2D, width, height, density, friction, restitution, rollingResistance);
-		
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE_WITH_DEFAULT(ScriptComponent, filepath);
-    
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Camera, position, target);
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(CameraComponent, mainCamera, camera);
-    
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(MeshComponent, uuid);
-    
-    NLOHMANN_MARK_AS_NON_SERIALIZABLE(CullingComponent);
-
-    class JsonOutputArchive
+    class JSONOutputArchive
     {
-    public:
-        JsonOutputArchive()
-        {
-            mObject = nlohmann::json::array();
-        }
-        
     public:
         void operator()(entt::entity entity)
         {
-            mCurrent.push_back(static_cast<u32>(entity));
+            if(mEntityList.size() != mEntityCount)
+            {
+                mEntityList.push_back(entity);
+                return;
+            }
+
+            if(mEntityMap.find(entity) == mEntityMap.end())
+                mEntityMap[entity] = {};
+
+            mEntityMap[entity].push_back({});
+            mCurrentValue = &mEntityMap[entity].back();
         }
 
         void operator()(std::underlying_type_t<entt::entity> size)
         {
-            if (!mCurrent.empty())
-                mObject.push_back(mCurrent);
-        
-            mCurrent = nlohmann::json::array();
-            mCurrent.push_back(size);
+            // Header:
+            if(mEntityCount == invalid_handle)
+            {
+                mEntityCount = size;
+                mEntityList.reserve(size);
+                return;
+            }
         }
 
         template<typename T>
         void operator()(const T& component)
         {
-            nlohmann::json componentObject = component;
-            mCurrent.push_back(componentObject);
+            *mCurrentValue = component;
         }
 
     public:
         void save(const std::filesystem::path& filepath)
         {
-            if (!mCurrent.empty())
-                mObject.push_back(mCurrent);
+            nlohmann::json output;
+            output["entities"] = mEntityList;
 
-            json_write_file(filepath, mObject);
+            nlohmann::json entityList;
+            for(auto& [entity, components] : mEntityMap)
+            {
+                std::string key = std::string(std::to_string(static_cast<u32>(entity)));
+                entityList[key] = nlohmann::json::array();
+
+                for(const auto& component : components)
+                    entityList[key].push_back(component);
+            }
+            output["components"] = entityList;
+
+            write_json(filepath, output);
         }
 
     private:
-        nlohmann::json mObject, mCurrent;
+        u32 mEntityCount = invalid_handle;
+        std::vector<entt::entity> mEntityList;
+
+        nlohmann::json* mCurrentValue = nullptr;
+        std::unordered_map<entt::entity, std::vector<nlohmann::json>> mEntityMap;
     };
 
+    /*
+    TODO:
     class JSONInputArchive 
     {
     public:
-        JSONInputArchive(const nlohmann::json& object)
+        JSONInputArchive(const toml::value& object)
         {
             mObject = object;
         };
@@ -133,16 +124,17 @@ namespace tur
         }
 
     private:
-        nlohmann::json mObject;
-        nlohmann::json mCurrent;
+        toml::value mObject;
+        toml::value mCurrent;
 
         int mObjectIndex = -1;
         int mCurrentIndex = 0;
     };
+    */
 
     inline void serialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)
     {
-        JsonOutputArchive archive;
+        JSONOutputArchive archive;
         entt::snapshot{scene->get_registry()}
             .get<entt::entity>(archive)
             .get<AudioSourceComponent>(archive)
@@ -165,7 +157,9 @@ namespace tur
 
     inline void deserialize_scene(NON_OWNING Scene* scene, const Project& project, const std::filesystem::path& sceneFilename)
     {
-        JSONInputArchive archive(json_parse_file(project.get_project_filepath(sceneFilename)));
+        return;
+
+        /*TOMLInputArchive archive(read_toml(project.get_project_filepath(sceneFilename)));
         
         entt::snapshot_loader{scene->get_registry()}
             .get<entt::entity>(archive)
@@ -183,6 +177,6 @@ namespace tur
             .get<Body2DComponent>(archive)
             .get<RectCollider2D>(archive)
             .get<ScriptComponent>(archive)
-            .orphans();
+            .orphans();*/
     }
 }

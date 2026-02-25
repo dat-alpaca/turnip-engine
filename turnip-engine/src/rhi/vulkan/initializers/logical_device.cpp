@@ -37,7 +37,11 @@ namespace tur::vulkan
 
 		// Extensions:
 		std::vector<const char*> extensions;
-		extensions = logicDeviceReqs.extensions;
+		extensions.reserve(logicDeviceReqs.extensions.size());
+
+		for (const auto& extension : logicDeviceReqs.extensions)
+			extensions.push_back(extension.c_str());
+		
 		{
 			for (const auto& extension : vulkanConfig.physicalDeviceRequirements.extensions)
 				extensions.push_back(extension.c_str());

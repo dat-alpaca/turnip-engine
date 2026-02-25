@@ -60,6 +60,6 @@ namespace tur
 
 	public:
 		Transform transform;
-		Transform worldTransform;
+		FIELD_SET_INTERNALLY Transform worldTransform;
 	};
 }

@@ -82,14 +82,14 @@ namespace tur
 		}
 
 	public:
-		FIELD_SET_INTERNALLY std::vector<TilemapChunk> worldData;
-		FIELD_SET_INTERNALLY u32 tilesPerChunk;
-		FIELD_SET_INTERNALLY u32 tilePixelSize;
+		std::vector<TilemapChunk> worldData;
+		u32 tilesPerChunk;
+		u32 tilePixelSize;
+
+		UUID uuid; // tilemap texture UUID
 
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
-
-		UUID uuid; // texture UUID
 	};
 
 	struct TextComponent
@@ -120,11 +120,12 @@ namespace tur
 		}
 
 	public:
-		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		UUID uuid; // mesh UUID
 
 	public:
 		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;
+
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 
 		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
 		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;

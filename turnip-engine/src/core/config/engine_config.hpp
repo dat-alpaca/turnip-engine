@@ -1,13 +1,13 @@
 #pragma once
 #include "common.hpp"
-#include <nlohmann/json.hpp>
 
 namespace tur
 {
 	struct EngineSpecification
 	{
-		u32 major = TUR_ENGINE_VERSION_MAJOR, minor = TUR_ENGINE_VERSION_MINOR, patch = 0, variant = 0;
-
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(EngineSpecification, major, minor, patch, variant);
+		u32 major = TUR_ENGINE_VERSION_MAJOR;
+		u32 minor = TUR_ENGINE_VERSION_MINOR;
+		u32 patch = 0;
+		u32 variant = 0;
 	};
 }

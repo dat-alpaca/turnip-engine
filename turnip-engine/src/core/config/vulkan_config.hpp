@@ -1,47 +1,36 @@
 #pragma once
-#include <nlohmann/json.hpp>
-#include <string>
-#include <vector>
 #include <vulkan/vulkan.hpp>
-
-#include "rhi/vulkan/requirements/instance.hpp"
-#include "rhi/vulkan/requirements/logical_device.hpp"
-#include "rhi/vulkan/requirements/physical_device.hpp"
 
 namespace tur::vulkan
 {
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(InstanceRequirements, layers, extensions, enableDrawing, enableValidationLayers);
-
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(PhysicalDeviceRequirements, extensions, preferDiscrete);
-
-	// Logical Device:
-	inline void to_json(nlohmann::json& json, const LogicalDeviceRequirements& requirements)
+	struct InstanceRequirements
 	{
-		json["customQueueRequirements"] = requirements.customQueueRequirements;
-		json["requiredQueueOperations"] = nlohmann::json::array();
+		std::vector<std::string> layers, extensions;
 
-		for (const auto& operation : requirements.requiredQueueOperations)
-		{
-			for (const auto& usageString : get_queue_operation_strings(operation))
-				json["requiredQueueOperations"].push_back(usageString);
-		}
-	}
+		bool enableDrawing = true;
+		bool enableValidationLayers = false;
+	};
 
-	inline void from_json(const nlohmann::json& json, LogicalDeviceRequirements& requirements)
+	struct LogicalDeviceRequirements
 	{
-		requirements.customQueueRequirements = json["customQueueRequirements"];
+		bool customQueueRequirements = false;
+		std::vector<std::string> requiredQueueOperations = { "GRAPHICS", "PRESENT" };
+		std::vector<std::string> extensions = {};
+	};
 
-		for (const auto& operation : json["requiredQueueOperations"])
-			requirements.requiredQueueOperations.push_back(get_queue_operation_from_string(operation));
-	}
+	struct PhysicalDeviceRequirements
+	{
+		// Mandatory:
+		std::vector<std::string> extensions = {"VK_KHR_dynamic_rendering", "VK_KHR_synchronization2"};
+
+		// Optional:
+		bool preferDiscrete = true;
+	};
 
 	struct VulkanConfig
 	{
 		InstanceRequirements instanceRequirements;
 		PhysicalDeviceRequirements physicalDeviceRequirements;
 		LogicalDeviceRequirements logicalDeviceRequirements;
-
-		NLOHMANN_DEFINE_TYPE_INTRUSIVE(VulkanConfig, instanceRequirements, physicalDeviceRequirements,
-									   logicalDeviceRequirements);
 	};
 }

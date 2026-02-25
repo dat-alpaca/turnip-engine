@@ -3,10 +3,12 @@
 #include "core/config/config_data.hpp"
 #include "defines.hpp"
 
-#include "client/scene_serialization.hpp"
+#include "bridge/serialization/scene.hpp"
+
 #include "graphics/constants.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/types/queue_operations.hpp"
+#include "logging/logging.hpp"
 
 namespace tur::engine
 {
@@ -76,17 +78,13 @@ namespace tur
 
 		// Config:
 		initialize_config_data(configFilepath);
-		auto configDataResult = json_parse_file<ConfigData>(configFilepath);
+		auto result = parse_json<ConfigData>(configFilepath);
+		if(!result.has_value())
 		{
-			if (!configDataResult.has_value())
-			{
-				TUR_LOG_CRITICAL(
-					"Failed to parse the configuration from the specified filepath: {}", configFilepath.string()
-				);
-				return;
-			}
+			TUR_LOG_ERROR("Failed to read the engine configuration file");
+			return;
 		}
-		mConfigData = configDataResult.value();
+		mConfigData = *result;
 
 		// Event Callback:
 		mMainEventCallback = [&](Event& event) { engine::on_event(event, *this); };
