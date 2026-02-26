@@ -23,7 +23,11 @@ namespace tur
 	void AudioHandler::play(asset_handle assetHandle)
 	{
 		TUR_ASSERT(rAssetLibrary, "AudioHandler not initialized");
-		TUR_ASSERT(assetHandle != invalid_handle, "Invalid asset handle passed to play()");
+		if(assetHandle == invalid_handle)
+		{
+			TUR_LOG_ERROR("Invalid asset handle passed to play()");
+			return;
+		}
 
 		auto& soundAsset = rAssetLibrary->get_audio_asset(assetHandle);
 		if (soundAsset.state != AssetState::READY)

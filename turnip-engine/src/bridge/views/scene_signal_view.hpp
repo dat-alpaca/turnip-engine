@@ -30,17 +30,17 @@ namespace tur
 			subscriber.subscribe<SceneDeserializedEvent>(
 				[&](const SceneDeserializedEvent& deserializedEvent) -> bool
 				{
-                    handle_textures(deserializedEvent.scene, deserializedEvent.project);
-                    handle_audio(deserializedEvent.scene, deserializedEvent.project);
+                    handle_textures(deserializedEvent.scene);
+                    handle_audio(deserializedEvent.scene);
                     handle_script(deserializedEvent.scene, deserializedEvent.project);
-                    handle_meshes(deserializedEvent.scene, deserializedEvent.project);
+                    handle_meshes(deserializedEvent.scene);
                     return false;
 				}
 			);
 		}
 
     private:
-        void handle_textures(NON_OWNING Scene* scene, const Project& project)
+        void handle_textures(NON_OWNING Scene* scene)
         {
             TUR_ASS(rLibrary);
             TUR_ASS(scene);
@@ -82,7 +82,7 @@ namespace tur
             }
         }
 
-        void handle_audio(NON_OWNING Scene* scene, const Project& project)
+        void handle_audio(NON_OWNING Scene* scene)
         {
             TUR_ASS(rLibrary);
             TUR_ASS(scene);
@@ -112,7 +112,7 @@ namespace tur
             }
         }
 
-        void handle_meshes(NON_OWNING Scene* scene, const Project& project)
+        void handle_meshes(NON_OWNING Scene* scene)
         {
             TUR_ASS(rLibrary);
             TUR_ASS(scene);

@@ -6,6 +6,8 @@ namespace tur
 {
 	struct AudioSourceComponent
 	{
+		REGISTER_COMPONENT(audio_source);
+
 	public:
 		AudioSourceComponent() = default;
 		AudioSourceComponent(asset_handle assetHandle)

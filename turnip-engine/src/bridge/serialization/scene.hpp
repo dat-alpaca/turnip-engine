@@ -5,6 +5,7 @@
 
 #include "defines.hpp"
 #include "components.hpp"
+#include "entt/entity/entity.hpp"
 #include "utils/json/json_file.hpp"
 #include "bridge/project/project.hpp"
 
@@ -25,7 +26,8 @@ namespace tur
                 mEntityMap[entity] = {};
 
             mEntityMap[entity].push_back({});
-            mCurrentValue = &mEntityMap[entity].back();
+            mCurrentComponentName = &mEntityMap[entity].back().first;
+            mCurrentValue = &mEntityMap[entity].back().second;
         }
 
         void operator()(std::underlying_type_t<entt::entity> size)
@@ -40,8 +42,10 @@ namespace tur
         }
 
         template<typename T>
+        requires NamedComponent<T>
         void operator()(const T& component)
         {
+            *mCurrentComponentName = T::get_component_name();
             *mCurrentValue = component;
         }
 
@@ -51,17 +55,19 @@ namespace tur
             nlohmann::json output;
             output["entities"] = mEntityList;
 
-            nlohmann::json entityList;
-            for(auto& [entity, components] : mEntityMap)
+            nlohmann::json entityList = nlohmann::json::object();
+            for(auto& [entity, componentPair] : mEntityMap)
             {
-                std::string key = std::string(std::to_string(static_cast<u32>(entity)));
-                entityList[key] = nlohmann::json::array();
+                std::string key = std::to_string(static_cast<u32>(entity));
+                
+                nlohmann::json entityObject = nlohmann::json::object();
+                for(const auto& [componentName, component] : componentPair)
+                    entityObject[componentName] = component;
 
-                for(const auto& component : components)
-                    entityList[key].push_back(component);
+                entityList[key] = entityObject;
             }
-            output["components"] = entityList;
 
+            output["components"] = entityList;
             write_json(filepath, output);
         }
 
@@ -70,7 +76,12 @@ namespace tur
         std::vector<entt::entity> mEntityList;
 
         nlohmann::json* mCurrentValue = nullptr;
-        std::unordered_map<entt::entity, std::vector<nlohmann::json>> mEntityMap;
+        std::string* mCurrentComponentName = nullptr;
+
+        std::unordered_map<
+            entt::entity, 
+            std::vector<std::pair<std::string, nlohmann::json>>
+        > mEntityMap;
     };
 
     class JSONInputArchive
@@ -78,55 +89,47 @@ namespace tur
     public:
         JSONInputArchive(const nlohmann::json& object)
         {
-            mEntityList = object["entities"].get<std::vector<entt::entity>>();
-            mEntityCount = static_cast<u32>(mEntityList.size());
-
-            const auto& components = object["components"];
-            for (auto& [key, value] : components.items())
-            {
-                entt::entity entity = static_cast<entt::entity>(std::stoul(key));
-                mEntityMap[entity] = value.get<std::vector<nlohmann::json>>();
-            }
-        }
-
-        void operator()(std::underlying_type_t<entt::entity>& size)
-        {
-            size = mEntityCount;
+            mEntities = object["entities"].get<std::vector<entt::entity>>();
+            mComponents = object["components"];
         }
 
         void operator()(entt::entity& entity)
         {
-            if (mEntityIndex < mEntityList.size())
-            {
-                entity = mEntityList[mEntityIndex++];
-                mCurrentEntity = entity;
-                mComponentIndex = 0;
-                return;
-            }
+            entity = static_cast<entt::entity>(mEntities[mEntityIndex++]);
 
-            mCurrentEntity = entity;
-            mComponentIndex = 0;
+            std::string key = std::to_string(static_cast<u32>(entity));
+
+            auto it = mComponents.find(key);
+            mCurrentComponents = (it != mComponents.end()) ? &(*it) : nullptr;
+        }
+
+        void operator()(std::underlying_type_t<entt::entity>& size)
+        {
+            size = static_cast<std::underlying_type_t<entt::entity>>(mEntities.size());
+            mEntityIndex = 0;
         }
 
         template<typename T>
+        requires NamedComponent<T>
         void operator()(T& component)
         {
-            auto& componentArray = mEntityMap[mCurrentEntity];
-
-            if (mComponentIndex >= componentArray.size())
+            if(!mCurrentComponents)
                 return;
 
-            component = componentArray[mComponentIndex++].get<T>();
+            auto key = T::get_component_name();
+
+            auto it = mCurrentComponents->find(key);
+            if(it == mCurrentComponents->end())
+                return;
+
+            component = it->template get<T>();
         }
 
     private:
-        std::vector<entt::entity> mEntityList;
-        std::unordered_map<entt::entity, std::vector<nlohmann::json>> mEntityMap;
-    
-        u32 mEntityCount = 0;
+        nlohmann::json* mCurrentComponents = nullptr;
+        std::vector<entt::entity> mEntities;
+        nlohmann::json mComponents;
         u32 mEntityIndex = 0;
-        u32 mComponentIndex = 0;
-        entt::entity mCurrentEntity = entt::null;
     };
 
     inline void serialize_scene(NON_OWNING Scene* scene, const std::filesystem::path& filepath)

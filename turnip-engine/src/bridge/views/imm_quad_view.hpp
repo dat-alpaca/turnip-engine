@@ -82,7 +82,8 @@ namespace tur
 	private:
 		void on_imm_component_added(entt::registry& registry, entt::entity entity)
 		{
-			registry.emplace<CullingComponent>(entity);
+			if(!registry.any_of<CullingComponent>(entity))
+				registry.emplace<CullingComponent>(entity);
 		}
 
 	public:

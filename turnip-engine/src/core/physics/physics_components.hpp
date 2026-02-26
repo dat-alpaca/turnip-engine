@@ -9,6 +9,8 @@ namespace tur
 {
 	struct Body2DComponent
 	{
+		REGISTER_COMPONENT(body2D);
+
 	public:
 		Body2DComponent() = default;
 
@@ -22,6 +24,8 @@ namespace tur
 
 	struct RectCollider2D
 	{
+		REGISTER_COMPONENT(rectCollider2D);
+
 	public:
 		RectCollider2D() = default;
 

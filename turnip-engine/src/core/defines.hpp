@@ -1,7 +1,9 @@
 #pragma once
-#include <cstdint>
-#include <functional>
 #include <glm/glm.hpp>
+#include <string>
+#include <string_view>
+#include <concepts>
+#include <cstdint>
 #include <limits>
 
 #define TUR_PROJECT_NAME "Turnip"
@@ -37,6 +39,20 @@
 #define STRINGIFY(string) #string
 #define REMOVE_PREFIX(string, amount) std::string_view(STRINGIFY(string)).substr(amount)
 
+/* Components */
+#define REGISTER_COMPONENT(componentName) 															\
+	public:																							\
+			constexpr static inline const char* get_component_name() {  return #componentName; }	\
+
+namespace tur
+{
+	template<typename T>
+	concept NamedComponent = requires 
+	{
+		{ T::get_component_name() } -> std::convertible_to<std::string>;
+	};
+}
+
 namespace tur
 {
 	using u8 = std::uint8_t;
@@ -57,6 +73,5 @@ namespace tur
 	using handle_type = u32;
 	constexpr handle_type invalid_handle = std::numeric_limits<handle_type>::max();
 
-	constexpr glm::uvec2 invalid_size =
-		glm::uvec2(std::numeric_limits<handle_type>::max(), std::numeric_limits<handle_type>::max());
+	constexpr glm::uvec2 invalid_size = glm::uvec2(std::numeric_limits<handle_type>::max(), std::numeric_limits<handle_type>::max());
 }

@@ -19,7 +19,6 @@ namespace tur
 		CubemapView(NON_OWNING RenderInterface* rhi)
 		{
 			mCubemapRenderer.initialize(rhi);
-			// mCubemapRenderer.set_clear_color(color::Blue, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 	
 	public:

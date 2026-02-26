@@ -86,8 +86,11 @@ namespace tur
 	private:
 		void on_tilemap_component_added(entt::registry& registry, entt::entity entity)
 		{
-			registry.emplace<CullingComponent>(entity);
-			registry.emplace<TransformComponent>(entity);
+			if(!registry.any_of<CullingComponent>(entity))
+				registry.emplace<CullingComponent>(entity);
+
+			if(!registry.any_of<TransformComponent>(entity))
+				registry.emplace<TransformComponent>(entity);
 		}
 
 	public:

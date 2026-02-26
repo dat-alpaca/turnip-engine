@@ -6,8 +6,11 @@
 
 namespace tur
 {
+	/* Hierarchy */
 	struct HierarchyComponent
 	{
+		REGISTER_COMPONENT(hierarchy);
+
 	public:
 		HierarchyComponent() = default;
 
@@ -18,6 +21,8 @@ namespace tur
 
 	struct UUIDComponent
 	{
+		REGISTER_COMPONENT(uuid);
+
 	public:
 		UUIDComponent() = default;
 		UUIDComponent(UUID uuid)
@@ -32,6 +37,8 @@ namespace tur
 
 	struct NameComponent
 	{
+		REGISTER_COMPONENT(name);
+
 	public:
 		NameComponent() = default;
 		NameComponent(const NameComponent&) = default;
@@ -46,6 +53,8 @@ namespace tur
 
 	struct TransformComponent
 	{
+		REGISTER_COMPONENT(transform);
+
 	public:
 		TransformComponent() = default;
 		TransformComponent(const TransformComponent&) = default;

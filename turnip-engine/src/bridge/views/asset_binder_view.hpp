@@ -76,7 +76,6 @@ namespace tur
 					texture_handle textureHandle = create_texture_from_asset(event.assetHandle, isArray);
 					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
-
 				} break;
 
 				case AssetType::CUBEMAP:
@@ -99,6 +98,11 @@ namespace tur
 					texture_handle textureHandle = create_font_texture_from_asset(event.assetHandle);
 					TextureUploadedEvent uploadEvent(event.assetHandle, textureHandle, event.type);
 					callback(uploadEvent);
+				} break;
+
+				case AssetType::AUDIO:
+				{
+					/* Blank */
 				} break;
 
 				default:

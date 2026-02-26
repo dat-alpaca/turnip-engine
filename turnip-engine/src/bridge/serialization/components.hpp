@@ -103,7 +103,7 @@ namespace tur
 namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tur::ScriptComponent, 
+        ScriptComponent, 
         filepath
     );
 }
@@ -113,7 +113,7 @@ namespace tur
 namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tur::MeshComponent, 
+        MeshComponent, 
         uuid
     );
 }
@@ -123,12 +123,12 @@ namespace tur
 namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tur::Sprite2DComponent, 
+        Sprite2DComponent, 
         uuid
     );
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tur::CubemapComponent, 
+        CubemapComponent, 
         uuid
     );
 }
@@ -138,7 +138,7 @@ namespace tur
 namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
-        tur::TextComponent, 
+        TextComponent, 
         uuid, text, color
     );
 }

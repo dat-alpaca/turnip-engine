@@ -10,6 +10,8 @@ namespace tur
 {
 	struct ScriptComponent
 	{
+		REGISTER_COMPONENT(script);
+
 	public:
 		ScriptComponent(const std::filesystem::path& filepath)
 			: filepath(filepath)

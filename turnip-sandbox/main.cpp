@@ -1,13 +1,15 @@
+#include "assets/audio/audio_asset.hpp"
 #include "assets/font/font_asset.hpp"
+#include "audio/audio_components.hpp"
+#include "bridge/serialization/scene.hpp"
 #include "bridge/views/text_view.hpp"
-#include "entt/entity/fwd.hpp"
 #include "graphics/components.hpp"
 #include "scene/common_components.hpp"
+#include "scene/scene.hpp"
 #include "script/script_components.hpp"
+#include "utils/transform.hpp"
 
 #include <turnip_engine.hpp>
-#include <ft2build.h>
-#include <freetype/freetype.h>
 
 using namespace tur;
 
@@ -23,7 +25,7 @@ public:
 		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent);
 
-		mProject.initialize("newproject");
+		mProject.initialize("project");
 
 		initialize_resources();
 		initialize_entities();
@@ -32,16 +34,6 @@ public:
 		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
 		WindowFramebufferEvent initialSizeEvent0(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent0);
-
-		Scene scene;
-		auto e = scene.get_registry().create();
-		scene.get_registry().emplace<TransformComponent>(e);
-		scene.get_registry().emplace<Sprite2DComponent>(e);
-		scene.get_registry().emplace<MeshComponent>(e);
-		scene.get_registry().emplace<ScriptComponent>(e);
-		
-		mProject.add_scene(&scene, "scene.json");
-		mProject.save();
 	}
 
 	void on_render() final
@@ -156,13 +148,13 @@ private:
 
 	void initialize_entities()
 	{
-		return;
 		bool isMainSet = false;
 		for(const auto& sceneFilepath : mProject.get_scene_filepaths())
 		{
 			scene_handle sceneHandle = mSceneHolder.create_scene();
 			Scene* scene = mSceneHolder.get_scene(sceneHandle);
 			engine->load_scene(sceneFilepath, mProject, scene);
+			scene->reset_entity_count();
 			mSceneHolder.set_current_scene(sceneHandle);
 			return;
 		}

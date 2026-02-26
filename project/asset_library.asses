@@ -1,190 +1,205 @@
 {
-  "audios": [
-    {
-      "metadata": {
-        "filepath": "audio/sound.wav",
-        "type": 3,
-        "uuid": 162924625927748480,
-        "lifetime": 0
-      }
-    }
-  ],
-  "fonts": [
-    {
-      "height": 24,
-      "isSDF": true,
-      "metadata": {
-        "filepath": "fonts/dogica/dogica.ttf",
-        "type": 4,
-        "uuid": 232924622933348300,
-        "lifetime": 1
-      },
-      "options": {
-        "arrayLayers": 0,
-        "dataFormat": 3,
-        "depth": 1,
-        "floatTexture": false,
-        "format": 3,
-        "generateMipmaps": false,
-        "isTextureArray": true,
-        "layerHeight": 0,
-        "layerWidth": 0,
-        "magFilter": 0,
-        "minFilter": 0,
-        "mipLevels": 1,
-        "samples": 1,
-        "tiling": 0,
-        "type": 0,
-        "wrapR": 3,
-        "wrapS": 3,
-        "wrapT": 3
-      }
-    }
-  ],
-  "meshes": [
-    {
-      "metadata": {
-        "filepath": "models/beretta_m9/beretta.gltf",
-        "type": 4,
-        "uuid": 482924622923348500,
-        "lifetime": 1
-      }
-    }
-  ],
-  "textures": [
-    {
-      "channels": 4,
-      "height": 144,
-      "metadata": {
-        "filepath": "textures/face.png",
-        "type": 1,
-        "uuid": 444101566143259000,
-        "lifetime": 0
-      },
-      "options": {
-        "arrayLayers": 1,
-        "dataFormat": 3,
-        "depth": 1,
-        "floatTexture": false,
-        "format": 3,
-        "generateMipmaps": false,
-        "isTextureArray": false,
-        "layerHeight": 0,
-        "layerWidth": 0,
-        "magFilter": 0,
-        "minFilter": 0,
-        "mipLevels": 1,
-        "samples": 1,
-        "tiling": 0,
-        "type": 0,
-        "wrapR": 3,
-        "wrapS": 3,
-        "wrapT": 3
-      },
-      "width": 144
-    },
-    {
-      "channels": 4,
-      "height": 16,
-      "metadata": {
-        "filepath": "textures/floor0.png",
-        "type": 1,
-        "uuid": 444101512133259000,
-        "lifetime": 0
-      },
-      "options": {
-        "arrayLayers": 1,
-        "dataFormat": 3,
-        "depth": 1,
-        "floatTexture": false,
-        "format": 3,
-        "generateMipmaps": false,
-        "isTextureArray": false,
-        "layerHeight": 0,
-        "layerWidth": 0,
-        "magFilter": 0,
-        "minFilter": 0,
-        "mipLevels": 1,
-        "samples": 1,
-        "tiling": 0,
-        "type": 0,
-        "wrapR": 3,
-        "wrapS": 3,
-        "wrapT": 3
-      },
-      "width": 16
-    },
-    {
-      "channels": 4,
-      "width": 160,
-      "height": 32,
-      "metadata": {
-        "filepath": "textures/face_sheet.png",
-        "type": 1,
-        "uuid": 3047054274889524700,
-        "lifetime": 0
-      },
-      "options": {
-        "arrayLayers": 5,
-        "dataFormat": 3,
-        "depth": 1,
-        "floatTexture": false,
-        "format": 3,
-        "generateMipmaps": false,
-        "isTextureArray": true,
-        "layerHeight": 32,
-        "layerWidth": 32,
-        "magFilter": 0,
-        "minFilter": 0,
-        "mipLevels": 1,
-        "samples": 1,
-        "tiling": 0,
-        "type": 0,
-        "wrapR": 3,
-        "wrapS": 3,
-        "wrapT": 3
-      }
-    }
-  ],
-  "cubemaps": [
-    {
-      "channels": 3,
-      "filepaths": [
-        "cubemaps/yokohama/posx.jpg",
-        "cubemaps/yokohama/negx.jpg",
-        "cubemaps/yokohama/negy.jpg",
-        "cubemaps/yokohama/posy.jpg",
-        "cubemaps/yokohama/posz.jpg",
-        "cubemaps/yokohama/negz.jpg"
-      ],
-      "metadata": {
-        "filepath": "cubemaps/posx.jpg",
-        "type": 3,
-        "uuid": 1147054274889512000,
-        "lifetime": 0
-      },
-      "options": {
-        "arrayLayers": 6,
-        "dataFormat": 3,
-        "depth": 1,
-        "floatTexture": false,
-        "format": 3,
-        "generateMipmaps": false,
-        "isTextureArray": false,
-        "layerHeight": 0,
-        "layerWidth": 0,
-        "magFilter": 0,
-        "minFilter": 0,
-        "mipLevels": 1,
-        "samples": 1,
-        "tiling": 0,
-        "type": 0,
-        "wrapR": 3,
-        "wrapS": 3,
-        "wrapT": 3
-      },
-      "width": 2048,
-      "height": 2048
-    }
-  ]
+    "audios": [
+        {
+            "metadata": {
+                "filepath": "audio/sound.wav",
+                "type": "AUDIO",
+                "uuid": 162924625927748480,
+                "lifetime": "APPLICATION"
+            }
+        }
+    ],
+
+    "fonts": [
+        {
+            "metadata": {
+                "filepath": "fonts/dogica/dogica.ttf",
+                "type": "FONT",
+                "uuid": 232924622933348300,
+                "lifetime": "SCENEBOUND"
+            },
+
+            "height": 24,
+            "isSDF": true,
+            
+            "options": {
+                "arrayLayers": 0,
+                "dataFormat": "RGBA",
+                "depth": 1,
+                "floatTexture": false,
+                "format": "RGBAU",
+                "generateMipmaps": false,
+                "isTextureArray": true,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": "OPTIMAL",
+                "type": "TEXTURE2D",
+                "wrapR": "CLAMPTOBORDER",
+                "wrapS": "CLAMPTOBORDER",
+                "wrapT": "CLAMPTOBORDER"
+            }
+        }
+    ],
+
+    "meshes": [
+        {
+            "metadata": {
+                "filepath": "models/beretta_m9/beretta.gltf",
+                "type": "MESH",
+                "uuid": 482924622923348500,
+                "lifetime": "SCENEBOUND"
+            }
+        }
+    ],
+    
+    "textures": [
+        {
+            "metadata": {
+                "filepath": "textures/face.png",
+                "type": "TEXTURE",
+                "uuid": 444101566143259000,
+                "lifetime": "Application"
+            },
+
+            "channels": 4,
+            "width": 144,
+            "height": 144,
+            
+            "options": {
+                "arrayLayers": 1,
+                "dataFormat": "RGBA",
+                "depth": 1,
+                "floatTexture": false,
+                "format": "RGBAU",
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": "OPTIMAL",
+                "type": "TEXTURE2D",
+                "wrapR": "CLAMPTOBORDER",
+                "wrapS": "CLAMPTOBORDER",
+                "wrapT": "CLAMPTOBORDER"
+            }
+        },
+        {
+            "metadata": {
+                "filepath": "textures/floor0.png",
+                "type": "TEXTURE",
+                "uuid": 444101512133259000,
+                "lifetime": "Application"
+            },
+
+            "width": 16,            
+            "height": 16,
+            "channels": 4,
+            
+            "options": {
+                "arrayLayers": 1,
+                "dataFormat": "RGBA",
+                "depth": 1,
+                "floatTexture": false,
+                "format": "RGBAU",
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": "OPTIMAL",
+                "type": "TEXTURE2D",
+                "wrapR": "CLAMPTOBORDER",
+                "wrapS": "CLAMPTOBORDER",
+                "wrapT": "CLAMPTOBORDER"
+            }
+        },
+        {
+            "metadata": {
+                "filepath": "textures/face_sheet.png",
+                "type": "TEXTURE",
+                "uuid": 3047054274889524700,
+                "lifetime": "Application"
+            },
+
+            "width": 160,
+            "height": 32,
+            "channels": 4,
+            
+            "options": {
+                "arrayLayers": 5,
+                "dataFormat": "RGBA",
+                "depth": 1,
+                "floatTexture": false,
+                "format": "RGBAU",
+                "generateMipmaps": false,
+                "isTextureArray": true,
+                "layerHeight": 32,
+                "layerWidth": 32,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": 0,
+                "type": 0,
+                "wrapR": "CLAMPTOBORDER",
+                "wrapS": "CLAMPTOBORDER",
+                "wrapT": "CLAMPTOBORDER"
+            }
+        }
+    ],
+    
+    "cubemaps": [
+        {
+            "metadata": {
+                "filepath": "cubemaps/posx.jpg",
+                "type": "CUBEMAP",
+                "uuid": 1147054274889512000,
+                "lifetime": "Application"
+            },
+
+            "width": 2048,
+            "height": 2048,
+            "channels": 3,
+
+            "filepaths": [
+                "cubemaps/yokohama/posx.jpg",
+                "cubemaps/yokohama/negx.jpg",
+                "cubemaps/yokohama/negy.jpg",
+                "cubemaps/yokohama/posy.jpg",
+                "cubemaps/yokohama/posz.jpg",
+                "cubemaps/yokohama/negz.jpg"
+            ],
+            
+            "options": {
+                "arrayLayers": 6,
+                "dataFormat": "RGBA",
+                "depth": 1,
+                "floatTexture": false,
+                "format": "RGBAU",
+                "generateMipmaps": false,
+                "isTextureArray": false,
+                "layerHeight": 0,
+                "layerWidth": 0,
+                "magFilter": 0,
+                "minFilter": 0,
+                "mipLevels": 1,
+                "samples": 1,
+                "tiling": "OPTIMAL",
+                "type": "TEXTURE2D",
+                "wrapR": "CLAMPTOBORDER",
+                "wrapS": "CLAMPTOBORDER",
+                "wrapT": "CLAMPTOBORDER"
+            }
+        }
+    ]
 }

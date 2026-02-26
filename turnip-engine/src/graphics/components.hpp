@@ -14,6 +14,8 @@ namespace tur
 {
 	struct CameraComponent
 	{
+		REGISTER_COMPONENT(camera);
+
 	public:
 		CameraComponent()
 		{
@@ -32,6 +34,8 @@ namespace tur
 
 	struct CullingComponent
 	{
+		REGISTER_COMPONENT(culling);
+
 	public:
 		CullingComponent() = default;
 		
@@ -41,6 +45,8 @@ namespace tur
 
 	struct Sprite2DComponent
 	{
+		REGISTER_COMPONENT(sprite2D);
+
 	public:
 		Sprite2DComponent() = default;
 		Sprite2DComponent(asset_handle assetHandle)
@@ -57,6 +63,8 @@ namespace tur
 
 	struct CubemapComponent
 	{
+		REGISTER_COMPONENT(cubemap);
+
 	public:
 		CubemapComponent() = default;
 		CubemapComponent(asset_handle assetHandle)
@@ -73,6 +81,8 @@ namespace tur
 
 	struct Tilemap2DComponent
 	{
+		REGISTER_COMPONENT(tilemap2D);
+
 	public:
 		Tilemap2DComponent() = default;
 		Tilemap2DComponent(asset_handle assetHandle, u32 tilePixelSize)
@@ -94,6 +104,8 @@ namespace tur
 
 	struct TextComponent
 	{
+		REGISTER_COMPONENT(text);
+
 	public:
 		TextComponent() = default;
 		TextComponent(asset_handle assetHandle)
@@ -112,6 +124,8 @@ namespace tur
 
 	struct MeshComponent
 	{
+		REGISTER_COMPONENT(mesh);
+
 	public:
 		MeshComponent() = default;
 		MeshComponent(asset_handle assetHandle)
