@@ -2,7 +2,7 @@
     "components": {
         "0": {
             "audio_source": {
-                "uuid": 162924625927748480
+                "audioSourceUUID": 162924625927748480
             },
             "body2D": {
                 "isBullet": false,
@@ -24,14 +24,14 @@
                 "mainCamera": true
             },
             "cubemap": {
-                "uuid": 1147054274889512000
+                "cubemapTextureUUID": 1147054274889512000
             },
             "hierarchy": {
                 "level": 0,
                 "parent": 4294967295
             },
             "mesh": {
-                "uuid": 482924622923348500
+                "meshUUID": 482924622923348500
             },
             "name": {
                 "name": "Example Entity"
@@ -48,9 +48,7 @@
                 "filepath": "scripts/player.lua"
             },
             "sprite2D": {
-                "uuid": {
-                    "uuid": 444101566143259000
-                }
+                "textureUUID": 444101566143259000
             },
             "text": {
                 "color": {
@@ -60,16 +58,12 @@
                     "z": 0.0
                 },
                 "text": "hello",
-                "uuid": {
-                    "uuid": 232924622933348300
-                }
+                "fontUUID": 232924622933348300
             },
             "tilemap2D": {
                 "tilePixelSize": 0,
                 "tilesPerChunk": 0,
-                "uuid": {
-                    "uuid": 3047054274889524700
-                },
+                "tilemapTextureUUID": 3047054274889524700,
                 "worldData": []
             },
             "transform": {
@@ -92,9 +86,7 @@
                 }
             },
             "uuid": {
-                "uuid": {
-                    "uuid": 18318581000007514880
-                }
+                "uuid": 18318581000007514880
             }
         }
     },

@@ -47,7 +47,7 @@ namespace tur
 
 			return mFilepathCache.at(filepath);
 		}
-		inline asset_handle get_asset_handle(UUID uuid)
+		inline asset_handle get_asset_handle(uuid uuid)
 		{
 			if(mUUIDCache.find(uuid) == mUUIDCache.end())
 				return invalid_handle;
@@ -106,7 +106,7 @@ namespace tur
 
 	private:
 		std::unordered_map<std::filesystem::path, asset_handle> mFilepathCache;
-		std::unordered_map<UUID, asset_handle> mUUIDCache;
+		std::unordered_map<uuid, asset_handle> mUUIDCache;
 
 		free_list<TextureAsset> mTextureAssets;
 		free_list<AudioAsset> mAudioAssets;

@@ -4,7 +4,7 @@
             "metadata": {
                 "filepath": "audio/sound.wav",
                 "type": "AUDIO",
-                "uuid": 162924625927748480,
+                "assetUUID": 162924625927748480,
                 "lifetime": "APPLICATION"
             }
         }
@@ -15,7 +15,7 @@
             "metadata": {
                 "filepath": "fonts/dogica/dogica.ttf",
                 "type": "FONT",
-                "uuid": 232924622933348300,
+                "assetUUID": 232924622933348300,
                 "lifetime": "SCENEBOUND"
             },
 
@@ -50,7 +50,7 @@
             "metadata": {
                 "filepath": "models/beretta_m9/beretta.gltf",
                 "type": "MESH",
-                "uuid": 482924622923348500,
+                "assetUUID": 482924622923348500,
                 "lifetime": "SCENEBOUND"
             }
         }
@@ -61,7 +61,7 @@
             "metadata": {
                 "filepath": "textures/face.png",
                 "type": "TEXTURE",
-                "uuid": 444101566143259000,
+                "assetUUID": 444101566143259000,
                 "lifetime": "Application"
             },
 
@@ -94,7 +94,7 @@
             "metadata": {
                 "filepath": "textures/floor0.png",
                 "type": "TEXTURE",
-                "uuid": 444101512133259000,
+                "assetUUID": 444101512133259000,
                 "lifetime": "Application"
             },
 
@@ -127,7 +127,7 @@
             "metadata": {
                 "filepath": "textures/face_sheet.png",
                 "type": "TEXTURE",
-                "uuid": 3047054274889524700,
+                "assetUUID": 3047054274889524700,
                 "lifetime": "Application"
             },
 
@@ -163,7 +163,7 @@
             "metadata": {
                 "filepath": "cubemaps/posx.jpg",
                 "type": "CUBEMAP",
-                "uuid": 1147054274889512000,
+                "assetUUID": 1147054274889512000,
                 "lifetime": "Application"
             },
 

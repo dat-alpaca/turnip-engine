@@ -245,9 +245,7 @@ namespace tur
 		timeType["get_accumulated_ms"] = &Time::get_accumulated_milliseconds;
 
 		// UUID:
-		sol::usertype<UUID> uuidType = mLua.new_usertype<UUID>("uuid", sol::constructors<UUID(), UUID(u64)>());
-		uuidType["value"] = &UUID::uuid;
-		uuidType["uuid"] = &UUID::uuid;
+		sol::usertype<uuid> uuidType = mLua.new_usertype<uuid>("uuid", sol::constructors<uuid()>());
 
 		// Name:
 		sol::usertype<NameComponent> nameType = mLua.new_usertype<NameComponent>("name");

@@ -9,7 +9,7 @@ namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         AudioSourceComponent, 
-        uuid
+        audioSourceUUID
     );
 }
 
@@ -73,7 +73,7 @@ namespace tur
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         Tilemap2DComponent, 
-        worldData, tilesPerChunk, tilePixelSize, uuid
+        worldData, tilesPerChunk, tilePixelSize, tilemapTextureUUID
     );
 }
 
@@ -114,7 +114,7 @@ namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         MeshComponent, 
-        uuid
+        meshUUID
     );
 }
 
@@ -124,12 +124,12 @@ namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         Sprite2DComponent, 
-        uuid
+        textureUUID
     );
 
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         CubemapComponent, 
-        uuid
+        cubemapTextureUUID
     );
 }
 
@@ -139,6 +139,6 @@ namespace tur
 {
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(
         TextComponent, 
-        uuid, text, color
+        fontUUID, text, color
     );
 }

@@ -151,7 +151,7 @@ namespace tur
 	struct AssetMetadata
 	{
 		std::filesystem::path filepath;
-		UUID uuid;
+		uuid assetUUID;
 		AssetType type;
 		AssetLifetime lifetime = AssetLifetime::APPLICATION;
 	};

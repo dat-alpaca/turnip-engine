@@ -84,7 +84,7 @@ namespace tur
 
 		asset_handle assetHandle = mTextureAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
-		mUUIDCache[metadata.uuid] = assetHandle;
+		mUUIDCache[metadata.assetUUID] = assetHandle;
 
 		if (metadata.lifetime == AssetLifetime::SCENE_BOUND)
 			mTextureRemoveOnSceneChange.push_back(assetHandle);
@@ -152,7 +152,7 @@ namespace tur
 		}
 
 		mFilepathCache[filepath] = assetHandle;
-		mUUIDCache[audioAsset.metadata.uuid] = assetHandle;
+		mUUIDCache[audioAsset.metadata.assetUUID] = assetHandle;
 
 		AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::AUDIO);
 		mEventCallback(assetLoadedEvent);
@@ -172,7 +172,7 @@ namespace tur
 		auto parentPath = filepath.parent_path();
 		asset_handle assetHandle = mMeshAssets.add(loadingAsset);
 		mFilepathCache[filepath] = assetHandle;
-		mUUIDCache[metadata.uuid] = assetHandle;
+		mUUIDCache[metadata.assetUUID] = assetHandle;
 
 		if(metadata.lifetime == AssetLifetime::SCENE_BOUND)
 			mMeshRemoveOnSceneChange.push_back(assetHandle);
@@ -223,7 +223,7 @@ namespace tur
 
 		asset_handle assetHandle = mCubemapAssets.add(loadingAsset);
 		mFilepathCache[asset.metadata.filepath] = assetHandle;
-		mUUIDCache[asset.metadata.uuid] = assetHandle;
+		mUUIDCache[asset.metadata.assetUUID] = assetHandle;
 
 		if (asset.metadata.lifetime == AssetLifetime::SCENE_BOUND)
 			mCubemapRemoveOnSceneChange.push_back(assetHandle);
@@ -275,7 +275,7 @@ namespace tur
 			mFontRemoveOnSceneChange.push_back(assetHandle);
 
 		mFilepathCache[filepath] = assetHandle;
-		mUUIDCache[fontAsset.metadata.uuid] = assetHandle;
+		mUUIDCache[fontAsset.metadata.assetUUID] = assetHandle;
 
 		rWorkerPool->submit<std::optional<FontAsset>>(
 			[fonts, filepath, metadata, options, height, loadSDF]()
@@ -316,7 +316,7 @@ namespace tur
 		TextureAsset asset;
 		{
 			asset.metadata.filepath = "internal/default_texture";
-			asset.metadata.uuid = UUID();
+			asset.metadata.assetUUID = generate_uuid();
 
 			asset.width = DefaultTexture::Width;
 			asset.height = DefaultTexture::Height;

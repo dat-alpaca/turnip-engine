@@ -32,7 +32,7 @@ namespace tur
         { AssetLifetime::SCENE_BOUND, "SCENEBOUND" },
     });
 
-    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AssetMetadata, filepath, type, lifetime);
+    NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(AssetMetadata, filepath, type, lifetime, assetUUID);
     NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(Asset, metadata);
 }
 

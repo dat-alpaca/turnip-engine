@@ -8,7 +8,6 @@
 
 #include "data-structures/free_list.hpp"
 #include "rhi/rhi.hpp"
-#include "utils/uuid/uuid.hpp"
 
 #include <tiny_gltf.h>
 #include <glm/glm.hpp>

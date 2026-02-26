@@ -51,7 +51,7 @@ namespace tur
                 if(sprite.assetHandle != invalid_handle)
                     continue;
 
-                sprite.assetHandle = rLibrary->get_asset_handle(sprite.uuid);
+                sprite.assetHandle = rLibrary->get_asset_handle(sprite.textureUUID);
             }
 
             auto viewTilemap = scene->get_registry().view<Tilemap2DComponent>();
@@ -60,7 +60,7 @@ namespace tur
                 if(tilemap.assetHandle != invalid_handle)
                     continue;
 
-                tilemap.assetHandle = rLibrary->get_asset_handle(tilemap.uuid);
+                tilemap.assetHandle = rLibrary->get_asset_handle(tilemap.tilemapTextureUUID);
             }
 
             auto viewCubemap = scene->get_registry().view<CubemapComponent>();
@@ -69,7 +69,7 @@ namespace tur
                 if(cubemap.assetHandle != invalid_handle)
                     continue;
 
-                cubemap.assetHandle = rLibrary->get_asset_handle(cubemap.uuid);
+                cubemap.assetHandle = rLibrary->get_asset_handle(cubemap.cubemapTextureUUID);
             }
 
             auto viewFont = scene->get_registry().view<TextComponent>();
@@ -78,7 +78,7 @@ namespace tur
                 if(text.assetHandle != invalid_handle)
                     continue;
 
-                text.assetHandle = rLibrary->get_asset_handle(text.uuid);
+                text.assetHandle = rLibrary->get_asset_handle(text.fontUUID);
             }
         }
 
@@ -93,7 +93,7 @@ namespace tur
                 if(audio.assetHandle != invalid_handle)
                     continue;
 
-                audio.assetHandle = rLibrary->get_asset_handle(audio.uuid);
+                audio.assetHandle = rLibrary->get_asset_handle(audio.audioSourceUUID);
             }
         }
 
@@ -123,7 +123,7 @@ namespace tur
                 if(mesh.assetHandle != invalid_handle)
                     continue;
 
-                mesh.assetHandle = rLibrary->get_asset_handle(mesh.uuid);
+                mesh.assetHandle = rLibrary->get_asset_handle(mesh.meshUUID);
             }
         }
 

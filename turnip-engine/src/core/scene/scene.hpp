@@ -18,7 +18,7 @@ namespace tur
 	public:
 		Entity add_entity();
 		Entity add_entity(const std::string& entityName);
-		Entity add_entity(UUID uuid, const std::string& entityName, entt::entity parent = entt::null);
+		Entity add_entity(uuid uuid, const std::string& entityName, entt::entity parent = entt::null);
 
 		void remove_entity(Entity entity);
 

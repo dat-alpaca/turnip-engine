@@ -4,13 +4,7 @@
 #include <sol/sol.hpp>
 #include <json.hpp>
 
-#include "utils/uuid/uuid.hpp"
 #include "core/defines.hpp"
-
-namespace tur 
-{
-	NLOHMANN_DEFINE_TYPE_NON_INTRUSIVE(UUID, uuid);
-}
 
 namespace glm
 {

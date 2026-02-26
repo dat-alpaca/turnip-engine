@@ -17,6 +17,6 @@ namespace tur
 
 	public:
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
-		UUID uuid;
+		uuid audioSourceUUID;
 	};
 }

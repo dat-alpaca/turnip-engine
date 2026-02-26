@@ -10,9 +10,9 @@ namespace tur
 	}
 	Entity Scene::add_entity(const std::string& entityName)
 	{
-		return add_entity({}, entityName);
+		return add_entity(generate_uuid(), entityName);
 	}
-	Entity Scene::add_entity(UUID uuid, const std::string& entityName, entt::entity parent)
+	Entity Scene::add_entity(uuid uuid, const std::string& entityName, entt::entity parent)
 	{
 		Entity entity = {mRegistry.create(), this};
 

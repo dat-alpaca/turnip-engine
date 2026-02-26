@@ -25,14 +25,14 @@ namespace tur
 
 	public:
 		UUIDComponent() = default;
-		UUIDComponent(UUID uuid)
+		UUIDComponent(uuid uuid)
 			: uuid(uuid)
 		{
 		}
 		UUIDComponent(const UUIDComponent&) = default;
 
 	public:
-		UUID uuid;
+		uuid uuid;
 	};
 
 	struct NameComponent

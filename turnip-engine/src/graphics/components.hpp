@@ -58,7 +58,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 		
-		UUID uuid; // texture UUID
+		uuid textureUUID;
 	};
 
 	struct CubemapComponent
@@ -76,7 +76,7 @@ namespace tur
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
 		
-		UUID uuid; // texture UUID
+		uuid cubemapTextureUUID;
 	};
 
 	struct Tilemap2DComponent
@@ -96,7 +96,7 @@ namespace tur
 		u32 tilesPerChunk;
 		u32 tilePixelSize;
 
-		UUID uuid; // tilemap texture UUID
+		uuid tilemapTextureUUID;
 
 		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
 		FIELD_SET_INTERNALLY texture_handle textureHandle = invalid_handle;
@@ -119,7 +119,7 @@ namespace tur
 
 		glm::vec4 color;
 		std::string text;
-		UUID uuid; // font UUID
+		uuid fontUUID;
 	};
 
 	struct MeshComponent
@@ -134,7 +134,7 @@ namespace tur
 		}
 
 	public:
-		UUID uuid; // mesh UUID
+		uuid meshUUID;
 
 	public:
 		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;

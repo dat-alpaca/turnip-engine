@@ -58,7 +58,7 @@ namespace tur
 
 	public:
 		inline bool is_valid() const { return mEntityHandle != entt::null; }
-		inline UUID get_uuid() const { return get_component<UUIDComponent>().uuid; }
+		inline uuid get_uuid() const { return get_component<UUIDComponent>().uuid; }
 		inline std::string name() const { return get_component<NameComponent>().name; }
 
 	public:
