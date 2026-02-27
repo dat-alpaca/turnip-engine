@@ -57,6 +57,11 @@ namespace tur
         { t.draw(vertexCount, instanceCount, firstVertex, firstInstance) };
         { t.draw_indexed(indexCount, instanceCount, firstVertex, firstInstance) };
 	} &&
+
+	requires(T t, u32 group)
+	{
+		{ t.dispatch(group, group, group) };
+	} &&
 	
 	requires(T t)
 	{

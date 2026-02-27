@@ -41,9 +41,6 @@ namespace tur::engine
 		if (!renderInterface.begin_frame())
 			return;
 
-		CommandBuffer commandBuffer = renderInterface.create_command_buffer();
-		commandBuffer.reset(renderInterface.get_current_command_buffer());
-
 		for (const auto& view : viewHandler.get_views())
 			view->on_render();
 

@@ -42,6 +42,9 @@ namespace tur::vulkan
 		void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 
+	public:
+		void dispatch(u32 groupsX, u32 groupsY, u32 groupsZ);
+
 	private:
 		RenderTarget get_render_target();
 		void copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize);

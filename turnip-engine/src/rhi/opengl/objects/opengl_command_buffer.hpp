@@ -45,6 +45,9 @@ namespace tur::gl
 		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 
 	public:
+		void dispatch(u32 groupsX, u32 groupsY, u32 groupsZ);
+
+	public:
 		EmptyCommandBuffer get_buffer() const { return {}; }
 
 	private:
