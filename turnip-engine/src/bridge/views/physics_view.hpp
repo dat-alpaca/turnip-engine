@@ -1,6 +1,7 @@
 #pragma once
 #include <box2d/box2d.h>
 #include "assert/assert.hpp"
+#include "scene/components/common.hpp"
 #include "view/view.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/events.hpp"
@@ -10,7 +11,6 @@
 #include "event/scene_events/scene_switched_event.hpp"
 #include "event/subscriber.hpp"
 #include "memory/memory.hpp"
-#include "physics/physics_components.hpp"
 #include "physics/physics_handler.hpp"
 
 #include "scene/scene.hpp"
@@ -162,6 +162,10 @@ namespace tur
 		void on_body2d_added(entt::registry& registry, entt::entity entity)
 		{
 			auto& body = registry.get<Body2DComponent>(entity);
+
+			if(!registry.any_of<TransformComponent>(entity))
+				registry.emplace<TransformComponent>(entity);
+
 			const auto& transform = registry.get<TransformComponent>(entity).transform;
 			
 			// Create body:
@@ -180,6 +184,9 @@ namespace tur
 
 		void on_rect2d_added(entt::registry& registry, entt::entity entity) 
 		{
+			if(!registry.any_of<Body2DComponent>(entity))
+				registry.emplace<Body2DComponent>(entity);
+
 			const auto& body = registry.get<Body2DComponent>(entity);
 			auto& rectCollider = registry.get<RectCollider2D>(entity);
 

@@ -12,6 +12,7 @@
 #include "bridge/views/tilemap_view.hpp"
 #include "bridge/views/physics_script_view.hpp"
 #include "bridge/views/asset_binder_view.hpp"
+#include "bridge/views/text_view.hpp"
 
 #include "bridge/serialization/asset.hpp"
 #include "bridge/serialization/asset_library.hpp"

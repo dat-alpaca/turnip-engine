@@ -1,12 +1,9 @@
 #pragma once
 #include "view/view.hpp"
 #include "defines.hpp"
-#include "graphics/components.hpp"
-#include "graphics/renderer/mesh_renderer.hpp"
-#include "scene/common_components.hpp"
 #include "scene/components.hpp"
+#include "graphics/renderer/mesh_renderer.hpp"
 #include "scene/scene.hpp"
-#include "utils/color.hpp"
 #include <unordered_map>
 
 namespace tur
@@ -17,7 +14,6 @@ namespace tur
 		MeshView(NON_OWNING RenderInterface* rhi)
 		{
 			mRenderer.initialize(rhi);
-			// mRenderer.set_clear_color(color::Blue, ClearFlags::COLOR | ClearFlags::DEPTH);
 		}
 
 	public:

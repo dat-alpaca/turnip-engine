@@ -1,202 +1,431 @@
 {
-    "components": 
-    {
-        "0": 
-        {
+    "0": {
+        "audio_source": {
+            "audioSourceUUID": 162924625927748480
+        },
+        "transform": {
             "transform": {
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
-            },
-            "uuid": { "uuid": 444101566143259000 },
-            "material": { "uuid": 444101566143258990 },
-            "script": { "filepath": "player.lua" },
-            "rigidbody": { "type": 2 },
-            "collider": {
-                "width": 1.0,
-                "height": 1.0,
-                "density": 1.0,
-                "friction": 1.0,
-                "restitution": 0.0,
-                "rollingResistance": 1.0
-            },
-            "name": "bloky",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
             }
         },
-
-        "1": 
-        {
-            "transform": {
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
-            },
-            "uuid": { "uuid": 2845539293992139141 },
-            "material": { "uuid": 444101566143258990 },
-            "name": "newone",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "uuid": {
+            "uuid": 444101366143259000
         },
-
-        "2": 
-        {
-            "transform": {
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
-            },
-            "uuid": { "uuid": 610547720144147111 },
-            "material": { "uuid": 444101566143259000 },
-            "rigidbody": { "type": 0 },
-            "collider": {
-                "width": 1.0,
-                "height": 1.0,
-                "density": 1.0,
-                "friction": 1.0,
-                "restitution": 0.0,
-                "rollingResistance": 1.0
-            },
-            "name": "floor1",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "sprite2D": {
+            "textureUUID": 444101566143259000
         },
-
-        "3": 
-        {
-            "uuid": { "uuid": 5198800675733440783 },
-            "tilemap": {
-                "uuid": 3047054274889524964,
-                "tilePixelSize": 32,
-                "tilesPerChunk": 0,
-                "worldData": [
-                    {
-                        "chunks": [
-                        { "layer": 0, "position": { "x": 0, "y": 0 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 0, "y": 1 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 0, "y": 2 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 1, "y": 0 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 1, "y": 1 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 1, "y": 2 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 2, "y": 0 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 2, "y": 1 }, "flags": { "data": 21 } },
-                        { "layer": 0, "position": { "x": 2, "y": 2 }, "flags": { "data": 21 } }
-                        ]
-                    }
-                ]
+        "script": {
+            "filepath": "scripts/player.lua"
         },
-        "name": "tiles",
+        "body2D": {
+            "type": "DYNAMIC",
+            "isBullet": false
+        },
+        "rectCollider2D": {
+            "width": 1,
+            "height": 1,
+            "density": 1,
+            "friction": 1,
+            "restitution": 0,
+            "rollingResistance": 1
+        },
+        "name": {
+            "name": "bloky"
+        },
         "hierarchy": {
             "level": 0,
             "parent": 4294967295
         }
-        },
-
-        "4": 
-        {
-            "uuid": { "uuid": 5198800375733440783 },
-            "camera": {
-                "mainCamera": true,
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "target": { "x": 0.0, "y": 0.0, "z": -1.0 }
-            },
-            "script": { "filepath": "camera.lua" },
-            "name": "camera",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
-        },
-
-        "5": 
-        {
+    },
+    "1": {
+        "transform": {
             "transform": {
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
-            },
-            "uuid": { "uuid": 5128800375733440783 },
-            "material": { "uuid": 444101566143259000 },
-            "rigidbody": { "type": 0 },
-            "collider": {
-                "width": 1.0,
-                "height": 1.0,
-                "density": 1.0,
-                "friction": 1.0,
-                "restitution": 0.0,
-                "rollingResistance": 0.0
-            },
-            "name": "floor2",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
             }
         },
-
-        "6": 
-        {
-            "transform": {
-                "position": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 1.0, "y": 1.0, "z": 1.0 }
-            },
-            "uuid": { "uuid": 482924622923348500 },
-            "script": { "filepath": "m9.lua" },
-            "name": "m9",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "uuid": {
+            "uuid": 2845539293992139300
         },
-
-        "7": 
-        {
-            "uuid": { "uuid": 1124800375733440783 },
-            "skybox": { "uuid": 1147054274889511900 },
-            "name": "skybox",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "sprite2D": {
+            "textureUUID": 444101566143259000
         },
-
-        "8": 
-        {
-            "uuid": { "uuid": 3324800375733440783 },
-            "script": { "filepath": "controller.lua" },
-            "name": "scene-controller",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "name": {
+            "name": "newone"
         },
-
-        "9": 
-        {
-            "transform": {
-                "position": { "x": 2.0, "y": 0.0, "z": 0.1 },
-                "rotation": { "x": 0.0, "y": 0.0, "z": 0.0 },
-                "scale": { "x": 0.005, "y": 0.005, "z": 1.0 }
-            },
-            "uuid": { "uuid": 832400372733440783 },
-            "text": {
-                "value": "cool font",
-                "color": { "x": 0.0, "y": 1.0, "z": 0.4, "w": 1.0 },
-                "uuid": 232924622933348300
-            },
-            "name": "text",
-            "hierarchy": {
-                "level": 0,
-                "parent": 4294967295
-            }
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
         }
     },
-
-    "entities": [0,1,2,3,4,5,6,7,8,9]
+    "2": {
+        "transform": {
+            "transform": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
+            }
+        },
+        "uuid": {
+            "uuid": 610547720144147100
+        },
+        "sprite2D": {
+            "textureUUID": 444101566143259000
+        },
+        "body2D": {
+            "type": "STATIC",
+            "isBullet": false
+        },
+        "rectCollider2D": {
+            "width": 1,
+            "height": 1,
+            "density": 1,
+            "friction": 1,
+            "restitution": 0,
+            "rollingResistance": 1
+        },
+        "name": {
+            "name": "floor1"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "3": {
+        "uuid": {
+            "uuid": 5198800675733440000
+        },
+        "tilemap2D": {
+            "tilemapTextureUUID": 3047054274889524700,
+            "tilePixelSize": 32,
+            "tilesPerChunk": 0,
+            "worldData": [
+                {
+                    "chunks": [
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 0,
+                                "y": 0
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 0,
+                                "y": 1
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 0,
+                                "y": 2
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 1,
+                                "y": 0
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 1,
+                                "y": 1
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 1,
+                                "y": 2
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 2,
+                                "y": 0
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 2,
+                                "y": 1
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        },
+                        {
+                            "layer": 0,
+                            "position": {
+                                "x": 2,
+                                "y": 2
+                            },
+                            "flags": {
+                                "data": 21
+                            }
+                        }
+                    ]
+                }
+            ]
+        },
+        "name": {
+            "name": "tiles"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "4": {
+        "uuid": {
+            "uuid": 5198800375733440000
+        },
+        "camera": {
+            "camera": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "target": {
+                    "x": 0,
+                    "y": 0,
+                    "z": -1
+                }
+            },
+            "mainCamera": true
+        },
+        "script": {
+            "filepath": "scripts/camera.lua"
+        },
+        "name": {
+            "name": "camera"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "5": {
+        "transform": {
+            "transform": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
+            }
+        },
+        "uuid": {
+            "uuid": 5128800375733440000
+        },
+        "sprite2D": {
+            "textureUUID": 333101512133259000
+        },
+        "body2D": {
+            "type": "STATIC",
+            "isBullet": false
+        },
+        "rectCollider2D": {
+            "width": 1,
+            "height": 1,
+            "density": 1,
+            "friction": 1,
+            "restitution": 0,
+            "rollingResistance": 0
+        },
+        "name": {
+            "name": "floor2"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "6": {
+        "transform": {
+            "transform": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
+            }
+        },
+        "mesh": {
+            "meshUUID": 482924622923348501
+        },
+        "uuid": {
+            "uuid": 482924622923348501
+        },
+        "script": {
+            "filepath": "scripts/m9.lua"
+        },
+        "name": {
+            "name": "m9"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "7": {
+        "uuid": {
+            "uuid": 1124800375733440800
+        },
+        "cubemap": {
+            "cubemapTextureUUID": 1147054274889512000
+        },
+        "name": {
+            "name": "skybox"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "8": {
+        "uuid": {
+            "uuid": 3324800375733441000
+        },
+        "script": {
+            "filepath": "scripts/controller.lua"
+        },
+        "name": {
+            "name": "scene-controller"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    },
+    "9": {
+        "transform": {
+            "transform": {
+                "position": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "rotation": {
+                    "x": 0,
+                    "y": 0,
+                    "z": 0
+                },
+                "scale": {
+                    "x": 1,
+                    "y": 1,
+                    "z": 1
+                }
+            }
+        },
+        "uuid": {
+            "uuid": 832400372733440800
+        },
+        "text": {
+            "text": "cool font",
+            "color": {
+                "x": 0,
+                "y": 1,
+                "z": 0.4,
+                "w": 1
+            },
+            "fontUUID": 232924622933348300
+        },
+        "name": {
+            "name": "text"
+        },
+        "hierarchy": {
+            "level": 0,
+            "parent": 4294967295
+        }
+    }
 }

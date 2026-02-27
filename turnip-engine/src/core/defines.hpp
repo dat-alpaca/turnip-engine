@@ -1,9 +1,8 @@
 #pragma once
 #include <glm/glm.hpp>
-#include <string>
-#include <string_view>
 #include <concepts>
 #include <cstdint>
+#include <string>
 #include <limits>
 
 #define TUR_PROJECT_NAME "Turnip"

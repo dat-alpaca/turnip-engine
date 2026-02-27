@@ -3,7 +3,6 @@
 #include "memory/memory.hpp"
 #include "view/view.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
-#include "graphics/components.hpp"
 #include "graphics/renderer/imm_quad_renderer.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"

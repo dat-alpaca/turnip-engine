@@ -8,11 +8,9 @@
 #include "memory/memory.hpp"
 #include "utils/transform.hpp"
 #include "view/view.hpp"
-#include "graphics/components.hpp"
 #include "graphics/renderer/tilemap_renderer.hpp"
 
 #include "rhi/rhi.hpp"
-#include "scene/common_components.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "utils/time/time.hpp"

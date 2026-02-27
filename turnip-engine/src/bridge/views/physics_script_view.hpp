@@ -11,7 +11,7 @@
 #include "scene/scene.hpp"
 #include "utils/script_utils.hpp"
 
-#include "script/script_components.hpp"
+#include "scene/components/script.hpp"
 
 namespace tur
 {

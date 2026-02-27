@@ -25,6 +25,11 @@ end
 
 function camera:on_wake()
     self.camera_c = self.find_component("camera")
+    self.camera_c = self.find_component("body2d")
+    self.camera_c = self.find_component("camera")
+    self.camera_c = self.find_component("camera")
+    self.camera_c = self.find_component("camera")
+    self.camera_c = self.find_component("camera")
     self.camera_c:set_position(vec3(0, 0, -1))
     self.camera_c:set_target(vec3(0, 0, -1))
 end
@@ -57,7 +62,7 @@ function camera:get_direction()
     if Input.get_key_pressed(Input.Key.P) then
         Scene.switch(0)
     end
-    if Input.get_key_pressed(Input.Key.L) then
+    if Input.get_key_pressed(Input.Key.M) then
         Scene.switch(1)
     end
 end

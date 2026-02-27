@@ -4,6 +4,7 @@
 #include "event/event.hpp"
 #include "event/window_events/window_framebuffer_event.hpp"
 #include "scene/components.hpp"
+#include "scene/entity.hpp"
 #include "scene/scene.hpp"
 #include "script/script_handler.hpp"
 

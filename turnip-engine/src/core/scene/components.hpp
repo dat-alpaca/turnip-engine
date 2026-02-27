@@ -1,6 +1,6 @@
 #pragma once
-#include "audio/audio_components.hpp"
-#include "common_components.hpp"
-#include "graphics/components.hpp"
-#include "physics/physics_components.hpp"
-#include "script/script_components.hpp"
+#include "components/audio.hpp"
+#include "components/common.hpp"
+#include "components/graphics.hpp"
+#include "components/physics.hpp"
+#include "components/script.hpp"

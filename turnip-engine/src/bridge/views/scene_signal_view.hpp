@@ -3,14 +3,12 @@
 #include "assert/assert.hpp"
 #include "assets/asset_library.hpp"
 #include "assets/cubemap/cubemap_asset.hpp"
-#include "audio/audio_components.hpp"
 #include "defines.hpp"
 
 #include "event/asset_events/scene_deserialization.hpp"
-#include "graphics/components.hpp"
 #include "memory/memory.hpp"
 #include "scene/scene.hpp"
-#include "script/script_components.hpp"
+#include "scene/components.hpp"
 #include <sol/types.hpp>
 
 namespace tur

@@ -4,7 +4,6 @@
 #include <sol/types.hpp>
 
 #include "common.hpp"
-#include "scene/entity.hpp"
 
 namespace tur
 {

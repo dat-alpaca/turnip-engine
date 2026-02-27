@@ -1,9 +1,9 @@
 #pragma once
-#include "box2d/id.h"
-#include "defines.hpp"
-#include "physics_types.hpp"
 #include <box2d/box2d.h>
 #include <glm/glm.hpp>
+
+#include "physics/physics_types.hpp"
+#include "defines.hpp"
 
 namespace tur
 {

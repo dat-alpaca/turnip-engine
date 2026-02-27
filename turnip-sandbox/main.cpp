@@ -1,13 +1,5 @@
-#include "assets/audio/audio_asset.hpp"
-#include "assets/font/font_asset.hpp"
-#include "audio/audio_components.hpp"
-#include "bridge/serialization/scene.hpp"
-#include "bridge/views/text_view.hpp"
-#include "graphics/components.hpp"
-#include "scene/common_components.hpp"
+#include "scene/components.hpp"
 #include "scene/scene.hpp"
-#include "script/script_components.hpp"
-#include "utils/transform.hpp"
 
 #include <turnip_engine.hpp>
 
@@ -155,8 +147,12 @@ private:
 			Scene* scene = mSceneHolder.get_scene(sceneHandle);
 			engine->load_scene(sceneFilepath, mProject, scene);
 			scene->reset_entity_count();
-			mSceneHolder.set_current_scene(sceneHandle);
-			return;
+
+			if(!isMainSet)
+			{
+				mSceneHolder.set_current_scene(sceneHandle);
+				isMainSet = true;
+			}
 		}
 	}
 

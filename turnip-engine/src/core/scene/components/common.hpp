@@ -1,12 +1,13 @@
 #pragma once
 #include "utils/transform.hpp"
 #include "utils/uuid/uuid.hpp"
+#include "graphics/camera.hpp"
+
 #include <entt/entt.hpp>
 #include <string>
 
 namespace tur
 {
-	/* Hierarchy */
 	struct HierarchyComponent
 	{
 		REGISTER_COMPONENT(hierarchy);
@@ -70,5 +71,25 @@ namespace tur
 	public:
 		Transform transform;
 		FIELD_SET_INTERNALLY Transform worldTransform;
+	};
+
+	struct CameraComponent
+	{
+		REGISTER_COMPONENT(camera);
+
+	public:
+		CameraComponent()
+		{
+			camera.position = glm::vec3(0.0f);
+			camera.target = glm::vec3(0.0f, 0.0f, -1.0f);
+		}
+		CameraComponent(const Camera& camera)
+			: camera(camera)
+		{
+		}
+
+	public:
+		bool mainCamera = false;
+		Camera camera;
 	};
 }

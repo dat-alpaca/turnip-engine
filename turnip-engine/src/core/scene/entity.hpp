@@ -2,7 +2,7 @@
 #include <entt/entt.hpp>
 
 #include "common.hpp"
-#include "common_components.hpp"
+#include "components/common.hpp"
 #include "scene.hpp"
 
 namespace tur

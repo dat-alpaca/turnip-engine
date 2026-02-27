@@ -5,9 +5,8 @@
 #include "engine/turnip_engine.hpp"
 #include "entt/entity/fwd.hpp"
 #include "glm/matrix.hpp"
-#include "graphics/components.hpp"
 #include "physics/physics_types.hpp"
-#include "scene/common_components.hpp"
+#include "scene/components.hpp"
 #include "scene/entity.hpp"
 #include "scene/scene.hpp"
 #include "scene/scene_holder.hpp"
@@ -457,7 +456,6 @@ namespace tur
 			body2dType["set_linear_velocity"] = [&](Body2DComponent* component, const glm::vec2& velocity ) {
 				b2Body_SetLinearVelocity(component->bodyID, b2Vec2(velocity.x, velocity.y));
 			};
-			
 
 			// TODO: add body2d methods: apply force/impulse, change mass, change type, etc.
 		}

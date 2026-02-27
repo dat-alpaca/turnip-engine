@@ -19,15 +19,15 @@
                 "lifetime": "SCENEBOUND"
             },
 
-            "height": 24,
-            "isSDF": true,
+            "height": 128,
+            "isSDF": false,
             
             "options": {
                 "arrayLayers": 0,
-                "dataFormat": "RGBA",
+                "dataFormat": "RED",
                 "depth": 1,
                 "floatTexture": false,
-                "format": "RGBAU",
+                "format": "REDINT",
                 "generateMipmaps": false,
                 "isTextureArray": true,
                 "layerHeight": 0,
@@ -50,7 +50,7 @@
             "metadata": {
                 "filepath": "models/beretta_m9/beretta.gltf",
                 "type": "MESH",
-                "assetUUID": 482924622923348500,
+                "assetUUID": 482924622923348501,
                 "lifetime": "SCENEBOUND"
             }
         }
@@ -94,7 +94,7 @@
             "metadata": {
                 "filepath": "textures/floor0.png",
                 "type": "TEXTURE",
-                "assetUUID": 444101512133259000,
+                "assetUUID": 333101512133259000,
                 "lifetime": "Application"
             },
 

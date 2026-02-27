@@ -7,7 +7,6 @@
 #include "defines.hpp"
 #include "event/asset_events/mesh_uploaded_event.hpp"
 #include "event/asset_events/texture_uploaded_event.hpp"
-#include "graphics/components.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/texture.hpp"
 #include "assets/asset.hpp"
