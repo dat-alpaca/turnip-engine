@@ -1,106 +1,91 @@
 {
-    "0": 
-    {
-        "audio_source": 
-        {
-            "audioSourceUUID": 162924625927748480
+  "0": {
+    "audio_source": {
+      "audioSourceUUID": 162924625927748480
+    },
+    "body2D": {
+      "isBullet": false,
+      "type": "STATIC"
+    },
+    "camera": {
+      "camera": {
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
         },
-        "body2D": 
-        {
-            "isBullet": false,
-            "type": "STATIC"
-        },
-        "camera": 
-        {
-            "camera": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "target": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": -1.0
-                }
-            },
-            "mainCamera": true
-        },
-        "cubemap": 
-        {
-            "cubemapTextureUUID": 1147054274889512000
-        },
-        "hierarchy": 
-        {
-            "level": 0,
-            "parent": 4294967295
-        },
-        "mesh": 
-        {
-            "meshUUID": 482924622923348500
-        },
-        "name": 
-        {
-            "name": "Example Entity"
-        },
-        "rectCollider2D": 
-        {
-            "density": 1.0,
-            "friction": 1.0,
-            "height": 1.0,
-            "restitution": 1.0,
-            "rollingResistance": 1.0,
-            "width": 1.0
-        },
-        "script": 
-        {
-            "filepath": "scripts/camera.lua"
-        },
-        "sprite2D": 
-        {
-            "textureUUID": 444101566143259000
-        },
-        "text": 
-        {
-            "color": {
-                "w": 0.0,
-                "x": 0.0,
-                "y": 0.0,
-                "z": 0.0
-            },
-            "text": "hello",
-            "fontUUID": 232924622933348300
-        },
-        "tilemap2D": 
-        {
-            "tilePixelSize": 0,
-            "tilesPerChunk": 0,
-            "tilemapTextureUUID": 3047054274889524700,
-            "worldData": []
-        },
-        "transform": 
-        {
-            "transform": {
-                "position": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "rotation": {
-                    "x": 0.0,
-                    "y": 0.0,
-                    "z": 0.0
-                },
-                "scale": {
-                    "x": 1.0,
-                    "y": 1.0,
-                    "z": 1.0
-                }
-            }
-        },
-        "uuid": 
-        {
-            "uuid": 18318581000007514880
+        "target": {
+          "x": 0,
+          "y": 0,
+          "z": -1
         }
+      },
+      "mainCamera": true
+    },
+    "cubemap": {
+      "cubemapTextureUUID": 1147054274889512000
+    },
+    "hierarchy": {
+      "level": 0,
+      "parent": 4294967295
+    },
+    "mesh": {
+      "meshUUID": 482924622923348500
+    },
+    "name": {
+      "name": "Example Entity"
+    },
+    "rectCollider2D": {
+      "density": 1,
+      "friction": 1,
+      "height": 1,
+      "restitution": 1,
+      "rollingResistance": 1,
+      "width": 1
+    },
+    "script": {
+      "filepath": "scripts/camera.lua"
+    },
+    "sprite2D": {
+      "textureUUID": 444101566143259000
+    },
+    "text": {
+      "color": {
+        "w": 0,
+        "x": 0,
+        "y": 0,
+        "z": 0
+      },
+      "text": "hello",
+      "fontUUID": 232924622933348300
+    },
+    "tilemap2D": {
+      "tilePixelSize": 0,
+      "tilesPerChunk": 0,
+      "tilemapTextureUUID": 3047054274889524700,
+      "worldData": []
+    },
+    "transform": {
+      "transform": {
+        "position": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "rotation": {
+          "x": 0,
+          "y": 0,
+          "z": 0
+        },
+        "scale": {
+          "x": 1,
+          "y": 1,
+          "z": 1
+        }
+      }
+    },
+    "uuid": {
+      "uuid": 18318581000007514000
     }
+  }
 }
