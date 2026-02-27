@@ -245,4 +245,9 @@ namespace tur::gl
 				topology, indexSize, get_buffer_index_type(mBufferIndexType), nullptr, instanceCount
 			);
 	}
+
+	void CommandBufferGL::dispatch(u32 groupsX, u32 groupsY, u32 groupsZ)
+	{
+		glDispatchCompute(groupsX, groupsY, groupsZ);
+	}
 }

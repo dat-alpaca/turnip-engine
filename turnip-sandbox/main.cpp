@@ -32,6 +32,19 @@ public:
 	{
 		auto& rhi = engine->get_render_interface();
 
+		/*
+		CommandBuffer computeCommands = rhi.create_command_buffer();
+
+		computeCommands.begin();
+		computeCommands.begin_renderering();
+
+		computeCommands.dispatch();
+
+		commandBuffer.end_rendering();
+		commandBuffer.blit();
+		commandBuffer.end();
+		*/
+
 		CommandBuffer commandBuffer = rhi.create_command_buffer();
 		commandBuffer.reset(rhi.get_current_command_buffer());
 		commandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);

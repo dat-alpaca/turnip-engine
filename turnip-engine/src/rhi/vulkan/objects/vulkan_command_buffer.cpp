@@ -212,6 +212,11 @@ namespace tur::vulkan
 	{
 		mCommandBuffer.drawIndexed(indexCount, instanceCount, 0, firstVertex, firstInstance);
 	}
+
+	void CommandBufferVulkan::dispatch(u32 groupsX, u32 groupsY, u32 groupsZ)
+	{
+		mCommandBuffer.dispatch(groupsX, groupsY, groupsZ);
+	}
 }
 
 namespace tur::vulkan
