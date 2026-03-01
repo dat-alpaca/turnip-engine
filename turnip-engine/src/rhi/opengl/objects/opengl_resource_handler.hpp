@@ -57,7 +57,9 @@ namespace tur::gl
 
 	public:
 		pipeline_handle create_graphics_pipeline(const PipelineDescriptor& descriptor);
+		pipeline_handle create_compute_pipeline(const ComputePipelineDescriptor& descriptor);
 		void destroy_graphics_pipeline(pipeline_handle pipelineHandle);
+		void destroy_compute_pipeline(pipeline_handle pipelineHandle);
 
 	public:
 		buffer_handle create_buffer(const BufferDescriptor& descriptor, const void* data, Range range);
@@ -76,6 +78,15 @@ namespace tur::gl
 		void destroy_texture(texture_handle textureHandle);
 
 	public:
+        fence_handle create_fence();
+        semaphore_handle create_semaphore();
+		void destroy_fence(fence_handle);
+		void destroy_semaphore(semaphore_handle);
+
+	public:
+		command_buffer_handle create_primary_command_buffer();
+
+	public:
 		free_list<Shader>& get_shaders() { return mShaders; }
 		free_list<Buffer>& get_buffers() { return mBuffers; }
 		free_list<Pipeline>& get_pipelines() { return mPipelines; }
@@ -92,6 +103,7 @@ namespace tur::gl
 		free_list<Shader> mShaders;
 		free_list<Buffer> mBuffers;
 		free_list<Pipeline> mPipelines;
+		free_list<ComputePipeline> mComputePipelines;
 		free_list<Texture> mTextures;
 		free_list<RenderTarget> mRenderTargets;
 		free_list<DescriptorSetLayout> mSetLayouts;

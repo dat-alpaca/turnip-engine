@@ -27,7 +27,7 @@ function controller:on_update()
     local mouse_pos = Input.get_mouse_position()
     local world_pos = self.camera:get_world_position(vec3(mouse_pos.x, mouse_pos.y, 1.0))
 
-    Log.info("world: ( " .. world_pos.x .. " )")
+    -- Log.info("world: ( " .. world_pos.x .. " )")
 end
 
 return controller

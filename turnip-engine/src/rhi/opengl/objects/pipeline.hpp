@@ -1,6 +1,7 @@
 #pragma once
 #include <glad/gl.h>
 
+#include "defines.hpp"
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "rhi/opengl/opengl_common.hpp"
@@ -317,14 +318,18 @@ namespace tur::gl
 	{
 		constexpr u64 BufferSize = 256;
 
-		int success;
-		char infoLog[BufferSize];
-
+		int success = 0;
 		glGetProgramiv(program, GL_LINK_STATUS, &success);
+
 		if (!success)
 		{
-			glGetProgramInfoLog(program, BufferSize, NULL, infoLog);
-			TUR_LOG_ERROR("Failed to link shader program: {}", infoLog);
+			int length = 0;
+			glGetProgramiv(program, GL_INFO_LOG_LENGTH, &length);
+
+			std::string log(length, '\0');
+			glGetProgramInfoLog(program, length, nullptr, log.data());
+
+			TUR_LOG_ERROR("Failed to link shader program: {}", log);
 		}
 	}
 }
@@ -339,7 +344,13 @@ namespace tur::gl
 		DepthDescriptor depthDescriptor;
 		BlendDescriptor blendDescriptor;
 
-		descriptor_set_layout_handle setLayout;
+		descriptor_set_layout_handle setLayout = invalid_handle;
 		gl_handle handle = invalid_handle;
+	};
+
+	struct ComputePipeline
+	{
+		descriptor_set_layout_handle setLayout = invalid_handle;
+		gl_handle handle = invalid_handle;	
 	};
 }

@@ -38,6 +38,8 @@
 #define STRINGIFY(string) #string
 #define REMOVE_PREFIX(string, amount) std::string_view(STRINGIFY(string)).substr(amount)
 
+#define UNUSED
+
 /* Components */
 #define REGISTER_COMPONENT(componentName) 															\
 	public:																							\

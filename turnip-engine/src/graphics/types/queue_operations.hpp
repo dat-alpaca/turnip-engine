@@ -20,9 +20,9 @@ namespace tur
 		return static_cast<u32>(lhs) & static_cast<u32>(rhs);
 	}
 
-	inline u32 operator|(QueueOperation lhs, QueueOperation rhs)
+	inline QueueOperation operator|(QueueOperation lhs, QueueOperation rhs)
 	{
-		return static_cast<u32>(lhs) | static_cast<u32>(rhs);
+		return static_cast<QueueOperation>(static_cast<u32>(lhs) | static_cast<u32>(rhs));
 	}
 
 	inline QueueOperation& operator|=(QueueOperation& lhs, QueueOperation rhs)

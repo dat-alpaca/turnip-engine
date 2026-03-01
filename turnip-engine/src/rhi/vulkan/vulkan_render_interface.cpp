@@ -1,9 +1,12 @@
 #include "vulkan_render_interface.hpp"
+
+#include <optional>
+#include "graphics/objects/sync.hpp"
+
 #include "rhi/vulkan/allocators/allocators.hpp"
 #include "rhi/vulkan/initializers/initializers.hpp"
 #include "rhi/vulkan/objects/texture.hpp"
-
-// TODO: substitute vk::result checks
+#include "rhi/vulkan/objects/vulkan_command_buffer.hpp"
 
 namespace tur::vulkan
 {
@@ -39,7 +42,6 @@ namespace tur::vulkan
 		
 			initialize_swapchain(mState, requirements);
 		}
-		
 
 		// Command Pool:
 		initialize_command_pool(mState);
@@ -50,9 +52,6 @@ namespace tur::vulkan
 			mImmCommandBuffer = allocate_single_primary_command_buffer(mState.logicalDevice, mImmCommandPool);
 			mImmFence = allocate_signaled_fence(mState.logicalDevice);
 		}
-
-		// Frame Data:
-		mFrameDataHolder.initialize(mState.logicalDevice, mState.commandPool, mState.swapchainTextures.size());
 
 		// Main Render Target:
 		create_main_render_target();
@@ -76,8 +75,6 @@ namespace tur::vulkan
 		{
 			mResources.destroy();
 			mDeletionQueue.flush();
-
-			mFrameDataHolder.shutdown(mState.logicalDevice);
 			mState.logicalDevice.destroyCommandPool(mState.commandPool);
 		}
 
@@ -104,10 +101,6 @@ namespace tur::vulkan
 	CommandBuffer RenderInterfaceVulkan::create_command_buffer()
 	{
 		return CommandBuffer(this);
-	}
-	vk::CommandBuffer RenderInterfaceVulkan::get_current_command_buffer()
-	{
-		return mFrameDataHolder.get_current_frame_data().commandBuffer;
 	}
 
 	queue_handle RenderInterfaceVulkan::get_queue(QueueOperation operation)
@@ -153,57 +146,63 @@ namespace tur::vulkan
 		mState.mainRenderTarget = mResources.get_render_targets().get(mState.mainRenderTargetHandle);
 	}
 
-	bool RenderInterfaceVulkan::begin_frame()
+	void RenderInterfaceVulkan::begin_frame(fence_handle inFlightFence, u32 fenceTimeout)
 	{
 		auto& device = mState.logicalDevice;
-		auto& swapchain = mState.swapchain;
+		auto& fence = mResources.get_fences().get(inFlightFence);
 
-		mFrameDataHolder.advance();
-		auto& frameData = mFrameDataHolder.get_current_frame_data();
-
-		vk::Result result = device.waitForFences({frameData.recordingFence}, true, RecordingFenceTimeout);
+		vk::Result result = device.waitForFences({ fence }, true, fenceTimeout);
 		if (result != vk::Result::eSuccess)
 			TUR_LOG_CRITICAL("Failed to wait for fences.");
 
 		mDeletionQueue.flush();
+	}
+	void RenderInterfaceVulkan::reset_fence(fence_handle inFlightFence)
+	{
+		auto& device = mState.logicalDevice;
+		auto& fence = mResources.get_fences().get(inFlightFence);
 
-		// Acquiring swapchain:
+		auto _ = device.resetFences({ fence });
+	}
+
+	std::optional<image_handle> RenderInterfaceVulkan::acquire_swapchain_image(semaphore_handle signalImageReady, u32 imageReadyTimeout)
+	{
+		auto& device = mState.logicalDevice;
+		auto& swapchain = mState.swapchain;
+
+		auto& imageReadySemaphore = mResources.get_semaphores().get(signalImageReady);
+
+		u32 imageIndex = 0;
+		VkResult result = vkAcquireNextImageKHR(device, swapchain, imageReadyTimeout, imageReadySemaphore, nullptr, &imageIndex);
+
+		if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
 		{
-			u32 imageIndex = 0;
-			VkResult result = vkAcquireNextImageKHR(
-				device, swapchain, ImageAvailableTimeout, frameData.imageReadySemaphore, nullptr, &imageIndex
-			);
-			mFrameDataHolder.set_image_buffer_index(imageIndex);
-
-			if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR)
-			{
-				utils::recreate_swapchain(*this);
-				return false;
-			}
-
-			else if (result == VK_SUCCESS || result == VK_NOT_READY || result == VK_TIMEOUT)
-			{
-			}
-
-			else
-				TUR_LOG_CRITICAL("Failed to acquire swapchain image");
+			utils::recreate_swapchain(*this);
+			return std::nullopt;
 		}
 
-		// Reset main command buffer:
-		auto _ = device.resetFences({frameData.recordingFence});
-		auto __ = frameData.commandBuffer.reset();
+		else if (result == VK_SUCCESS || result == VK_NOT_READY || result == VK_TIMEOUT)
+		{
+			/* Blank */
+		}
 
-		return true;
+		else
+			TUR_LOG_CRITICAL("Failed to acquire swapchain image");
+		
+		return imageIndex;
 	}
-	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue)
+
+	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, semaphore_handle waitFor, semaphore_handle signal)
 	{
-		// Submits data from the currently bound framedata object
+		auto& currentCommandBuffer = mResources.get_command_buffers().get(commandBuffer);
+		auto& fence = mResources.get_fences().get(inFlightFence);
+		auto& waitForSemaphore = mResources.get_semaphores().get(waitFor);
+		auto& signalThisSemaphore = mResources.get_semaphores().get(signal);
 
 		vk::Queue queue = mState.queueList.get_queue(graphicsQueue).queue;
-		auto& frameData = mFrameDataHolder.get_current_frame_data();
 
-		vk::Semaphore waitSemaphores[] = {frameData.imageReadySemaphore};
-		vk::Semaphore signalSemaphores[] = {mFrameDataHolder.get_render_finished_semaphore()};
+		vk::Semaphore waitSemaphores[] = { waitForSemaphore };
+		vk::Semaphore signalSemaphores[] = {signalThisSemaphore };
 		vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 		vk::SubmitInfo submitInfo = {};
 		{
@@ -216,24 +215,21 @@ namespace tur::vulkan
 			submitInfo.pSignalSemaphores = signalSemaphores;
 
 			submitInfo.commandBufferCount = 1;
-			submitInfo.pCommandBuffers = &frameData.commandBuffer;
+			submitInfo.pCommandBuffers = &currentCommandBuffer;
 		}
 
-		vk::Result result = queue.submit(submitInfo, frameData.recordingFence);
+		vk::Result result = queue.submit(submitInfo, fence);
 		if (result != vk::Result::eSuccess)
 			TUR_LOG_ERROR("Failed to submit commands to the graphics queue.");
 	}
-	void RenderInterfaceVulkan::present(queue_handle presentQueue)
+	void RenderInterfaceVulkan::present(image_handle imageHandle, queue_handle presentQueue, semaphore_handle waitFor)
 	{
-		// Submits a present command using "presentQueue" and the internal swapchain
+		auto& waitForSemaphore = mResources.get_semaphores().get(waitFor);
 
 		vk::Queue queue = mState.queueList.get_queue(presentQueue).queue;
-		auto& frameHolder = mFrameDataHolder;
-		const auto& frameData = frameHolder.get_current_frame_data();
+		vk::Semaphore waitSemaphores[] = { waitForSemaphore };
 
-		vk::Semaphore waitSemaphores[] = {mFrameDataHolder.get_render_finished_semaphore()};
-
-		u32 imageIndices[] = {frameHolder.get_image_buffer_index()};
+		u32 imageIndices[] = { imageHandle };
 
 		vk::PresentInfoKHR presentInfo = {};
 		{
@@ -340,14 +336,11 @@ namespace tur::vulkan::utils
 			initialize_swapchain(state, requirements);
 		}
 
-		rhi.mFrameDataHolder.initialize(state.logicalDevice, state.commandPool, state.swapchainTextures.size());
 		rhi.create_main_render_target();
 	}
 
-	void transition_texture_layout(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description)
+	void transition_texture_layout(RenderInterfaceVulkan& rhi, CommandBufferVulkan commandBuffer, Texture& texture, const ImageTransitionDescription& description)
 	{
-		auto& commandBuffer = rhi.get_frame_data().get_current_frame_data().commandBuffer;
-
 		if (texture.layout == description.newLayout)
 			return;
 
@@ -393,7 +386,7 @@ namespace tur::vulkan::utils
 
 		vk::DependencyInfo dependencyInfo = vk::DependencyInfo().setImageMemoryBarriers(imageBarrier);
 
-		commandBuffer.pipelineBarrier2(dependencyInfo);
+		commandBuffer.get_buffer().pipelineBarrier2(dependencyInfo);
 		texture.layout = description.newLayout;
 	}
 

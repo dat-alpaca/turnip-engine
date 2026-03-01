@@ -1,9 +1,13 @@
 #include "turnip_renderer.hpp"
+#include "defines.hpp"
+#include "graphics/objects/pipeline.hpp"
 
 namespace tur
 {
 	void TurnipRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
+		computeCommandBuffer = rhi->create_command_buffer();
+
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
@@ -23,17 +27,29 @@ namespace tur
 		if(!rCamera)
 			return;
 
-		commandBuffer.begin(renderTarget);
-			commandBuffer.set_viewport(viewport);
-			commandBuffer.set_scissor(scissor);
+		/* Graphics Pass */
+		//commandBuffer.begin(renderTarget);
+			//commandBuffer.set_viewport(viewport);
+			//commandBuffer.set_scissor(scissor);
 
 			/* For each material in the scene */
-			commandBuffer.bind_pipeline(pipeline);
-			commandBuffer.bind_descriptor_set(globalSet);
+			//commandBuffer.bind_pipeline(pipeline);
+			//commandBuffer.bind_descriptor_set(globalSet);
 			
-			commandBuffer.draw_indirect(drawCommands, 0, mIndirectCommands.size(), sizeof(IndirectCommand));
+			// commandBuffer.draw_indirect(drawCommands, 0, mIndirectCommands.size(), sizeof(IndirectCommand));
 
-		commandBuffer.end();
+		//commandBuffer.end();
+	}
+	void TurnipRenderer::dispatch()
+	{
+		/*
+		computeCommandBuffer.begin();
+
+			computeCommandBuffer.bind_pipeline(computePipeline);
+			computeCommandBuffer.dispatch(1, 0, 0);
+			// TODO: sync
+
+		computeCommandBuffer.end();*/
 	}
 
 	void TurnipRenderer::initialize_resources()
@@ -100,11 +116,21 @@ namespace tur
 			  	.amount = 1,
 			  	.type = DescriptorType::STORAGE_BUFFER,
 			  	.stage = PipelineStage::VERTEX_STAGE
+			},
+			{
+				.binding = 3,
+			  	.amount = 1,
+			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
+			  	.stage = PipelineStage::FRAGMENT_STAGE
 			}
 		});
 
-		setLayout = rRHI->get_resource_handler().create_descriptor_set_layout({.entries = LayoutEntries});
-		globalSet = rRHI->get_resource_handler().create_descriptor_set(setLayout);
+		setLayout = resources.create_descriptor_set_layout({.entries = LayoutEntries});
+		globalSet = resources.create_descriptor_set(setLayout);
+
+		/* Compute */
+		auto ComputeLayoutEntries = std::vector<DescriptorSetLayoutEntry>({});
+		computeSet = resources.create_descriptor_set_layout({.entries = ComputeLayoutEntries});
 	}
 	void TurnipRenderer::initialize_pipeline()
 	{
@@ -151,5 +177,16 @@ namespace tur
 		};
 
 		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
+
+		/* Compute */
+		shader_handle computeShader = resources.create_shader({"res/shaders/turnip/turnip_comp.spv", ShaderType::COMPUTE});
+		
+		ComputePipelineDescriptor computePipelineDescriptor = 
+        {
+			.computeShader = computeShader,
+			.setLayout = computeSet
+		};
+
+		computePipeline = resources.create_compute_pipeline(computePipelineDescriptor);
 	}
 }

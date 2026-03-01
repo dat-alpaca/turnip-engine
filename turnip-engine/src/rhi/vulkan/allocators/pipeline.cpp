@@ -1,5 +1,8 @@
 #include "pipeline.hpp"
+#include "assert/assert.hpp"
+#include "defines.hpp"
 #include "graphics/objects/pipeline.hpp"
+#include "graphics/types/pipeline_type.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/vulkan_resource_handler.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
@@ -391,6 +394,7 @@ namespace tur::vulkan
 	}
 }
 
+// Graphics
 namespace tur::vulkan
 {
 	Pipeline allocate_graphics_pipeline(RenderInterfaceVulkan* rhi, const PipelineDescriptor& descriptor)
@@ -476,6 +480,61 @@ namespace tur::vulkan
 
 			default:
 				TUR_LOG_CRITICAL("Failed to create graphics pipeline.");
+		}
+
+		pipeline.pipeline = result.value;
+		return pipeline;
+	}
+}
+
+// Compute
+namespace tur::vulkan
+{
+	static vk::PipelineShaderStageCreateInfo create_shader(ResourceHandler& resources, shader_handle computeShader)
+	{
+		TUR_ASS(computeShader != invalid_handle);
+
+		auto& shaders = resources.get_shaders();
+
+		vk::PipelineShaderStageCreateInfo computeShaderInfo = {};
+		computeShaderInfo.flags = vk::PipelineShaderStageCreateFlags();
+		computeShaderInfo.stage = vk::ShaderStageFlagBits::eCompute;
+		computeShaderInfo.pName = "main";
+		computeShaderInfo.module = shaders.get(computeShader);
+		
+		return computeShaderInfo;
+	}
+
+	Pipeline allocate_compute_pipeline(RenderInterfaceVulkan* rhi, const ComputePipelineDescriptor& descriptor)
+	{
+		TUR_ASS(rhi);
+		auto setLayout = rhi->get_resource_handler().get_set_layouts().get(descriptor.setLayout);
+		auto& device = rhi->get_state().logicalDevice;
+
+		Pipeline pipeline;
+		pipeline.type = PipelineType::COMPUTE;
+		
+		// Layout:
+		vk::PipelineLayoutCreateInfo pipelineLayout = create_pipeline_layout(&setLayout.layout);
+		pipeline.layout = check_vk_result(device.createPipelineLayout(pipelineLayout));
+		
+		// Pipeline Info:
+		vk::ComputePipelineCreateInfo pipelineInfo;
+		{
+			pipelineInfo.flags = vk::PipelineCreateFlags();
+
+			pipelineInfo.stage = create_shader(rhi->get_resource_handler(), descriptor.computeShader);
+			pipelineInfo.layout = pipeline.layout;
+		}
+
+		auto result = device.createComputePipeline(nullptr, pipelineInfo);
+		switch (result.result)
+		{
+			case vk::Result::eSuccess:
+				break;
+
+			default:
+				TUR_LOG_CRITICAL("Failed to create compute pipeline.");
 		}
 
 		pipeline.pipeline = result.value;

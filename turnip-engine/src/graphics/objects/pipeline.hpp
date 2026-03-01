@@ -233,4 +233,10 @@ namespace tur
 		TextureFormat workImageFormat = TextureFormat::RGBA8_UNORM;
 		TextureFormat depthStencilImageFormat = TextureFormat::DEPTH_STENCIL24_S8U_INT;
 	};
+
+	struct ComputePipelineDescriptor
+	{
+		shader_handle computeShader;
+		descriptor_set_layout_handle setLayout;
+	};
 }

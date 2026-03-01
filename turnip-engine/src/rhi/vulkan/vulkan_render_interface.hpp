@@ -1,4 +1,6 @@
 #pragma once
+#include "graphics/objects/command_buffer.hpp"
+#include "graphics/objects/sync.hpp"
 #include "objects/pipeline.hpp"
 #include "objects/queue.hpp"
 #include "objects/texture.hpp"
@@ -8,8 +10,8 @@
 
 #include "graphics/render_interface.hpp"
 #include "platform/platform.hpp"
-#include "types/frame_data.hpp"
 #include "vulkan_state.hpp"
+#include <limits>
 
 namespace tur::vulkan
 {
@@ -28,32 +30,17 @@ namespace tur::vulkan
 		using immediate_cmd_function = std::function<void(vk::CommandBuffer recordingBuffer)>;
 
 		void submit_immediate_command(RenderInterfaceVulkan& rhi, immediate_cmd_function&& command);
-
 		void recreate_swapchain(RenderInterfaceVulkan& rhi);
-
-		void transition_texture_layout(
-			RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-		);
-
-		void transition_texture_layout_imm(
-			RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description
-		);
+		void transition_texture_layout(RenderInterfaceVulkan& rhi, CommandBufferVulkan commandBuffer, Texture& texture, const ImageTransitionDescription& description);
+		void transition_texture_layout_imm(RenderInterfaceVulkan& rhi, Texture& texture, const ImageTransitionDescription& description);
 	}
 
 	class RenderInterfaceVulkan
 	{
-		friend void
-		utils::submit_immediate_command(RenderInterfaceVulkan& rhi, utils::immediate_cmd_function&& command);
-
+		friend void utils::submit_immediate_command(RenderInterfaceVulkan& rhi, utils::immediate_cmd_function&& command);
 		friend void utils::recreate_swapchain(RenderInterfaceVulkan& rhi);
-
-		friend void utils::transition_texture_layout(
-			RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description
-		);
-
-		friend void utils::transition_texture_layout_imm(
-			RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description
-		);
+		friend void utils::transition_texture_layout(RenderInterfaceVulkan& rhi, CommandBufferVulkan commandBuffer, Texture& texture, const utils::ImageTransitionDescription& description);
+		friend void utils::transition_texture_layout_imm(RenderInterfaceVulkan& rhi, Texture& texture, const utils::ImageTransitionDescription& description);
 
 	public:
 		void initialize(const ConfigData& configData, Window& window);
@@ -61,14 +48,17 @@ namespace tur::vulkan
 		void on_event(Event& event);
 
 	public:
-		bool begin_frame();
-		void submit(queue_handle graphicsQueue);
-		void present(queue_handle presentQueue);
+		void begin_frame(fence_handle inFlightFence, u32 fenceTimeout = RecordingFenceTimeout);
+		void reset_fence(fence_handle inFlightFence);
+
+		std::optional<image_handle> acquire_swapchain_image(semaphore_handle signalImageReady, u32 imageReadyTimeout = ImageAvailableTimeout);
+
+		void submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, semaphore_handle waitFor, semaphore_handle signal);
+		void present(image_handle imageHandle, queue_handle presentQueue, semaphore_handle waitFor);
 		void end_frame();
 
 	public:
 		CommandBuffer create_command_buffer();
-		vk::CommandBuffer get_current_command_buffer();
 
 	public:
 		queue_handle get_queue(QueueOperation operation);
@@ -79,14 +69,12 @@ namespace tur::vulkan
 
 	public:
 		inline NON_OWNING Window* get_window() { return rWindow; }
-		inline FrameDataHolder& get_frame_data() { return mFrameDataHolder; }
 		inline const VulkanState& get_state() const { return mState; }
 		inline VulkanState& get_state() { return mState; }
 		inline DeletionQueue& get_deletion_queue() { return mDeletionQueue; }
 
 	private:
 		NON_OWNING Window* rWindow = nullptr;
-		FrameDataHolder mFrameDataHolder;
 		ResourceHandler mResources;
 		DeletionQueue mDeletionQueue;
 		VulkanState mState;
@@ -100,8 +88,8 @@ namespace tur::vulkan
 		bool mWindowResized = false;
 
 	private:
-		static inline constexpr u32 RecordingFenceTimeout = UINT32_MAX;
-		static inline constexpr u32 ImageAvailableTimeout = UINT32_MAX;
+		static inline constexpr u32 RecordingFenceTimeout = std::numeric_limits<u32>::max();
+		static inline constexpr u32 ImageAvailableTimeout = std::numeric_limits<u32>::max();
 	};
 }
 

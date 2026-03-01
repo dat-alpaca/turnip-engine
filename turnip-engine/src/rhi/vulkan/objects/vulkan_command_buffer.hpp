@@ -17,15 +17,17 @@ namespace tur::vulkan
 
 	public:
 		void initialize_secondary();
-		void reset(vk::CommandBuffer commandBuffer);
+		void reset(command_buffer_handle commandBuffer);
 		void execute_secondary_buffers(std::span<vk::CommandBuffer> buffers);
 
 	public:
 		void begin(render_target_handle renderTargetHandle = invalid_handle);
 		void begin_rendering();
+		void begin_compute();
+
 		void end_rendering();
 		void end();
-		void blit();
+		void blit(image_handle imageHandle);
 
 	public:
 		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
@@ -51,7 +53,7 @@ namespace tur::vulkan
 	private:
 		RenderTarget get_render_target();
 		void copy_image(vk::Image source, vk::Image target, vk::Extent2D sourceSize, vk::Extent2D targetSize);
-		void blit_onto_swapchain();
+		void blit_onto_swapchain(image_handle imageHandle);
 
 	public:
 		vk::CommandBuffer get_buffer() const { return mCommandBuffer; }

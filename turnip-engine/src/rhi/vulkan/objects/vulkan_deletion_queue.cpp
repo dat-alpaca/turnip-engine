@@ -1,5 +1,6 @@
 #include "vulkan_deletion_queue.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -28,6 +29,14 @@ namespace tur::vulkan
 	{
 		mSetLayoutHandles.push_back(setLayoutHandle);
 	}
+	void DeletionQueue::submit_fence(fence_handle fenceHandle)
+	{
+		mFenceHandles.push_back(fenceHandle);
+	}
+	void DeletionQueue::submit_semaphore(semaphore_handle semaphoreHandle)
+	{
+		mSemaphoreHandles.push_back(semaphoreHandle);
+	}
 
 	void DeletionQueue::flush()
 	{
@@ -37,6 +46,36 @@ namespace tur::vulkan
 
 		for (const auto& deletionFunction : mAdditionalDeletionQueue)
 			deletionFunction();
+
+		// Fences:
+		auto& fences = rRHI->get_resource_handler().get_fences();
+		for (auto& fenceHandle : mFenceHandles)
+		{
+			if (fenceHandle == invalid_handle)
+				continue;
+
+			const vk::Fence& fence = fences.get(fenceHandle);
+			device.destroyFence(fence);
+
+			fences.remove(fenceHandle);
+			fenceHandle = invalid_handle;
+		}
+		mFenceHandles.clear();
+
+		// Semaphores:
+		auto& semaphores = rRHI->get_resource_handler().get_semaphores();
+		for (auto& semaphoreHandle : mSemaphoreHandles)
+		{
+			if (semaphoreHandle == invalid_handle)
+				continue;
+
+			const vk::Semaphore& semaphore = semaphores.get(semaphoreHandle);
+			device.destroySemaphore(semaphore);
+
+			semaphores.remove(semaphoreHandle);
+			semaphoreHandle = invalid_handle;
+		}
+		mSemaphoreHandles.clear();
 
 		// Buffers:
 		for (auto& bufferHandle : mBufferHandles)

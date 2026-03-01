@@ -2,9 +2,12 @@
 #include "assets/cubemap/cubemap_asset.hpp"
 #include "core/assets/texture/texture_asset.hpp"
 
+#include "graphics/objects/command_buffer.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/resource_handler.hpp"
+#include "graphics/objects/sync.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/render_interface.hpp"
 #include "graphics/types/access_flags.hpp"
@@ -14,6 +17,7 @@
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
+#include "vulkan/vulkan.hpp"
 
 #include <unordered_map>
 #include <vulkan/vulkan.hpp>
@@ -48,7 +52,9 @@ namespace tur::vulkan
 
 	public:
 		pipeline_handle create_graphics_pipeline(const PipelineDescriptor& descriptor);
+		pipeline_handle create_compute_pipeline(const ComputePipelineDescriptor& descriptor);
 		void destroy_graphics_pipeline(pipeline_handle pipelineHandle);
+		void destroy_compute_pipeline(pipeline_handle pipelineHandle);
 
 	public:
 		buffer_handle create_buffer(const BufferDescriptor& descriptor, const void* data, Range range);
@@ -68,6 +74,15 @@ namespace tur::vulkan
 		void destroy_texture(texture_handle textureHandle);
 
 	public:
+		fence_handle create_fence();
+		semaphore_handle create_semaphore();
+		void destroy_fence(fence_handle fenceHandle);
+		void destroy_semaphore(semaphore_handle semaphoreHandle);
+
+	public:
+		command_buffer_handle create_primary_command_buffer();
+
+	public:
 		free_list<vk::ShaderModule>& get_shaders() { return mShaders; }
 		free_list<Buffer>& get_buffers() { return mBuffers; }
 		free_list<Pipeline>& get_pipelines() { return mPipelines; }
@@ -75,6 +90,10 @@ namespace tur::vulkan
 		free_list<RenderTarget>& get_render_targets() { return mRenderTargets; }
 		free_list<DescriptorSetLayout>& get_set_layouts() { return mSetLayouts; }
 		free_list<DescriptorSet>& get_descriptor_sets() { return mDescriptorSets; }
+		free_list<vk::CommandBuffer>& get_command_buffers() { return mCommandBuffers; }
+
+		free_list<vk::Semaphore>& get_semaphores() { return mSemaphores; }
+		free_list<vk::Fence>& get_fences() { return mFences; }
 
 	private:
 		NON_OWNING RenderInterfaceVulkan* rRHI = nullptr;
@@ -88,6 +107,10 @@ namespace tur::vulkan
 		free_list<RenderTarget> mRenderTargets;
 		free_list<DescriptorSetLayout> mSetLayouts;
 		free_list<DescriptorSet> mDescriptorSets;
+
+		free_list<vk::Semaphore> mSemaphores;
+		free_list<vk::Fence> mFences;
+		free_list<vk::CommandBuffer> mCommandBuffers;
 	};
 }
 

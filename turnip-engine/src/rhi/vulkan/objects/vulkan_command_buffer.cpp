@@ -1,4 +1,6 @@
 #include "assert/assert.hpp"
+#include "graphics/objects/command_buffer.hpp"
+#include "graphics/objects/image.hpp"
 #include "rhi/vulkan/allocators/command_buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
@@ -20,12 +22,14 @@ namespace tur::vulkan
 		mCommandBuffer = allocate_single_secondary_command_buffer(rRHI->get_state().logicalDevice, rRHI->get_state().commandPool);
 		mIsSecondary = true;
 	}
-	void CommandBufferVulkan::reset(vk::CommandBuffer commandBuffer)
+	void CommandBufferVulkan::reset(command_buffer_handle commandBuffer)
 	{
-		TUR_ASS(commandBuffer);
+		TUR_ASS(commandBuffer != invalid_handle);
 
-		mCommandBuffer = commandBuffer;
+		mCommandBuffer = rRHI->get_resource_handler().get_command_buffers().get(commandBuffer);
 		mIsSecondary = false;
+
+		mCommandBuffer.reset();
 	}
 	void CommandBufferVulkan::execute_secondary_buffers(std::span<vk::CommandBuffer> buffers)
 	{
@@ -33,6 +37,30 @@ namespace tur::vulkan
 		mCommandBuffer.executeCommands(buffers.size(), buffers.data());
 	}
 
+	void CommandBufferVulkan::begin_compute()
+	{
+		auto& resources = rRHI->get_resource_handler();
+	
+		vk::CommandBufferInheritanceRenderingInfo renderingInfo = {};
+		
+		vk::CommandBufferInheritanceInfo inheritanceInfo = {};
+		if(mIsSecondary)
+		{
+			renderingInfo.sType = vk::StructureType::eCommandBufferInheritanceRenderingInfo;
+			inheritanceInfo.sType = vk::StructureType::eCommandBufferInheritanceInfo;
+			inheritanceInfo.pNext = &renderingInfo;
+		}
+
+		vk::CommandBufferBeginInfo beginInfo = {};
+		{
+			beginInfo.pInheritanceInfo = (mIsSecondary) ? &inheritanceInfo : nullptr;
+			beginInfo.flags = vk::CommandBufferUsageFlagBits::eOneTimeSubmit;
+		}
+
+		auto result = mCommandBuffer.begin(beginInfo);
+		if (result != vk::Result::eSuccess)
+			TUR_LOG_ERROR("Failed to begin() recording to vulkan command buffer.", static_cast<i32>(result));
+	}
 	void CommandBufferVulkan::begin(render_target_handle renderTargetHandle)
 	{
 		auto& resources = rRHI->get_resource_handler();
@@ -82,7 +110,7 @@ namespace tur::vulkan
 		auto& depthStencilTexture = resources.get_textures().get(target.depthStencilAttachment.textureHandle);
 
 		utils::transition_texture_layout(
-			*rRHI, colorTexture,
+			*rRHI, *this, colorTexture,
 			{
 				.newLayout = vk::ImageLayout::eColorAttachmentOptimal,
 				.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
@@ -95,7 +123,7 @@ namespace tur::vulkan
 		if (target.depthStencilAttachment.textureHandle != invalid_handle)
 		{
 			utils::transition_texture_layout(
-				*rRHI, depthStencilTexture,
+				*rRHI, *this, depthStencilTexture,
 				{
 					.newLayout = vk::ImageLayout::eDepthStencilAttachmentOptimal,
 					.srcStageMask = vk::PipelineStageFlagBits2::eTopOfPipe,
@@ -150,9 +178,9 @@ namespace tur::vulkan
 		if (result != vk::Result::eSuccess)
 			TUR_LOG_CRITICAL("Failed to end() recording to vulkan command buffer.");
 	}
-	void CommandBufferVulkan::blit()
+	void CommandBufferVulkan::blit(image_handle imageHandle)
 	{
-		blit_onto_swapchain();
+		blit_onto_swapchain(imageHandle);
 	}
 
 	void CommandBufferVulkan::set_clear_color(const ClearColor& clearColor, ClearFlags flags)
@@ -280,12 +308,12 @@ namespace tur::vulkan
 		mCommandBuffer.blitImage2(blitInfo);
 	}
 
-	void CommandBufferVulkan::blit_onto_swapchain()
+	void CommandBufferVulkan::blit_onto_swapchain(image_handle imageHandle)
 	{
 		if(mUsedTarget != invalid_handle)
 			return;
 
-		const auto& currentImage = rRHI->get_frame_data().get_image_buffer_index();
+		auto currentImage = imageHandle;
 		auto& swapchainTexture = rRHI->get_state().swapchainTextures.at(currentImage);
 		auto& swapchainExtent = rRHI->get_state().swapchainExtent;
 		
@@ -294,7 +322,7 @@ namespace tur::vulkan
 		auto& colorTexture = rRHI->get_resource_handler().get_textures().get(colorTextureHandle);
 
 		utils::transition_texture_layout(
-			*rRHI, colorTexture,
+			*rRHI, *this, colorTexture,
 			{
 				.newLayout = vk::ImageLayout::eTransferSrcOptimal,
 			 	.srcStageMask = vk::PipelineStageFlagBits2::eColorAttachmentOutput,
@@ -305,7 +333,7 @@ namespace tur::vulkan
 		);
 
 		utils::transition_texture_layout(
-			*rRHI, swapchainTexture, {
+			*rRHI, *this, swapchainTexture, {
 				.newLayout = vk::ImageLayout::eTransferDstOptimal,
 				.srcStageMask = vk::PipelineStageFlagBits2::eAllCommands,
 				.srcAccessMask = vk::AccessFlagBits2::eMemoryWrite,
@@ -320,7 +348,7 @@ namespace tur::vulkan
 		);
 
 		utils::transition_texture_layout(
-			*rRHI, swapchainTexture, {
+			*rRHI, *this, swapchainTexture, {
 				.newLayout = vk::ImageLayout::ePresentSrcKHR,
 			 	.srcStageMask = vk::PipelineStageFlagBits2::eTransfer,
 			 	.srcAccessMask = vk::AccessFlagBits2::eTransferWrite,

@@ -1,5 +1,7 @@
 #include "opengl_command_buffer.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/command_buffer.hpp"
+#include "graphics/objects/image.hpp"
 #include "logging/logging.hpp"
 #include "rhi/opengl/gl_render_interface.hpp"
 #include <glad/gl.h>
@@ -16,7 +18,7 @@ namespace tur::gl
 		glCreateVertexArrays(1, &mVAO);
 	}
 
-	void CommandBufferGL::reset(EmptyCommandBuffer commandBuffer)
+	void CommandBufferGL::reset(command_buffer_handle commandBuffer)
 	{
 		/* Blank */
 	}
@@ -45,6 +47,10 @@ namespace tur::gl
 	{
 		clear();
 	}
+	void CommandBufferGL::begin_compute()
+	{
+		/* Blank */
+	}
 	void CommandBufferGL::end_rendering()
 	{
 		/* Blank */
@@ -53,7 +59,7 @@ namespace tur::gl
 	{
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
-	void CommandBufferGL::blit()
+	void CommandBufferGL::blit(image_handle)
 	{
 		/* Blank */
 	}

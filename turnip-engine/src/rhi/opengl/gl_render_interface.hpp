@@ -1,4 +1,6 @@
 #pragma once
+#include "defines.hpp"
+#include "graphics/objects/command_buffer.hpp"
 #include "objects/opengl_command_buffer.hpp"
 #include "objects/opengl_resource_handler.hpp"
 
@@ -18,14 +20,16 @@ namespace tur::gl
 		void on_event(Event& event);
 
 	public:
-		bool begin_frame();
-		void submit([[maybe_unused]] queue_handle);
-		void present([[maybe_unused]] queue_handle);
+		void begin_frame([[maybe_unused]] fence_handle inFlightFence = invalid_handle, [[maybe_unused]] u32 inFlightTimeout = 0);
+		std::optional<image_handle> acquire_swapchain_image([[maybe_unused]] semaphore_handle waitFor, [[maybe_unused]] u32 timeout = 0);
+		void reset_fence([[maybe_unused]] fence_handle inFlightFence);
+
+		void submit([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] command_buffer_handle commandBuffer = invalid_handle, [[maybe_unused]] fence_handle inFlightFence = invalid_handle, [[maybe_unused]] semaphore_handle waitFor = invalid_handle, [[maybe_unused]] semaphore_handle signal = invalid_handle);
+		void present([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] semaphore_handle waitFor = invalid_handle, [[maybe_unused]] u32 imageHandle = invalid_handle);
 		void end_frame();
 
 	public:
 		CommandBuffer create_command_buffer();
-		EmptyCommandBuffer get_current_command_buffer() { return {}; }
 
 	public:
 		queue_handle get_queue(QueueOperation operation) { return invalid_handle; }

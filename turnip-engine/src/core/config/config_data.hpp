@@ -1,6 +1,5 @@
 #pragma once
 #include <filesystem>
-#include <vulkan/vulkan.hpp>
 
 #include "application_config.hpp"
 #include "engine_config.hpp"

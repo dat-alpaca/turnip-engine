@@ -6,6 +6,7 @@ set -e
     cmake --build --preset turnip-gl-build
 ) &
 
+# Vulkan:
 (
     cmake --build --preset turnip-vk-build
 ) &

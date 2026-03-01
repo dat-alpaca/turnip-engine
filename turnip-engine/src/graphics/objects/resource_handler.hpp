@@ -3,10 +3,12 @@
 
 #include "assets/texture/texture_asset.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/command_buffer.hpp"
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/shader.hpp"
+#include "graphics/objects/sync.hpp"
 #include "graphics/objects/texture.hpp"
 
 #include "core/data-structures/range.hpp"
@@ -47,9 +49,12 @@ namespace tur
 		{ t.write_storage_buffer_to_set(setHandle, bufferHandle, range, binding) };
 	} &&
 
-	requires(T t, const PipelineDescriptor& desc, pipeline_handle handle)
+	requires(T t, const PipelineDescriptor& desc, ComputePipelineDescriptor compDesc, pipeline_handle handle)
 	{ 
 		{ t.create_graphics_pipeline(desc) }						-> std::same_as<pipeline_handle>;
+		{ t.create_compute_pipeline(compDesc) }						-> std::same_as<pipeline_handle>;
+		{ t.destroy_graphics_pipeline(handle) };
+		{ t.destroy_compute_pipeline(handle) };
 	} && 
 	
 	requires(T t, const BufferDescriptor& desc, const void* data, Range range, u32 size)
@@ -77,8 +82,22 @@ namespace tur
 		{ t.update_texture(handle, asset) };
 		{ t.update_array_texture_layer(handle, asset, offset, layer) };
 		{ t.destroy_texture(handle) };
+	} &&
+
+	requires(T t, fence_handle fence, semaphore_handle semaphore)
+	{
+        { t.create_fence() }							-> std::same_as<fence_handle>;
+        { t.create_semaphore() }						-> std::same_as<semaphore_handle>;
+		{ t.destroy_fence(fence) };
+		{ t.destroy_semaphore(semaphore) };
+	} &&
+
+	requires(T t, command_buffer_handle commandBufferHandle)
+	{
+        { t.create_primary_command_buffer() }			-> std::same_as<command_buffer_handle>;
 	};
 
+	/* Concepts */
 	template <typename T, typename DataType>
 	concept IsGraphicsGenericResource = requires(T t, buffer_handle handle, std::span<const DataType> data, u32 offset)
 	{

@@ -38,15 +38,8 @@ namespace tur::engine
 	}
 	static void on_render(RenderInterface& renderInterface, ViewHandler& viewHandler)
 	{
-		if (!renderInterface.begin_frame())
-			return;
-
 		for (const auto& view : viewHandler.get_views())
 			view->on_render();
-
-		renderInterface.end_frame();
-		renderInterface.submit(renderInterface.get_queue(QueueOperation::GRAPHICS));
-		renderInterface.present(renderInterface.get_queue(QueueOperation::PRESENT));
 	}
 	static void on_render_gui(ViewHandler& viewHandler)
 	{

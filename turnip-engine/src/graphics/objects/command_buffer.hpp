@@ -1,6 +1,8 @@
 #pragma once
+#include "defines.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/image.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 
@@ -10,21 +12,24 @@
 
 namespace tur
 {
+	using command_buffer_handle = handle_type;
+
 	template <typename T, typename CommandBufferType>
-	concept IsCommandBuffer = requires(T t, CommandBufferType commandBuffer, std::span<CommandBufferType> buffers)
+	concept IsCommandBuffer = requires(T t, command_buffer_handle buffer, std::span<CommandBufferType> buffers)
 	{
 		{ t.execute_secondary_buffers(buffers) };
         { t.initialize_secondary() };
-        { t.reset(commandBuffer) };
+        { t.reset(buffer) };
 	} &&
 	
-	requires(T t, render_target_handle renderTargetHandle)
+	requires(T t, render_target_handle renderTargetHandle, image_handle imageHandle)
 	{
 		{ t.begin(renderTargetHandle) };
 		{ t.begin_rendering() };
+		{ t.begin_compute() };
 		{ t.end_rendering() };
         { t.end() };
-        { t.blit() };
+        { t.blit(imageHandle) };
 	} &&
 	
 	requires(T t, const ClearColor& clearColor, ClearFlags flags)

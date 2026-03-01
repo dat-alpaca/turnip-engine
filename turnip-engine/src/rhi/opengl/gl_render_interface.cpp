@@ -20,16 +20,23 @@ namespace tur::gl
 		/* Blank */
 	}
 
-	bool RenderInterfaceGL::begin_frame()
-	{
-		/* Blank */
-		return true;
-	}
-	void RenderInterfaceGL::submit([[maybe_unused]] queue_handle)
+	void RenderInterfaceGL::begin_frame(fence_handle, u32)
 	{
 		/* Blank */
 	}
-	void RenderInterfaceGL::present([[maybe_unused]] queue_handle)
+	std::optional<image_handle> RenderInterfaceGL::acquire_swapchain_image(semaphore_handle, u32)
+	{
+		return 0;
+	}
+	void RenderInterfaceGL::submit(queue_handle, command_buffer_handle, fence_handle, semaphore_handle, semaphore_handle)
+	{
+		/* Blank */
+	}
+	void RenderInterfaceGL::reset_fence(fence_handle)
+	{
+		/* Blank */
+	}
+	void RenderInterfaceGL::present(queue_handle, semaphore_handle, u32)
 	{
 		platform::WindowingSystem::get_binder().present();
 	}

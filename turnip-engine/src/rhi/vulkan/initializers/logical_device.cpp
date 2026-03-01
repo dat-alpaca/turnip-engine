@@ -10,6 +10,7 @@ namespace tur::vulkan
 	{
 		using queue_family_index = handle_type;
 
+		const auto& physicalDeviceReqs = vulkanConfig.physicalDeviceRequirements;
 		const auto& logicDeviceReqs = vulkanConfig.logicalDeviceRequirements;
 		const auto& requiredQueueOperations = logicDeviceReqs.requiredQueueOperations;
 		const auto& queueFamilies = get_queue_families(state.physicalDevice, state.surface);
@@ -51,13 +52,23 @@ namespace tur::vulkan
 		}
 
 		// Features:
+		vk::PhysicalDeviceVulkan11Features vulkan11Features;
 		vk::PhysicalDeviceVulkan12Features vulkan12Features;
 		vk::PhysicalDeviceVulkan13Features vulkan13Features;
 		vk::PhysicalDeviceFeatures deviceFeatures = vk::PhysicalDeviceFeatures();
 		{
+			vulkan11Features.pNext = &vulkan12Features;
+
 			// Required bufffer device address feature
 			vulkan12Features.bufferDeviceAddress = true;
 			vulkan12Features.pNext = &vulkan13Features;
+
+			if(physicalDeviceReqs.enableMDI)
+			{
+				vulkan11Features.shaderDrawParameters = true;
+				vulkan12Features.runtimeDescriptorArray = true;
+				vulkan12Features.shaderSampledImageArrayNonUniformIndexing = true;
+			}
 
 			const auto& strExtensions = vulkanConfig.physicalDeviceRequirements.extensions;
 
@@ -74,7 +85,7 @@ namespace tur::vulkan
 		vk::DeviceCreateInfo deviceInfo = vk::DeviceCreateInfo(
 			vk::DeviceCreateFlags(), static_cast<u32>(queueCreateInfos.size()), queueCreateInfos.data(),
 			static_cast<u32>(layers.size()), layers.data(), static_cast<u32>(extensions.size()), extensions.data(),
-			&deviceFeatures, &vulkan12Features
+			&deviceFeatures, &vulkan11Features
 		);
 
 		state.logicalDevice = check_vk_result(state.physicalDevice.createDevice(deviceInfo));
@@ -97,7 +108,7 @@ namespace tur::vulkan
 		}
 
 		vk::Queue queue = state.logicalDevice.getQueue(graphicsIndex, 0);
-		QueueOperation operation = (QueueOperation)(QueueOperation::GRAPHICS | QueueOperation::TRANSFER);
+		QueueOperation operation = (QueueOperation::GRAPHICS | QueueOperation::COMPUTE | QueueOperation::TRANSFER);
 		state.queueList.register_queue({queue, operation, graphicsIndex});
 
 		queue = state.logicalDevice.getQueue(presentIndex, 0);

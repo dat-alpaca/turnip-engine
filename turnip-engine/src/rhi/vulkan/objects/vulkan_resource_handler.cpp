@@ -1,6 +1,9 @@
 #include "vulkan_resource_handler.hpp"
 #include "defines.hpp"
+#include "graphics/objects/pipeline.hpp"
+#include "graphics/objects/sync.hpp"
 #include "graphics/objects/texture.hpp"
+#include "rhi/vulkan/allocators/semaphore.hpp"
 #include "rhi/vulkan/vulkan_render_interface.hpp"
 #include "vulkan/vulkan.hpp"
 #include <vk_mem_alloc.h>
@@ -225,7 +228,18 @@ namespace tur::vulkan
 
 		return mPipelines.add(pipeline);
 	}
+	pipeline_handle ResourceHandler::create_compute_pipeline(const ComputePipelineDescriptor& descriptor)
+	{
+		Pipeline pipeline = allocate_compute_pipeline(rRHI, descriptor);
+		destroy_shader(descriptor.computeShader);
+		return mPipelines.add(pipeline);
+	}
 	void ResourceHandler::destroy_graphics_pipeline(pipeline_handle pipelineHandle)
+	{
+		TUR_ASSERT(pipelineHandle != invalid_handle, "Invalid pipeline_handle");
+		rRHI->get_deletion_queue().submit_pipeline(pipelineHandle);
+	}
+	void ResourceHandler::destroy_compute_pipeline(pipeline_handle pipelineHandle)
 	{
 		TUR_ASSERT(pipelineHandle != invalid_handle, "Invalid pipeline_handle");
 		rRHI->get_deletion_queue().submit_pipeline(pipelineHandle);
@@ -595,5 +609,34 @@ namespace tur::vulkan
 	{
 		TUR_ASSERT(textureHandle != invalid_handle, "Invalid texture_handle");
 		rRHI->get_deletion_queue().submit_texture(textureHandle);
+	}
+
+	fence_handle ResourceHandler::create_fence()
+	{
+		auto& device = rRHI->get_state().logicalDevice;
+		return mFences.add(allocate_signaled_fence(device));
+	}
+	semaphore_handle ResourceHandler::create_semaphore()
+	{
+		auto& device = rRHI->get_state().logicalDevice;
+		return mSemaphores.add(allocate_semaphore(device));
+	}
+	void ResourceHandler::destroy_fence(fence_handle fenceHandle)
+	{
+		TUR_ASSERT(fenceHandle != invalid_handle, "Invalid fence");
+		rRHI->get_deletion_queue().submit_fence(fenceHandle);
+	}
+	void ResourceHandler::destroy_semaphore(semaphore_handle semaphoreHandle)
+	{
+		TUR_ASSERT(semaphoreHandle != invalid_handle, "Invalid semaphore");
+		rRHI->get_deletion_queue().submit_semaphore(semaphoreHandle);
+	}
+
+	command_buffer_handle ResourceHandler::create_primary_command_buffer()
+	{
+		auto& device = rRHI->get_state().logicalDevice;
+		auto& commandPool = rRHI->get_state().commandPool;
+
+		return mCommandBuffers.add(allocate_single_primary_command_buffer(device, commandPool));
 	}
 }

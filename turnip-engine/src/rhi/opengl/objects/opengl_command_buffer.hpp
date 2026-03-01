@@ -1,5 +1,7 @@
 #pragma once
+#include "defines.hpp"
 #include "graphics/objects/command_buffer.hpp"
+#include "graphics/objects/image.hpp"
 #include "rhi/opengl/objects/pipeline.hpp"
 #include "rhi/opengl/opengl_common.hpp"
 
@@ -18,16 +20,18 @@ namespace tur::gl
 		CommandBufferGL();
 
 	public:
-		void reset(EmptyCommandBuffer commandBuffer);
+		void reset(command_buffer_handle commandBuffer);
 		void execute_secondary_buffers(std::span<EmptyCommandBuffer>);
 		void initialize_secondary();
 
 	public:
 		void begin(render_target_handle renderTarget = invalid_handle);
 		void begin_rendering();
+		void begin_compute();
+		
 		void end_rendering();
 		void end();
-		void blit();
+		void blit([[maybe_unused]] image_handle imageHandle = invalid_handle);
 
 	public:
 		void set_clear_color(const ClearColor& clearColor, ClearFlags flags);
@@ -51,7 +55,7 @@ namespace tur::gl
 		void dispatch(u32 groupsX, u32 groupsY, u32 groupsZ);
 
 	public:
-		EmptyCommandBuffer get_buffer() const { return {}; }
+		inline EmptyCommandBuffer get_buffer() const { return {}; }
 
 	private:
 		void clear();

@@ -6,7 +6,7 @@ do
     do
         extension="${file##*.}"
 
-        if [[ $extension == "vert" || $extension == "frag" ]]; then
+        if [[ $extension == "vert" || $extension == "frag" || $extension == "comp" ]]; then
             directory=$(dirname -- "$file")
             basename=$(basename -- $file)
             filename="${basename%.*}"

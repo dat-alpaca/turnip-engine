@@ -1,4 +1,5 @@
 #include "opengl_resource_handler.hpp"
+#include "graphics/objects/pipeline.hpp"
 #include "rhi/opengl/allocators/allocators.hpp"
 #include "rhi/opengl/gl_render_interface.hpp"
 #include <glad/gl.h>
@@ -206,9 +207,35 @@ namespace tur::gl
 
 		return mPipelines.add(pipeline);
 	}
+	pipeline_handle ResourceHandler::create_compute_pipeline(const ComputePipelineDescriptor& descriptor)
+	{
+		gl_handle pipelineID = glCreateProgram();
+
+		const shader_handle& computeShader = descriptor.computeShader;
+
+		glAttachShader(pipelineID, mShaders.get(computeShader).handle);
+		glLinkProgram(pipelineID);
+		glValidateProgram(pipelineID);
+
+		check_program_link_errors(pipelineID);
+		destroy_shader(computeShader);
+
+		ComputePipeline pipeline;
+		{
+			pipeline.setLayout = descriptor.setLayout;
+			pipeline.handle = pipelineID;
+		}
+
+		return mComputePipelines.add(pipeline);
+	}
 	void ResourceHandler::destroy_graphics_pipeline(pipeline_handle pipelineHandle)
 	{
 		const auto& pipeline = mPipelines.remove(pipelineHandle);
+		glDeleteProgram(pipeline.handle);
+	}
+	void ResourceHandler::destroy_compute_pipeline(pipeline_handle pipelineHandle)
+	{
+		const auto& pipeline = mComputePipelines.remove(pipelineHandle);
 		glDeleteProgram(pipeline.handle);
 	}
 
@@ -350,5 +377,27 @@ namespace tur::gl
 	{
 		const auto& texture = mTextures.remove(textureHandle);
 		glDeleteTextures(1, &texture.handle);
+	}
+
+	fence_handle ResourceHandler::create_fence()
+	{
+		return 0;
+	}
+    semaphore_handle ResourceHandler::create_semaphore()
+	{
+		return 0;
+	}
+	void ResourceHandler::destroy_fence(fence_handle)
+	{
+		/* Blank */
+	}
+	void ResourceHandler::destroy_semaphore(semaphore_handle)
+	{
+		/* Blank */
+	}
+
+	command_buffer_handle ResourceHandler::create_primary_command_buffer()
+	{
+		return 0;
 	}
 }

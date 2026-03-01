@@ -4,6 +4,8 @@
 #include <vulkan/vulkan.hpp>
 
 #include "core/data-structures/free_list.hpp"
+#include "graphics/objects/command_buffer.hpp"
+#include "graphics/objects/sync.hpp"
 #include "rhi/vulkan/objects/buffer.hpp"
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
@@ -29,7 +31,9 @@ namespace tur::vulkan
 		void submit_texture(texture_handle textureHandle);
 		void submit_pipeline(pipeline_handle pipelineHandle);
 		void submit_descriptor_set_layout(descriptor_set_layout_handle setLayoutHandle);
-
+		void submit_fence(fence_handle fenceHandle);
+		void submit_semaphore(semaphore_handle semaphoreHandle);
+	
 		void flush();
 
 	private:
@@ -40,6 +44,9 @@ namespace tur::vulkan
 		std::vector<texture_handle> mTextureHandles;
 		std::vector<pipeline_handle> mPipelineHandles;
 		std::vector<descriptor_set_layout_handle> mSetLayoutHandles;
+		std::vector<fence_handle> mFenceHandles;
+		std::vector<semaphore_handle> mSemaphoreHandles;
+
 		std::vector<std::function<void()>> mAdditionalDeletionQueue;
 	};
 }

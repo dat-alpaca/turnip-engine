@@ -1,18 +1,23 @@
-#include "scene/components.hpp"
-#include "scene/scene.hpp"
-
 #include <turnip_engine.hpp>
+#include "frame_data.hpp"
 
 using namespace tur;
 
 class MainSceneView final : public View
 {
 public:
+	void on_engine_shutdown() final
+	{
+		mFrameData.shutdown();
+	}
+
 	void on_view_added() final
 	{
+		auto& rhi = engine->get_render_interface();
+		mFrameData.initialize(&engine->get_render_interface(), 3);
 		initialize_views();
 
-		// Windowing:
+		// Windowing: TODO: check if needed
 		// Warning: Required for Wayland. For some reason, it does not send a resize event on window creation.
 		WindowFramebufferEvent initialSizeEvent(engine->get_window_dimensions().x, engine->get_window_dimensions().y);
 		engine->get_event_callback()(initialSizeEvent);
@@ -31,57 +36,74 @@ public:
 	void on_render() final
 	{
 		auto& rhi = engine->get_render_interface();
+		auto& resources = rhi.get_resource_handler();
+		auto& frame = mFrameData.get_current_frame_data();
+		
+		mFrameData.advance();
 
-		/*
-		CommandBuffer computeCommands = rhi.create_command_buffer();
-
-		computeCommands.begin();
-		computeCommands.begin_renderering();
-
-		computeCommands.dispatch();
-
-		commandBuffer.end_rendering();
-		commandBuffer.blit();
-		commandBuffer.end();
-		*/
-
-		CommandBuffer commandBuffer = rhi.create_command_buffer();
-		commandBuffer.reset(rhi.get_current_command_buffer());
-		commandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
-
-		commandBuffer.begin();
-		commandBuffer.begin_rendering();
-
-		rCubemapView->render_deferred();
-		rQuadView->render_deferred();
-		rTilemapView->render_deferred();
-		rMeshView->render_deferred();
-		rFontView->render_deferred();
-
-		std::vector<CommandBuffer::BufferType> commandBuffers;
+		rhi.begin_frame(frame.inFlightFence);
+		
+		auto imageResult = rhi.acquire_swapchain_image(frame.imageReadySemaphore);
+		if(!imageResult.has_value())
 		{
-			commandBuffers.reserve(4);
-
-			if (rCubemapView->renderer().is_valid())
-				commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
-
-			commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
-
-			if (!rTilemapView->renderer().is_empty())
-				commandBuffers.push_back(rTilemapView->renderer().get_command_buffer().get_buffer());
-
-			if (rMeshView->renderer().mesh_count() > 0)
-				commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
-
-			if (!rFontView->renderer().is_empty())
-				commandBuffers.push_back(rFontView->renderer().get_command_buffer().get_buffer());
+			mFrameData.initialize(&rhi, 3);
+			return;
 		}
 
-		commandBuffer.execute_secondary_buffers(std::span{commandBuffers.data(), commandBuffers.size()});
+		u32 imageHandle = *imageResult;
+		mFrameData.set_image_buffer_index(imageHandle);
 
-		commandBuffer.end_rendering();
-		commandBuffer.blit();
-		commandBuffer.end();
+		rhi.reset_fence(frame.inFlightFence);
+
+		mCommandBuffer.reset(frame.commandBuffer);
+		mCommandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
+			
+		mCommandBuffer.begin();
+		mCommandBuffer.begin_rendering();
+
+			// rTurnipView->render_deferred();
+			rCubemapView->render_deferred();
+			rQuadView->render_deferred();
+			rTilemapView->render_deferred();
+			rMeshView->render_deferred();
+			rFontView->render_deferred();
+
+			// TODO: improve
+			std::vector<CommandBuffer::BufferType> commandBuffers;
+			{
+				commandBuffers.reserve(4);
+
+				// commandBuffers.push_back(rTurnipView->renderer().get_command_buffer().get_buffer());
+
+				if (rCubemapView->renderer().is_valid())
+					commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
+
+				commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
+
+				if (!rTilemapView->renderer().is_empty())
+					commandBuffers.push_back(rTilemapView->renderer().get_command_buffer().get_buffer());
+
+				if (rMeshView->renderer().mesh_count() > 0)
+					commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
+
+				if (!rFontView->renderer().is_empty())
+					commandBuffers.push_back(rFontView->renderer().get_command_buffer().get_buffer());
+			}
+			
+		mCommandBuffer.execute_secondary_buffers(commandBuffers);
+		mCommandBuffer.end_rendering();
+		mCommandBuffer.blit(imageHandle);
+		mCommandBuffer.end();
+
+		rhi.end_frame();
+		rhi.submit(
+			rhi.get_queue(QueueOperation::GRAPHICS), 
+			frame.commandBuffer, 
+			frame.inFlightFence, 
+			frame.imageReadySemaphore,
+			mFrameData.get_render_finished_semaphore()
+		);
+		rhi.present(imageHandle, rhi.get_queue(QueueOperation::PRESENT), mFrameData.get_render_finished_semaphore());
 	}
 
 private:
@@ -93,6 +115,8 @@ private:
 		auto& physics = engine->get_physics_handler();
 		auto& scriptHandler = engine->get_script_handler();
 
+		mCommandBuffer = rhi.create_command_buffer();
+
 		// Final touches:
 		engine->get_asset_library().create_default_texture();
 		engine->get_script_handler().initialize_scene_holder(&mSceneHolder);
@@ -101,7 +125,7 @@ private:
 
 		// Views:
 		assetBinderView 	= engine->add_view(tur::make_unique<AssetBinderView>(&rhi, &library));
-
+		
 		immQuadView 		= engine->add_view(tur::make_unique<ImmQuadView>(&rhi));
 		cubemapView 		= engine->add_view(tur::make_unique<CubemapView>(&rhi));
 		tilemapView 		= engine->add_view(tur::make_unique<TilemapView>(&rhi));
@@ -118,12 +142,15 @@ private:
 		auto* scriptPtr 	= views.get<ScriptView>(scriptView);
 		physicsScriptView 	= engine->add_view(tur::make_unique<PhysicsScriptView>(physicsPtr, scriptPtr));
 
+		turnipView 			= engine->add_view(tur::make_unique<TurnipRendererView>(&rhi));
+
 		// Handles:
 		rQuadView 		= views.get<ImmQuadView>(immQuadView);
 		rCubemapView 	= views.get<CubemapView>(cubemapView);
 		rMeshView 		= views.get<MeshView>(meshView);
 		rTilemapView 	= views.get<TilemapView>(tilemapView);
 		rFontView		= views.get<TextView>(fontView);
+		rTurnipView 	= views.get<TurnipRendererView>(turnipView);
 	}
 
 	void initialize_resources()
@@ -170,10 +197,14 @@ private:
 	}
 
 private:
+	FrameDataHolder mFrameData;
+	CommandBuffer mCommandBuffer;
 	SceneHolder mSceneHolder;
 	Project mProject;
 
 private:
+	NON_OWNING TurnipRendererView* 	rTurnipView		= nullptr;
+	
 	NON_OWNING ImmQuadView* rQuadView 		= nullptr;
 	NON_OWNING CubemapView* rCubemapView 	= nullptr;
 	NON_OWNING MeshView* 	rMeshView 		= nullptr;
@@ -181,6 +212,8 @@ private:
 	NON_OWNING TextView* 	rFontView		= nullptr;
 
 private:
+	view_handle turnipView			= invalid_handle;
+
 	view_handle assetBinderView 	= invalid_handle;
 	view_handle immQuadView 		= invalid_handle;
 	view_handle cubemapView 		= invalid_handle;

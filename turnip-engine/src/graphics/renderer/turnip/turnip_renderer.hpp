@@ -3,7 +3,6 @@
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/camera.hpp"
 #include "rhi/rhi.hpp"
-#include <limits>
 
 namespace tur
 {
@@ -35,6 +34,7 @@ namespace tur
 		void initialize(NON_OWNING RenderInterface* rhi);
 		void set_camera(NON_OWNING Camera* camera);
 		void render();
+        void dispatch();
 
 	private:
 		void initialize_resources();
@@ -46,12 +46,20 @@ namespace tur
 		NON_OWNING RenderInterface* rRHI = nullptr;
 		NON_OWNING Camera* rCamera = nullptr;
 
+    public:
+        CommandBuffer computeCommandBuffer;
+
 	public:
 		descriptor_set_layout_handle setLayout;
         descriptor_set_handle globalSet;
 		buffer_handle worldUBO, vertexSSBO, objectSSBO;
         buffer_handle drawCommands;
+
 		pipeline_handle pipeline;
+
+    public:
+        descriptor_set_handle computeSet;
+		pipeline_handle computePipeline;
 
     private:
         static inline constexpr u32 s_MaxVertexCount = 1 << 20;
