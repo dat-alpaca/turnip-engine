@@ -1,4 +1,5 @@
 #include "opengl_command_buffer.hpp"
+#include "graphics/objects/buffer.hpp"
 #include "logging/logging.hpp"
 #include "rhi/opengl/gl_render_interface.hpp"
 #include <glad/gl.h>
@@ -244,6 +245,25 @@ namespace tur::gl
 			glDrawElementsInstanced(
 				topology, indexSize, get_buffer_index_type(mBufferIndexType), nullptr, instanceCount
 			);
+	}
+
+	void CommandBufferGL::draw_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride)
+	{
+		auto& resources = rRHI->get_resource_handler();
+		const Buffer& buffer = resources.get_buffers().get(bufferHandle);		
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, buffer.handle);
+
+		gl_handle topology = get_primitive_topology(mPipeline.inputAssemblyStage.topology);
+		glMultiDrawArraysIndirect(topology, nullptr, drawCount, stride);
+	}
+	void CommandBufferGL::draw_indexed_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride)
+	{
+		auto& resources = rRHI->get_resource_handler();
+		const Buffer& buffer = resources.get_buffers().get(bufferHandle);		
+		glBindBuffer(GL_DRAW_INDIRECT_BUFFER, buffer.handle);
+		
+		gl_handle topology = get_primitive_topology(mPipeline.inputAssemblyStage.topology);
+		glMultiDrawElementsIndirect(topology, get_buffer_index_type(mBufferIndexType), nullptr, drawCount, stride);
 	}
 
 	void CommandBufferGL::dispatch(u32 groupsX, u32 groupsY, u32 groupsZ)

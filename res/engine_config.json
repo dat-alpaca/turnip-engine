@@ -37,7 +37,8 @@
                 "VK_KHR_dynamic_rendering",
                 "VK_KHR_synchronization2"
             ],
-            "preferDiscrete": true
+            "preferDiscrete": true,
+            "enableMDI": true
         }
     },
     "windowProperties": {

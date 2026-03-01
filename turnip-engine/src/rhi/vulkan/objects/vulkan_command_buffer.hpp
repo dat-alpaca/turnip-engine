@@ -42,6 +42,9 @@ namespace tur::vulkan
 		void draw(u32 vertexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 		void draw_indexed(u32 indexCount, u32 instanceCount, u32 firstVertex, u32 firstInstance);
 
+		void draw_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride);
+		void draw_indexed_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride);
+
 	public:
 		void dispatch(u32 groupsX, u32 groupsY, u32 groupsZ);
 

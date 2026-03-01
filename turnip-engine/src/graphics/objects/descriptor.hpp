@@ -32,5 +32,10 @@ namespace tur
 	struct DescriptorSetLayoutDescriptor
 	{
 		std::vector<DescriptorSetLayoutEntry> entries;
+		
+		u32 maxSets = 1000;
+
+		/* Translates to Descriptor indexing in Vulkan and Bindless textures in OpenGL */
+		bool useDynamicIndexing = false;
 	};
 }

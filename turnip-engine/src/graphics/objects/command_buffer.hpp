@@ -58,6 +58,12 @@ namespace tur
         { t.draw_indexed(indexCount, instanceCount, firstVertex, firstInstance) };
 	} &&
 
+	requires(T t, buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride)
+	{
+        { t.draw_indirect(bufferHandle, offset, drawCount, stride) };
+        { t.draw_indexed_indirect(bufferHandle, offset, drawCount, stride) };
+	} &&
+
 	requires(T t, u32 group)
 	{
 		{ t.dispatch(group, group, group) };
