@@ -212,6 +212,16 @@ namespace tur::vulkan
 	{
 		mCommandBuffer.drawIndexed(indexCount, instanceCount, 0, firstVertex, firstInstance);
 	}
+	void CommandBufferVulkan::draw_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride)
+	{
+		const Buffer& buffer = rRHI->get_resource_handler().get_buffers().get(bufferHandle);
+		mCommandBuffer.drawIndirect(buffer.buffer, static_cast<vk::DeviceSize>(offset), drawCount, stride);
+	}
+	void CommandBufferVulkan::draw_indexed_indirect(buffer_handle bufferHandle, u64 offset, u32 drawCount, u32 stride)
+	{
+		const Buffer& buffer = rRHI->get_resource_handler().get_buffers().get(bufferHandle);
+		mCommandBuffer.drawIndexedIndirect(buffer.buffer, static_cast<vk::DeviceSize>(offset), drawCount, stride);
+	}
 
 	void CommandBufferVulkan::dispatch(u32 groupsX, u32 groupsY, u32 groupsZ)
 	{

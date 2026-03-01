@@ -69,6 +69,10 @@ namespace tur::vulkan
 			for (const auto& device : suitableDevices)
 			{
 				const auto& properties = device.getProperties();
+				const auto& features   = chosenDevice.getFeatures2().features;
+
+				if (requirements.enableMDI && !features.multiDrawIndirect)
+					continue;
 
 				if (requirements.preferDiscrete && properties.deviceType == vk::PhysicalDeviceType::eDiscreteGpu)
 					chosenDevice = device;

@@ -25,6 +25,7 @@ namespace tur::vulkan
 
 		// Optional:
 		bool preferDiscrete = true;
+		bool enableMDI = true;
 	};
 
 	struct VulkanConfig

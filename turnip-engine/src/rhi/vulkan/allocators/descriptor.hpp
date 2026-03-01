@@ -8,6 +8,7 @@
 #include "rhi/vulkan/objects/descriptor.hpp"
 #include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/utils/logger.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -39,6 +40,19 @@ namespace tur::vulkan
 	{
 		TUR_ASS(device);
 
+		vk::DescriptorSetLayoutBindingFlagsCreateInfoEXT bindingFlags = {};
+		const vk::DescriptorBindingFlags flags = 
+				vk::DescriptorBindingFlagBits::eVariableDescriptorCount | 
+				vk::DescriptorBindingFlagBits::ePartiallyBound | 
+				vk::DescriptorBindingFlagBits::eUpdateAfterBind | 
+				vk::DescriptorBindingFlagBits::eUpdateUnusedWhilePending;
+
+		if(layout.useDynamicIndexing)
+		{
+			bindingFlags.bindingCount = 1;
+			bindingFlags.pBindingFlags = &flags;
+		}
+
 		std::vector<vk::DescriptorSetLayoutBinding> bindings;
 		for (const auto& entry : layout.entries)
 		{
@@ -57,6 +71,7 @@ namespace tur::vulkan
 		{
 			createInfo.pBindings = bindings.data();
 			createInfo.bindingCount = bindings.size();
+			createInfo.pNext = layout.useDynamicIndexing ? &bindingFlags : nullptr;
 		}
 
 		return check_vk_object(device.createDescriptorSetLayout(createInfo), "DescriptorSetLayout");
