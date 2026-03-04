@@ -1,4 +1,6 @@
 #pragma once
+#include "data-structures/ring_buffer.hpp"
+#include "graphics/objects/sync.hpp"
 #include <turnip_engine.hpp>
 
 using namespace tur;
@@ -72,7 +74,9 @@ public:
 
 	constexpr inline std::vector<FrameData>& get_frames() { return mData.get_data(); }
 	constexpr inline FrameData& get_current_frame_data() { return mData.get_current(); }
+	constexpr inline u32 get_frame_index() const { return mData.current_index(); }
 
+	inline void set_ring_data_index(u32 index) { mData.set_current(index); }
 	inline void set_image_buffer_index(u32 index) { mImageBufferIndex = index; }
 	inline u32 get_image_buffer_index() { return mImageBufferIndex; }
 

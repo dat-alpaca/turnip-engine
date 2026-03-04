@@ -7,6 +7,7 @@ namespace tur
 	void TurnipRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
 		computeCommandBuffer = rhi->create_command_buffer();
+		computeCommandBuffer.initialize_secondary();
 
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
@@ -42,14 +43,12 @@ namespace tur
 	}
 	void TurnipRenderer::dispatch()
 	{
-		/*
 		computeCommandBuffer.begin();
 
 			computeCommandBuffer.bind_pipeline(computePipeline);
 			computeCommandBuffer.dispatch(1, 0, 0);
-			// TODO: sync
 
-		computeCommandBuffer.end();*/
+		computeCommandBuffer.end();
 	}
 
 	void TurnipRenderer::initialize_resources()

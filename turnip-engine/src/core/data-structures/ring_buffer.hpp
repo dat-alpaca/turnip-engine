@@ -39,14 +39,15 @@ namespace tur
 		constexpr auto end() const noexcept { return mData.end(); }
 
 	public:
+		constexpr inline void set_current(size_type index) { mCurrentIndex = index % mSize; }
+		constexpr inline size_type current_index() const { return mCurrentIndex; }
+
 		constexpr inline T& get_current() { return mData[mCurrentIndex]; }
 		constexpr inline const T& get_current() const { return mData[mCurrentIndex]; }
 
-		constexpr inline std::vector<T>& get_data() { return mData; }
-
-	public:
-		constexpr inline size_type current_index() const { return mCurrentIndex; }
 		constexpr inline size_type capacity() const { return mSize; }
+
+		constexpr inline std::vector<T>& get_data() { return mData; }
 
 	private:
 		std::vector<T> mData;

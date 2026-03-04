@@ -1,5 +1,7 @@
 #include <turnip_engine.hpp>
-#include "frame_data.hpp"
+
+#include "compute_pass.hpp"
+#include "graphics_pass.hpp"
 
 using namespace tur;
 
@@ -8,13 +10,17 @@ class MainSceneView final : public View
 public:
 	void on_engine_shutdown() final
 	{
-		mFrameData.shutdown();
+		mComputePass.shutdown();
+		mGraphicsPass.shutdown();
 	}
 
 	void on_view_added() final
 	{
 		auto& rhi = engine->get_render_interface();
-		mFrameData.initialize(&engine->get_render_interface(), 3);
+
+		mComputePass.initialize(&rhi /* TODO: swapchain size */);
+		mGraphicsPass.initialize(&rhi);
+
 		initialize_views();
 
 		// Windowing: TODO: check if needed
@@ -35,75 +41,32 @@ public:
 
 	void on_render() final
 	{
-		auto& rhi = engine->get_render_interface();
-		auto& resources = rhi.get_resource_handler();
-		auto& frame = mFrameData.get_current_frame_data();
+		mGraphicsPass.advance();
 		
-		mFrameData.advance();
-
-		rhi.begin_frame(frame.inFlightFence);
+		/* Graphics Pass*/
+		mGraphicsPass.on_render_begin();
 		
-		auto imageResult = rhi.acquire_swapchain_image(frame.imageReadySemaphore);
-		if(!imageResult.has_value())
-		{
-			mFrameData.initialize(&rhi, 3);
-			return;
-		}
-
-		u32 imageHandle = *imageResult;
-		mFrameData.set_image_buffer_index(imageHandle);
-
-		rhi.reset_fence(frame.inFlightFence);
-
-		mCommandBuffer.reset(frame.commandBuffer);
-		mCommandBuffer.set_clear_color({}, ClearFlags::COLOR | ClearFlags::DEPTH);
-			
-		mCommandBuffer.begin();
-		mCommandBuffer.begin_rendering();
-
-			// rTurnipView->render_deferred();
 			rCubemapView->render_deferred();
 			rQuadView->render_deferred();
 			rTilemapView->render_deferred();
 			rMeshView->render_deferred();
 			rFontView->render_deferred();
 
-			// TODO: improve
-			std::vector<CommandBuffer::BufferType> commandBuffers;
-			{
-				commandBuffers.reserve(4);
+			if (rCubemapView->renderer().is_valid())
+				mGraphicsPass.add_command_buffer(rCubemapView->renderer().get_command_buffer().get_buffer());
 
-				// commandBuffers.push_back(rTurnipView->renderer().get_command_buffer().get_buffer());
+			mGraphicsPass.add_command_buffer(rQuadView->renderer().get_command_buffer().get_buffer());
 
-				if (rCubemapView->renderer().is_valid())
-					commandBuffers.push_back(rCubemapView->renderer().get_command_buffer().get_buffer());
+			if (!rTilemapView->renderer().is_empty())
+				mGraphicsPass.add_command_buffer(rTilemapView->renderer().get_command_buffer().get_buffer());
 
-				commandBuffers.push_back(rQuadView->renderer().get_command_buffer().get_buffer());
+			if (rMeshView->renderer().mesh_count() > 0)
+				mGraphicsPass.add_command_buffer(rMeshView->renderer().get_command_buffer().get_buffer());
 
-				if (!rTilemapView->renderer().is_empty())
-					commandBuffers.push_back(rTilemapView->renderer().get_command_buffer().get_buffer());
+			if (!rFontView->renderer().is_empty())
+				mGraphicsPass.add_command_buffer(rFontView->renderer().get_command_buffer().get_buffer());
 
-				if (rMeshView->renderer().mesh_count() > 0)
-					commandBuffers.push_back(rMeshView->renderer().get_command_buffer().get_buffer());
-
-				if (!rFontView->renderer().is_empty())
-					commandBuffers.push_back(rFontView->renderer().get_command_buffer().get_buffer());
-			}
-			
-		mCommandBuffer.execute_secondary_buffers(commandBuffers);
-		mCommandBuffer.end_rendering();
-		mCommandBuffer.blit(imageHandle);
-		mCommandBuffer.end();
-
-		rhi.end_frame();
-		rhi.submit(
-			rhi.get_queue(QueueOperation::GRAPHICS), 
-			frame.commandBuffer, 
-			frame.inFlightFence, 
-			frame.imageReadySemaphore,
-			mFrameData.get_render_finished_semaphore()
-		);
-		rhi.present(imageHandle, rhi.get_queue(QueueOperation::PRESENT), mFrameData.get_render_finished_semaphore());
+		mGraphicsPass.on_render_end();
 	}
 
 private:
@@ -114,8 +77,6 @@ private:
 		auto& library = engine->get_asset_library();
 		auto& physics = engine->get_physics_handler();
 		auto& scriptHandler = engine->get_script_handler();
-
-		mCommandBuffer = rhi.create_command_buffer();
 
 		// Final touches:
 		engine->get_asset_library().create_default_texture();
@@ -197,8 +158,9 @@ private:
 	}
 
 private:
-	FrameDataHolder mFrameData;
-	CommandBuffer mCommandBuffer;
+	ComputePass mComputePass;
+	GraphicsPass mGraphicsPass;
+
 	SceneHolder mSceneHolder;
 	Project mProject;
 

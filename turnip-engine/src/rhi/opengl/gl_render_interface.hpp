@@ -9,6 +9,7 @@
 
 #include "config/config_data.hpp"
 #include "platform/platform.hpp"
+#include <vector>
 
 namespace tur::gl
 {
@@ -24,8 +25,8 @@ namespace tur::gl
 		std::optional<image_handle> acquire_swapchain_image([[maybe_unused]] semaphore_handle waitFor, [[maybe_unused]] u32 timeout = 0);
 		void reset_fence([[maybe_unused]] fence_handle inFlightFence);
 
-		void submit([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] command_buffer_handle commandBuffer = invalid_handle, [[maybe_unused]] fence_handle inFlightFence = invalid_handle, [[maybe_unused]] semaphore_handle waitFor = invalid_handle, [[maybe_unused]] semaphore_handle signal = invalid_handle);
-		void present([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] semaphore_handle waitFor = invalid_handle, [[maybe_unused]] u32 imageHandle = invalid_handle);
+		void submit([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] command_buffer_handle commandBuffer = invalid_handle, [[maybe_unused]] fence_handle inFlightFence = invalid_handle, [[maybe_unused]] const std::vector<semaphore_handle>& waitFor = invalid_handle, [[maybe_unused]] semaphore_handle signal = invalid_handle);
+		void present([[maybe_unused]] queue_handle = invalid_handle, [[maybe_unused]] const std::vector<semaphore_handle>& waitFor = invalid_handle, [[maybe_unused]] u32 imageHandle = invalid_handle);
 		void end_frame();
 
 	public:

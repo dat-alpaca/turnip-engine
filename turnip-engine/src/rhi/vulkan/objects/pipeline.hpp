@@ -191,6 +191,19 @@ namespace tur::vulkan
 
 		return flags;
 	}
+
+	constexpr inline vk::PipelineStageFlags get_pipeline_stage_flags(PipelineStageFlags stageFlags)
+	{
+		vk::PipelineStageFlags flags;
+
+		if (static_cast<u32>(stageFlags) & static_cast<u32>(PipelineStageFlags::VERTEX_INPUT))
+			flags |= vk::PipelineStageFlagBits::eVertexInput;
+
+		if (static_cast<u32>(stageFlags) & static_cast<u32>(PipelineStageFlags::COLOR_ATTACH_OUTPUT))
+			flags |= vk::PipelineStageFlagBits::eColorAttachmentOutput;
+
+		return flags;
+	}
 }
 
 namespace tur::vulkan

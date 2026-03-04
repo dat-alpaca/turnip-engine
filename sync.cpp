@@ -23,6 +23,15 @@ void drawFrame()
 		throw std::runtime_error("failed to submit compute command buffer!");
 	};
 
+
+
+
+
+
+
+
+
+	
 	// Graphics submission
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
 

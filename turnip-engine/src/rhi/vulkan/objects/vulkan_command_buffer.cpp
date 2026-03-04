@@ -29,7 +29,7 @@ namespace tur::vulkan
 		mCommandBuffer = rRHI->get_resource_handler().get_command_buffers().get(commandBuffer);
 		mIsSecondary = false;
 
-		mCommandBuffer.reset();
+		auto _ = mCommandBuffer.reset();
 	}
 	void CommandBufferVulkan::execute_secondary_buffers(std::span<vk::CommandBuffer> buffers)
 	{

@@ -1,8 +1,7 @@
 #pragma once
 #include "graphics/objects/command_buffer.hpp"
 #include "graphics/objects/sync.hpp"
-#include "objects/pipeline.hpp"
-#include "objects/queue.hpp"
+
 #include "objects/texture.hpp"
 #include "objects/vulkan_command_buffer.hpp"
 #include "objects/vulkan_deletion_queue.hpp"
@@ -53,8 +52,8 @@ namespace tur::vulkan
 
 		std::optional<image_handle> acquire_swapchain_image(semaphore_handle signalImageReady, u32 imageReadyTimeout = ImageAvailableTimeout);
 
-		void submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, semaphore_handle waitFor, semaphore_handle signal);
-		void present(image_handle imageHandle, queue_handle presentQueue, semaphore_handle waitFor);
+		void submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, const std::vector<SubmitSemaphoreData>& waitFor, semaphore_handle signal);
+		void present(queue_handle presentQueue, const std::vector<semaphore_handle>& waitFor, image_handle imageHandle);
 		void end_frame();
 
 	public:

@@ -1,12 +1,17 @@
 #include "vulkan_render_interface.hpp"
 
 #include <optional>
+#include <sys/wait.h>
+#include <vector>
+#include "defines.hpp"
 #include "graphics/objects/sync.hpp"
 
 #include "rhi/vulkan/allocators/allocators.hpp"
 #include "rhi/vulkan/initializers/initializers.hpp"
+#include "rhi/vulkan/objects/pipeline.hpp"
 #include "rhi/vulkan/objects/texture.hpp"
 #include "rhi/vulkan/objects/vulkan_command_buffer.hpp"
+#include "vulkan/vulkan.hpp"
 
 namespace tur::vulkan
 {
@@ -192,24 +197,34 @@ namespace tur::vulkan
 		return imageIndex;
 	}
 
-	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, semaphore_handle waitFor, semaphore_handle signal)
+	void RenderInterfaceVulkan::submit(queue_handle graphicsQueue, command_buffer_handle commandBuffer, fence_handle inFlightFence, const std::vector<SubmitSemaphoreData>& waitFor, semaphore_handle signal)
 	{
+		TUR_ASS(commandBuffer != invalid_handle);
+
 		auto& currentCommandBuffer = mResources.get_command_buffers().get(commandBuffer);
 		auto& fence = mResources.get_fences().get(inFlightFence);
-		auto& waitForSemaphore = mResources.get_semaphores().get(waitFor);
-		auto& signalThisSemaphore = mResources.get_semaphores().get(signal);
 
+		// Semaphores:
+		std::vector<vk::Semaphore> waitForSemaphores;
+		std::vector<vk::PipelineStageFlags> stageFlags;
+		waitForSemaphores.reserve(waitFor.size());
+		stageFlags.reserve(waitFor.size());
+		for(const auto& [semaphore, flags] : waitFor)
+		{
+			waitForSemaphores.push_back(mResources.get_semaphores().get(semaphore));
+			stageFlags.push_back(get_pipeline_stage_flags(flags));
+		}
+
+		// Submit information:
 		vk::Queue queue = mState.queueList.get_queue(graphicsQueue).queue;
-
-		vk::Semaphore waitSemaphores[] = { waitForSemaphore };
-		vk::Semaphore signalSemaphores[] = {signalThisSemaphore };
+		vk::Semaphore signalSemaphores[] = { mResources.get_semaphores().get(signal) };
 		vk::PipelineStageFlags waitStages[] = {vk::PipelineStageFlagBits::eColorAttachmentOutput};
 		vk::SubmitInfo submitInfo = {};
 		{
-			submitInfo.pWaitDstStageMask = waitStages;
+			submitInfo.pWaitDstStageMask = stageFlags.data();
 
-			submitInfo.waitSemaphoreCount = 1;
-			submitInfo.pWaitSemaphores = waitSemaphores;
+			submitInfo.waitSemaphoreCount = waitForSemaphores.size();
+			submitInfo.pWaitSemaphores = waitForSemaphores.data();
 
 			submitInfo.signalSemaphoreCount = 1;
 			submitInfo.pSignalSemaphores = signalSemaphores;
@@ -222,19 +237,21 @@ namespace tur::vulkan
 		if (result != vk::Result::eSuccess)
 			TUR_LOG_ERROR("Failed to submit commands to the graphics queue.");
 	}
-	void RenderInterfaceVulkan::present(image_handle imageHandle, queue_handle presentQueue, semaphore_handle waitFor)
+	void RenderInterfaceVulkan::present(queue_handle presentQueue, const std::vector<semaphore_handle>& waitFor, image_handle imageHandle)
 	{
-		auto& waitForSemaphore = mResources.get_semaphores().get(waitFor);
+		std::vector<vk::Semaphore> waitForSemaphores;
+		waitForSemaphores.reserve(waitFor.size());
+		for(const auto& semaphore : waitFor)
+			waitForSemaphores.push_back(mResources.get_semaphores().get(semaphore));
 
 		vk::Queue queue = mState.queueList.get_queue(presentQueue).queue;
-		vk::Semaphore waitSemaphores[] = { waitForSemaphore };
 
 		u32 imageIndices[] = { imageHandle };
 
 		vk::PresentInfoKHR presentInfo = {};
 		{
-			presentInfo.waitSemaphoreCount = 1;
-			presentInfo.pWaitSemaphores = waitSemaphores;
+			presentInfo.waitSemaphoreCount = waitForSemaphores.size();
+			presentInfo.pWaitSemaphores = waitForSemaphores.data();
 			presentInfo.swapchainCount = 1;
 			presentInfo.pSwapchains = &mState.swapchain;
 			presentInfo.pImageIndices = imageIndices;

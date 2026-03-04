@@ -8,9 +8,18 @@
 #include "objects/queue.hpp"
 #include "objects/image.hpp"
 #include "objects/command_buffer.hpp"
+#include "types/queue_operations.hpp"
 
 #include "platform/platform.hpp"
-#include "types/queue_operations.hpp"
+
+namespace tur
+{
+	struct SubmitSemaphoreData
+	{
+		semaphore_handle waitFor;
+		PipelineStageFlags stageFlag;
+	};
+}
 
 namespace tur
 {
@@ -22,14 +31,22 @@ namespace tur
 		{ t.on_event(event) };
 	} && 
 	
-	requires(T t, queue_handle queue, u32 timeout, fence_handle inFlightFence, semaphore_handle waitFor, semaphore_handle signal, command_buffer_handle cb)
+	requires(T t, fence_handle inFlightFence, semaphore_handle signal, u32 timeout)
 	{
 		{ t.begin_frame(inFlightFence, timeout) };
 		{ t.acquire_swapchain_image(signal, timeout) } 		-> std::same_as<std::optional<image_handle>>;
-		{ t.reset_fence(inFlightFence) };
-		
-		{ t.submit(queue, cb, inFlightFence, waitFor, signal) };
-		{ t.present(queue, waitFor, timeout /* imageHandle */) };
+		{ t.reset_fence(inFlightFence) };		
+	} &&
+
+	requires(T t, queue_handle q, command_buffer_handle cb, fence_handle inFlightFence, semaphore_handle signal,
+		     const std::vector<SubmitSemaphoreData>& semaphoreData)
+	{
+		{ t.submit(q, cb, inFlightFence, semaphoreData, signal) };
+	} &&
+
+	requires(T t, queue_handle queue, u32 imageHandle, const std::vector<semaphore_handle>& waitFor)
+	{
+		{ t.present(queue, waitFor, imageHandle) };
 		{ t.end_frame() };
 	} &&
 

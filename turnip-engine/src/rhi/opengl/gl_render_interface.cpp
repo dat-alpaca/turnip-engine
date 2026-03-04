@@ -28,7 +28,7 @@ namespace tur::gl
 	{
 		return 0;
 	}
-	void RenderInterfaceGL::submit(queue_handle, command_buffer_handle, fence_handle, semaphore_handle, semaphore_handle)
+	void RenderInterfaceGL::submit(queue_handle, command_buffer_handle, fence_handle, const std::vector<semaphore_handle>&, semaphore_handle)
 	{
 		/* Blank */
 	}
@@ -36,7 +36,7 @@ namespace tur::gl
 	{
 		/* Blank */
 	}
-	void RenderInterfaceGL::present(queue_handle, semaphore_handle, u32)
+	void RenderInterfaceGL::present(queue_handle, const std::vector<semaphore_handle>&, u32)
 	{
 		platform::WindowingSystem::get_binder().present();
 	}
