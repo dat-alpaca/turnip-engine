@@ -39,6 +39,7 @@ namespace tur::vulkan
 
 	void CommandBufferVulkan::begin_compute()
 	{
+		auto _ = mCommandBuffer.reset();
 		auto& resources = rRHI->get_resource_handler();
 	
 		vk::CommandBufferInheritanceRenderingInfo renderingInfo = {};

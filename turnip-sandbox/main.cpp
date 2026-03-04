@@ -42,10 +42,22 @@ public:
 	void on_render() final
 	{
 		mGraphicsPass.advance();
+		mComputePass.set_frame_index(mGraphicsPass.get_frame_index());
 		
+		/* Compute Pass */
+		mComputePass.on_render_begin();
+
+			// Dispatch
+			rTurnipView->dispatch();
+			mComputePass.add_command_buffer(rTurnipView->renderer().computeCommandBuffer.get_buffer());
+
+		mComputePass.on_render_end();
+		auto& computeData = mComputePass.get_current_frame_data();
+
 		/* Graphics Pass*/
 		mGraphicsPass.on_render_begin();
-		
+		mGraphicsPass.add_wait_semaphore(computeData.imageReadySemaphore, PipelineStageFlags::VERTEX_INPUT);
+
 			rCubemapView->render_deferred();
 			rQuadView->render_deferred();
 			rTilemapView->render_deferred();

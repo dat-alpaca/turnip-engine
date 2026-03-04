@@ -28,13 +28,16 @@ public:
 		rRHI->reset_fence(mCurrentFrame->inFlightFence);
 
 		mCommandBuffer.reset(mCurrentFrame->commandBuffer);
+
+		mCommandBuffer.begin();
 	}
 
 	void on_render_end()
 	{
-		mCommandBuffer.execute_secondary_buffers({});
-		rRHI->end_frame();
+		mCommandBuffer.execute_secondary_buffers(mCommandBuffers);
+		mCommandBuffer.end();
 
+		rRHI->end_frame();
 		rRHI->submit(
 			rRHI->get_queue(QueueOperation::COMPUTE), 
             mCurrentFrame->commandBuffer, 
@@ -42,7 +45,15 @@ public:
             {},
 			mCurrentFrame->imageReadySemaphore
 		);
+
+		mCommandBuffers.clear();
 	}
+
+public:
+	void add_command_buffer(const CommandBuffer::BufferType& buffer)
+    {
+        mCommandBuffers.push_back(buffer);
+    }
 
 public:
     void set_frame_index(u32 index) { mFrameDataHolder.set_ring_data_index(index); }
@@ -54,6 +65,7 @@ private:
 private:
     CommandBuffer mCommandBuffer;
     FrameDataHolder mFrameDataHolder;
-
+	
 	FrameData* mCurrentFrame = nullptr;
+    std::vector<CommandBuffer::BufferType> mCommandBuffers;
 };

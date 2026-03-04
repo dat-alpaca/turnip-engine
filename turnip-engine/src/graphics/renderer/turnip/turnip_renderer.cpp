@@ -43,7 +43,7 @@ namespace tur
 	}
 	void TurnipRenderer::dispatch()
 	{
-		computeCommandBuffer.begin();
+		computeCommandBuffer.begin_compute();
 
 			computeCommandBuffer.bind_pipeline(computePipeline);
 			computeCommandBuffer.dispatch(1, 0, 0);

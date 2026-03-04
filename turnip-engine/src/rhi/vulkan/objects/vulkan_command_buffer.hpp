@@ -1,6 +1,7 @@
 #pragma once
 #include <vulkan/vulkan.hpp>
 
+#include "defines.hpp"
 #include "graphics/objects/command_buffer.hpp"
 #include "rhi/vulkan/objects/render_target.hpp"
 #include "vulkan/vulkan.hpp"
