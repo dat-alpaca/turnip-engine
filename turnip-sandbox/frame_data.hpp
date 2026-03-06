@@ -1,5 +1,6 @@
 #pragma once
 #include "data-structures/ring_buffer.hpp"
+#include "defines.hpp"
 #include "graphics/objects/sync.hpp"
 #include <turnip_engine.hpp>
 
@@ -46,10 +47,10 @@ public:
 
 		for (const auto& frame : mData)
 		{
-			if (frame.inFlightFence)
+			if (frame.inFlightFence != invalid_handle)
 				resources.destroy_fence(frame.inFlightFence);
 
-			if (frame.imageReadySemaphore)
+			if (frame.imageReadySemaphore != invalid_handle)
 				resources.destroy_semaphore(frame.imageReadySemaphore);
 		}
 

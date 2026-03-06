@@ -74,5 +74,8 @@ namespace tur
 	using handle_type = u32;
 	constexpr handle_type invalid_handle = std::numeric_limits<handle_type>::max();
 
+	constexpr inline bool is_invalid_handle(handle_type handle) { return handle == invalid_handle; }
+	constexpr inline bool is_valid_handle(handle_type handle) { return handle != invalid_handle; }
+
 	constexpr glm::uvec2 invalid_size = glm::uvec2(std::numeric_limits<handle_type>::max(), std::numeric_limits<handle_type>::max());
 }
