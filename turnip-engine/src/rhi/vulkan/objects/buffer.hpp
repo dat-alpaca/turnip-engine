@@ -61,6 +61,9 @@ namespace tur::vulkan
 		if (typeValue & static_cast<u32>(BufferType::TRANSFER_DST))
 			valueFlags |= static_cast<u32>(vk::BufferUsageFlagBits::eTransferDst);
 
+		if (typeValue & static_cast<u32>(BufferType::INDIRECT))
+			valueFlags |= static_cast<u32>(vk::BufferUsageFlagBits::eIndirectBuffer);
+
 		return vk::BufferUsageFlags(valueFlags);
 	}
 
