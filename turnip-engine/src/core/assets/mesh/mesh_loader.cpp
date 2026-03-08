@@ -225,7 +225,7 @@ namespace tur
                 destination += sizeof(glm::vec3);
 
                 // uv_x: float
-                std::memcpy(destination, uvData.data() + i * sizeof(float), sizeof(float)); 
+                std::memcpy(destination, uvData.data() + i * 2 + 0, sizeof(float));
                 destination += sizeof(float);
 
                 // normal: vec3
@@ -233,7 +233,7 @@ namespace tur
                 destination += sizeof(glm::vec3);
 
                 // uv_y: float
-                std::memcpy(destination, uvData.data() + i * 2 * sizeof(float), sizeof(float)); 
+                std::memcpy(destination, uvData.data() + i * 2 + 1, sizeof(float));
                 destination += sizeof(float);
             }
 

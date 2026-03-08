@@ -1,5 +1,7 @@
 #pragma once
+#include "assets/asset.hpp"
 #include "assets/asset_library.hpp"
+#include "event/asset_events/mesh_uploaded_event.hpp"
 #include "graphics/renderer/turnip/turnip_renderer.hpp"
 
 #include "event/events.hpp"
@@ -48,7 +50,12 @@ namespace tur
 
 			subscriber.subscribe<SceneSwitchedEvent>([this](const SceneSwitchedEvent& event) -> bool {
 				rScene = event.currentScene;
-				on_scene_switch();
+				on_scene_switched();
+				return false;
+			});
+
+			subscriber.subscribe<MeshUploadedEvent>([this](const MeshUploadedEvent& event) -> bool {
+				upload_mesh_data_on_load(event);
 				return false;
 			});
 
@@ -67,36 +74,30 @@ namespace tur
 			auto cullView = rScene->get_registry().view<const TransformComponent, const CullingComponent, const MeshComponent>();
 			for (auto [entity, transform, culling, mesh] : cullView.each())
 			{
+				if(!mesh.indexCount)
+					continue;
+				
 				bool visible = true /* frustrum_culling() */;
 				if(!visible)
-					return;
+					continue;
 
 				if(mMeshBatch.find(mesh.meshUUID) != mMeshBatch.end())
 				{
 					++mMeshBatch[mesh.meshUUID].instanceCount;
-					return;
+					continue;
 				}
-
-				auto& offset = mOffsets[mesh.assetHandle];
-				DrawCommand drawCommand;
-				{
-					drawCommand.count 			= mesh.indexCount;
-					drawCommand.instanceCount 	= 1;
-					drawCommand.firstIndex 		= offset.firstIndex;
-					drawCommand.baseVertex 		= offset.baseVertex;
-					drawCommand.baseInstance 	= 0;
-				}
-
-				mMeshBatch[mesh.meshUUID] = (drawCommand);
 			}
 
 			mDrawCommands.clear();
 			mDrawCommands.reserve(mMeshBatch.size());
-			for(auto [_, drawCommand] : mMeshBatch)
+			for(auto& [_, drawCommand] : mMeshBatch)
+			{
 				mDrawCommands.push_back(drawCommand);
+				drawCommand.instanceCount = 0;
+			}
 
 			/* Uploading commands */
-
+			mRenderer.set_draw_commands(mDrawCommands);
 		}
 
 		void on_render() override
@@ -105,7 +106,7 @@ namespace tur
 		}
 
 	private:
-		void on_scene_switch()
+		void on_scene_switched()
 		{
 			mRenderer.clear_buffers();
 
@@ -113,9 +114,49 @@ namespace tur
 			for (auto [entity, mesh] : cullView.each())
 			{
 				auto& meshAsset = rLibrary->get_mesh_asset(mesh.assetHandle);
+				if(meshAsset.state == AssetState::LOADING)
+					continue;
+
 				auto offset = mRenderer.upload_mesh(meshAsset.meshData.indices, meshAsset.meshData.vertices);
-				
 				mOffsets[mesh.assetHandle] = offset;
+
+				DrawCommand drawCommand;
+				{
+					drawCommand.count 			= mesh.indexCount;
+					drawCommand.instanceCount 	= 0;
+					drawCommand.firstIndex 		= offset.firstIndex;
+					drawCommand.baseVertex 		= offset.baseVertex;
+					drawCommand.baseInstance 	= 0;
+				}
+
+				mMeshBatch[mesh.meshUUID] = drawCommand;
+			}
+		}
+
+		void upload_mesh_data_on_load(const MeshUploadedEvent& event)
+		{
+			auto view = rScene->get_registry().view<const MeshComponent>();
+			for (auto [entity, mesh] : view.each())
+			{
+				if(mesh.assetHandle != event.data.meshAssetHandle)
+					continue;
+
+				auto& meshAsset = rLibrary->get_mesh_asset(mesh.assetHandle);
+				TUR_ASSERT(meshAsset.state == AssetState::READY, "Upload mesh event signaled before mesh marked as ready.");
+					
+				auto offset = mRenderer.upload_mesh(meshAsset.meshData.vertices, meshAsset.meshData.indices);				
+				mOffsets[mesh.assetHandle] = offset;
+
+				DrawCommand drawCommand;
+				{
+					drawCommand.count 			= mesh.indexCount;
+					drawCommand.instanceCount 	= 0;
+					drawCommand.firstIndex 		= offset.firstIndex;
+					drawCommand.baseVertex 		= offset.baseVertex;
+					drawCommand.baseInstance 	= 0;
+				}
+
+				mMeshBatch[mesh.meshUUID] = drawCommand;
 			}
 		}
 

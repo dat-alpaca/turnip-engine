@@ -51,8 +51,10 @@ public:
 	}
     void on_render_end()
     {
-        mCommandBuffer.execute_secondary_buffers(mCommandBuffers);
-		mCommandBuffer.end_rendering();
+        if(!mCommandBuffers.empty())
+            mCommandBuffer.execute_secondary_buffers(mCommandBuffers);
+		
+        mCommandBuffer.end_rendering();
 		mCommandBuffer.blit(mImageResult);
 		mCommandBuffer.end();
 

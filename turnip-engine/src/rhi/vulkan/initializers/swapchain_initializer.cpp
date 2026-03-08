@@ -162,6 +162,9 @@ namespace tur::vulkan
 					check_vk_object(state.logicalDevice.createImageView(imageCreateInfo), "SwapchainImageView");
 			}
 		}
+
+		// Query hardware information:
+		state.hardwareInformation.swapchainImages = state.swapchainTextures.size();;
 	}
 
 	void destroy_swapchain(VulkanState& state)

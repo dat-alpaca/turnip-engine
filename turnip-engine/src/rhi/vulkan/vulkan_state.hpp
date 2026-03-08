@@ -4,12 +4,17 @@
 
 #include "objects/texture.hpp"
 #include "objects/render_target.hpp"
+
+#include "graphics/types/hardware_information.hpp"
 #include "types/queue_list.hpp"
 
 namespace tur::vulkan
 {
 	struct VulkanState
 	{
+		// Hardware:
+		HardwareInformation hardwareInformation;
+			
 		// Instance:
 		u32 apiVersion;
 		vk::Instance instance;

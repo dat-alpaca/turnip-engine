@@ -8,9 +8,12 @@
 #include "objects/queue.hpp"
 #include "objects/image.hpp"
 #include "objects/command_buffer.hpp"
+
 #include "types/queue_operations.hpp"
+#include "types/hardware_information.hpp"
 
 #include "platform/platform.hpp"
+#include <concepts>
 
 namespace tur
 {
@@ -59,6 +62,11 @@ namespace tur
 	{
 		{ t.get_queue(operation) }			-> std::same_as<queue_handle>;
 		{ t.get_resource_handler() };
+	} && 
+	
+	requires(T t)
+	{
+		{ t.get_hardware_information() } 	-> std::same_as<HardwareInformation>;
 	};
 
 	template <IsRenderInterface Interface>

@@ -1,4 +1,5 @@
 #include "gl_render_interface.hpp"
+#include "graphics/render_interface.hpp"
 #include "platform/platform.hpp"
 
 namespace tur::gl
@@ -10,6 +11,8 @@ namespace tur::gl
 
 		mResources.initialize(this);
 		glClipControl(GL_UPPER_LEFT, GL_ZERO_TO_ONE);
+
+		mHardwareInformation.swapchainImages = 1;
 	}
 	void RenderInterfaceGL::shutdown()
 	{
@@ -28,7 +31,7 @@ namespace tur::gl
 	{
 		return 0;
 	}
-	void RenderInterfaceGL::submit(queue_handle, command_buffer_handle, fence_handle, const std::vector<semaphore_handle>&, semaphore_handle)
+	void RenderInterfaceGL::submit(queue_handle, command_buffer_handle, fence_handle, const std::vector<SubmitSemaphoreData>&, semaphore_handle)
 	{
 		/* Blank */
 	}

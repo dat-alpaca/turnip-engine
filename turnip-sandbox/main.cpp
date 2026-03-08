@@ -18,8 +18,8 @@ public:
 	{
 		auto& rhi = engine->get_render_interface();
 
-		mComputePass.initialize(&rhi /* TODO: swapchain size */);
-		mGraphicsPass.initialize(&rhi);
+		mComputePass.initialize(&rhi, rhi.get_hardware_information().swapchainImages);
+		mGraphicsPass.initialize(&rhi, rhi.get_hardware_information().swapchainImages);
 
 		initialize_views();
 
@@ -58,12 +58,17 @@ public:
 		mGraphicsPass.on_render_begin();
 		// mGraphicsPass.add_wait_semaphore(computeData.imageReadySemaphore, PipelineStageFlags::VERTEX_INPUT);
 
-			rCubemapView->render_deferred();
-			rQuadView->render_deferred();
-			rTilemapView->render_deferred();
-			rMeshView->render_deferred();
-			rFontView->render_deferred();
+			rTurnipView->render_deferred();
+			if(!rTurnipView->renderer().is_empty())
+				mGraphicsPass.add_command_buffer(rTurnipView->renderer().get_command_buffer().get_buffer());
 
+			// rCubemapView->render_deferred();
+			// rQuadView->render_deferred();
+			// rTilemapView->render_deferred();
+			// rMeshView->render_deferred();
+			// rFontView->render_deferred();
+
+			/*
 			if (rCubemapView->renderer().is_valid())
 				mGraphicsPass.add_command_buffer(rCubemapView->renderer().get_command_buffer().get_buffer());
 
@@ -77,6 +82,7 @@ public:
 
 			if (!rFontView->renderer().is_empty())
 				mGraphicsPass.add_command_buffer(rFontView->renderer().get_command_buffer().get_buffer());
+			*/
 
 		mGraphicsPass.on_render_end();
 	}

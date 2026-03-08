@@ -5,6 +5,8 @@
 #include "rhi/vulkan/utils/logger.hpp"
 #include "rhi/vulkan/utils/swapchain_features.hpp"
 #include "rhi/vulkan/vulkan_constants.hpp"
+#include "vulkan/vulkan.hpp"
+#include <vulkan/vulkan_core.h>
 
 namespace tur::vulkan
 {
@@ -80,5 +82,8 @@ namespace tur::vulkan
 		}
 
 		state.physicalDevice = chosenDevice;
+	
+		// Querying limitations:
+		// TODO:
 	}
 }

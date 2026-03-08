@@ -63,6 +63,12 @@ namespace tur::vulkan
 		queue_handle get_queue(QueueOperation operation);
 		inline ResourceHandler& get_resource_handler() { return mResources; }
 
+	public:
+		inline HardwareInformation get_hardware_information() const
+		{
+			return mState.hardwareInformation;
+		}
+
 	private:
 		void create_main_render_target();
 
