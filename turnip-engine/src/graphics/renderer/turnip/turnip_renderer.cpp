@@ -1,19 +1,29 @@
 #include "turnip_renderer.hpp"
 #include "defines.hpp"
-#include "graphics/objects/pipeline.hpp"
+#include "graphics/objects/buffer.hpp"
+#include "graphics/renderer/turnip/common.hpp"
+#include <limits>
 
 namespace tur
 {
 	void TurnipRenderer::initialize(NON_OWNING RenderInterface* rhi)
 	{
+		rRHI = rhi;
+
 		computeCommandBuffer = rhi->create_command_buffer();
 		computeCommandBuffer.initialize_secondary();
 
 		commandBuffer = rhi->create_command_buffer();
 		commandBuffer.initialize_secondary();
 
-		rRHI = rhi;
-		initialize_resources();
+		/* Draw buffer */
+		auto& resources = rRHI->get_resource_handler();
+		BufferDescriptor drawDescriptor =
+		{
+			.type = BufferType::INDIRECT | BufferType::TRANSFER_DST,
+			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
+		};
+		drawBuffer = resources.create_empty_buffer(drawDescriptor, std::numeric_limits<u32>::max());
 	}
 	void TurnipRenderer::set_camera(NON_OWNING Camera* camera)
 	{
@@ -28,164 +38,66 @@ namespace tur
 		if(!rCamera)
 			return;
 
-		/* Graphics Pass */
-		//commandBuffer.begin(renderTarget);
-			//commandBuffer.set_viewport(viewport);
-			//commandBuffer.set_scissor(scissor);
+		commandBuffer.begin(renderTarget);
+			commandBuffer.set_viewport(viewport);
+			commandBuffer.set_scissor(scissor);
+		
+			/* foreach material get pipeline, bind pipeline */
+			commandBuffer.bind_pipeline(mPlaceholderPipeline);
+			resources.write_storage_buffer_to_set
+			(
+				mDescriptorSetMap[mPlaceholderPipeline], 
+				verticesSSBO,
+				Range{ .size = vertexOffset, .offset = 0 }, 
+				0
+			);
 
-			/* For each material in the scene */
-			//commandBuffer.bind_pipeline(pipeline);
-			//commandBuffer.bind_descriptor_set(globalSet);
-			
-			// commandBuffer.draw_indirect(drawCommands, 0, mIndirectCommands.size(), sizeof(IndirectCommand));
+			resources.write_storage_buffer_to_set
+			(
+				mDescriptorSetMap[mPlaceholderPipeline], 
+				verticesSSBO,
+				Range{ .size = indicesOffset, .offset = 0 }, 
+				1
+			);
 
-		//commandBuffer.end();
+			commandBuffer.bind_descriptor_set(mDescriptorSetMap[mPlaceholderPipeline]);
+			commandBuffer.draw_indirect(drawBuffer, 0, mDrawCommands.size(), sizeof(DrawCommand));
+		commandBuffer.end();
 	}
 	void TurnipRenderer::dispatch()
 	{
+		auto& resources = rRHI->get_resource_handler();
+		
+		descriptor_set_handle computeDescriptor = 0;
+		resources.write_storage_buffer_to_set(computeDescriptor, 0 /* ssbo with bounds */, {}, 0);	
+
 		computeCommandBuffer.begin_compute();
 
-			computeCommandBuffer.bind_pipeline(computePipeline);
-			computeCommandBuffer.dispatch(1, 0, 0);
+			computeCommandBuffer.bind_descriptor_set(computeDescriptor);
+			computeCommandBuffer.bind_pipeline(0);
+			computeCommandBuffer.dispatch(0, 0, 0);
 
 		computeCommandBuffer.end();
+
+		commandBuffer.begin();
+		commandBuffer.begin_rendering();
+		commandBuffer.end();
 	}
 
-	void TurnipRenderer::initialize_resources()
-	{
-		initialize_buffers();
-		initialize_descriptors();
-		initialize_pipeline();
-	}
-	void TurnipRenderer::initialize_buffers()
+	void TurnipRenderer::prepare_buffers()
 	{
 		auto& resources = rRHI->get_resource_handler();
 
+		BufferDescriptor descriptor =
 		{
-			BufferDescriptor descriptor = 
-			{
-				.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
-				.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
-			};
-
-			vertexSSBO = resources.create_empty_buffer(descriptor, sizeof(Vertex) * s_MaxVertexCount);
-		}
-
-		{
-			BufferDescriptor descriptor = 
-			{
-				.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
-				.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
-			};
-
-			objectSSBO = resources.create_empty_buffer(descriptor, sizeof(Vertex) * s_MaxObjectCount);
-		}
-
-		{
-			BufferDescriptor descriptor = 
-			{
-				.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
-				.usage = BufferUsage::COHERENT | BufferUsage::PERSISTENT
-			};
-
-			worldUBO = resources.create_empty_buffer(descriptor, sizeof(World));
-		}
-	}
-	void TurnipRenderer::initialize_descriptors()
-	{
-		auto& resources = rRHI->get_resource_handler();
-
-		/* Descriptor Set */
-		auto LayoutEntries = std::vector<DescriptorSetLayoutEntry>
-		({
-			{
-				.binding = 0,
-			  	.amount = 1,
-			  	.type = DescriptorType::STORAGE_BUFFER,
-			  	.stage = PipelineStage::VERTEX_STAGE
-			},
-			{
-				.binding = 1,
-			  	.amount = 1,
-			  	.type = DescriptorType::STORAGE_BUFFER,
-			  	.stage = PipelineStage::VERTEX_STAGE
-			},
-			{
-				.binding = 2,
-			  	.amount = 1,
-			  	.type = DescriptorType::STORAGE_BUFFER,
-			  	.stage = PipelineStage::VERTEX_STAGE
-			},
-			{
-				.binding = 3,
-			  	.amount = 1,
-			  	.type = DescriptorType::COMBINED_IMAGE_SAMPLER,
-			  	.stage = PipelineStage::FRAGMENT_STAGE
-			}
-		});
-
-		setLayout = resources.create_descriptor_set_layout({.entries = LayoutEntries});
-		globalSet = resources.create_descriptor_set(setLayout);
-
-		/* Compute */
-		auto ComputeLayoutEntries = std::vector<DescriptorSetLayoutEntry>({});
-		computeSet = resources.create_descriptor_set_layout({.entries = ComputeLayoutEntries});
-	}
-	void TurnipRenderer::initialize_pipeline()
-	{
-		auto& resources = rRHI->get_resource_handler();
-
-		// Shaders:
-		shader_handle vertexShader =
-			resources.create_shader({"res/shaders/turnip/turnip_vert.spv", ShaderType::VERTEX});
-		shader_handle fragmentShader =
-			resources.create_shader({"res/shaders/turnip/turnip_frag.spv", ShaderType::FRAGMENT});
-		
-		constexpr auto DynamicStates = std::to_array<DynamicState>({
-			DynamicState::VIEWPORT,
-			DynamicState::SCISSOR
-		});
-		
-		constexpr auto Viewports = std::to_array<Viewport>({Viewport{}});
-		constexpr auto Scissors = std::to_array<Extent2D>({Extent2D{}});
-
-		// Pipeline:
-		PipelineDescriptor pipelineDescriptor = 
-        {
-			.vertexInputStage = 
-			{
-				.vertexBindings = {},
-				.attributes = {}
-			},
-			.inputAssemblyStage = 
-			{
-				.topology = PrimitiveTopology::TRIANGLES,
-				.primitiveRestartEnable = false
-			},
-			.rasterizerStage = 
-			{
-				.frontFace = FrontFace::COUNTER_CLOCKWISE, 
-				.cullMode = CullMode::FRONT,
-			},
-			.setLayout = setLayout,
-			.viewports = Viewports,
-			.scissors = Scissors,
-			.dynamicStates = DynamicStates,
-			.vertexShader = vertexShader,
-			.fragmentShader = fragmentShader,
+			.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
+			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 		};
+		verticesSSBO = resources.create_empty_buffer(descriptor, std::numeric_limits<u32>::max());
+		indicesSSBO = resources.create_empty_buffer(descriptor, std::numeric_limits<u32>::max());
+	}
+	void TurnipRenderer::prepare_placeholder_pipeline()
+	{
 
-		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
-
-		/* Compute */
-		shader_handle computeShader = resources.create_shader({"res/shaders/turnip/turnip_comp.spv", ShaderType::COMPUTE});
-		
-		ComputePipelineDescriptor computePipelineDescriptor = 
-        {
-			.computeShader = computeShader,
-			.setLayout = computeSet
-		};
-
-		computePipeline = resources.create_compute_pipeline(computePipelineDescriptor);
 	}
 }

@@ -52,9 +52,6 @@ namespace tur
 			if(mesh.setHandle == invalid_handle)
 				mesh.setHandle = resources.create_descriptor_set(setLayout);
 
-			if(mesh.material.is_valid())
-				write_material(mesh.setHandle, mesh.material);
-
 			resources.update_buffer(mesh.ubo, &ubo, {.size = sizeof(UBO)});
 			resources.write_uniform_buffer_to_set(mesh.setHandle, mesh.ubo, {.size = sizeof(UBO)}, 0);
 		}
@@ -200,36 +197,5 @@ namespace tur
 		};
 
 		pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
-	}
-
-	void MeshRenderer::write_material(descriptor_set_handle setHandle, const MetallicRoughnessMaterial& material)
-	{
-		auto& resources = rRHI->get_resource_handler();
-
-		// TODO: use a blank texture rather than the default one.
-
-		// Albedo:
-		if(material.albedo == invalid_handle)
-			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 1);
-		else
-			resources.write_texture_to_set(setHandle, material.albedo, 1);
-
-		// Normal:
-		if(material.normal == invalid_handle)
-			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 2);
-		else
-			resources.write_texture_to_set(setHandle, material.normal, 2);
-
-		// Metallic:
-		if(material.metallic == invalid_handle)
-			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 3);
-		else
-			resources.write_texture_to_set(setHandle, material.metallic, 3);
-
-		// Roughness:
-		if(material.roughness == invalid_handle)
-			resources.write_texture_to_set(setHandle, rRHI->DefaultTextureHandle, 4);
-		else
-			resources.write_texture_to_set(setHandle, material.roughness, 4);
 	}
 }

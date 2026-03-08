@@ -220,14 +220,21 @@ namespace tur
 
             for (size_t i = 0; i < vertexCount; ++i)
             {
+                // position: vec3
                 std::memcpy(destination, positionData.data() + i * sizeof(glm::vec3), sizeof(glm::vec3)); 
                 destination += sizeof(glm::vec3);
 
+                // uv_x: float
+                std::memcpy(destination, uvData.data() + i * sizeof(float), sizeof(float)); 
+                destination += sizeof(float);
+
+                // normal: vec3
                 std::memcpy(destination, normalData.data() + i * sizeof(glm::vec3), sizeof(glm::vec3)); 
                 destination += sizeof(glm::vec3);
 
-                std::memcpy(destination, uvData.data() + i * sizeof(glm::vec2), sizeof(glm::vec2)); 
-                destination += sizeof(glm::vec2);
+                // uv_y: float
+                std::memcpy(destination, uvData.data() + i * 2 * sizeof(float), sizeof(float)); 
+                destination += sizeof(float);
             }
 
             meshData.vertices = vertices;

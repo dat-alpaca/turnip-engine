@@ -24,6 +24,7 @@ namespace tur
 		STORAGE_BUFFER = 1 << 3,
 		TRANSFER_SRC = 1 << 4,
 		TRANSFER_DST = 1 << 5,
+		INDIRECT = 1 << 6
 	};
 
 	inline BufferType operator|(BufferType lhs, BufferType rhs)

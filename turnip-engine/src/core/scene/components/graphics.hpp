@@ -11,6 +11,17 @@
 
 namespace tur
 {
+	struct MaterialComponent
+	{
+		REGISTER_COMPONENT(material);
+	
+	public:
+		MaterialComponent() = default;
+
+	public:
+		material_handle materialHandle = invalid_handle;
+	};
+	
 	struct CullingComponent
 	{
 		REGISTER_COMPONENT(culling);
@@ -20,6 +31,9 @@ namespace tur
 		
 	public:
 		FIELD_SET_INTERNALLY bool visible = true;
+		
+		glm::vec3 center;
+		float radius;
 	};
 
 	struct Sprite2DComponent
@@ -116,13 +130,8 @@ namespace tur
 		uuid meshUUID;
 
 	public:
-		FIELD_SET_INTERNALLY MetallicRoughnessMaterial material;
-
-		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
-
-		FIELD_SET_INTERNALLY buffer_handle vbo = invalid_handle;
-		FIELD_SET_INTERNALLY buffer_handle ebo = invalid_handle;
-		FIELD_SET_INTERNALLY u64 indexCount = 0;
 		FIELD_SET_INTERNALLY BufferIndexType indexType = BufferIndexType::UNSIGNED_BYTE;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY u64 indexCount = 0;
 	};
 }

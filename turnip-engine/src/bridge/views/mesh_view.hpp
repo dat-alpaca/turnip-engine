@@ -61,23 +61,13 @@ namespace tur
             auto view = rScene->get_registry().view<TransformComponent, MeshComponent, const CullingComponent>();
 			for (auto [e, transform, mesh, culling] : view.each())
 			{
-				if(!mesh.material.is_valid())
-					continue;
-
-				if(mesh.vbo == invalid_handle || mesh.ebo == invalid_handle)
-					continue;
-
 				if(mMeshCache.find(e) == mMeshCache.end())
 				{
 					MeshRenderer::InternalMesh internal;
-					internal.ebo = mesh.ebo;
-					internal.vbo = mesh.vbo;
 					internal.indexCount = mesh.indexCount;
 					internal.isVisible = culling.visible;
 					internal.indexType = mesh.indexType;
 					internal.transform = transform.worldTransform.transform();
-
-					internal.material = mesh.material;
 
 					mMeshCache[e] = mRenderer.add_mesh(internal);
 					continue;
@@ -85,10 +75,7 @@ namespace tur
 
 				auto& rendererMesh = mRenderer.get_mesh(mMeshCache[e]);
 
-				rendererMesh.ebo = mesh.ebo;
-				rendererMesh.vbo = mesh.vbo;
 				rendererMesh.indexCount = mesh.indexCount;
-				rendererMesh.material = mesh.material;
 				rendererMesh.isVisible = culling.visible;
 				rendererMesh.transform = transform.worldTransform.transform();
 			}

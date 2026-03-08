@@ -45,18 +45,18 @@ public:
 		mComputePass.set_frame_index(mGraphicsPass.get_frame_index());
 		
 		/* Compute Pass */
-		mComputePass.on_render_begin();
+		// mComputePass.on_render_begin();
 
 			// Dispatch
-			rTurnipView->dispatch();
-			mComputePass.add_command_buffer(rTurnipView->renderer().computeCommandBuffer.get_buffer());
+			// rTurnipView->dispatch();
+			// mComputePass.add_command_buffer(rTurnipView->renderer().computeCommandBuffer.get_buffer());
 
-		mComputePass.on_render_end();
-		auto& computeData = mComputePass.get_current_frame_data();
+		// mComputePass.on_render_end();
+		// auto& computeData = mComputePass.get_current_frame_data();
 
 		/* Graphics Pass*/
 		mGraphicsPass.on_render_begin();
-		mGraphicsPass.add_wait_semaphore(computeData.imageReadySemaphore, PipelineStageFlags::VERTEX_INPUT);
+		// mGraphicsPass.add_wait_semaphore(computeData.imageReadySemaphore, PipelineStageFlags::VERTEX_INPUT);
 
 			rCubemapView->render_deferred();
 			rQuadView->render_deferred();
@@ -72,8 +72,8 @@ public:
 			if (!rTilemapView->renderer().is_empty())
 				mGraphicsPass.add_command_buffer(rTilemapView->renderer().get_command_buffer().get_buffer());
 
-			if (rMeshView->renderer().mesh_count() > 0)
-				mGraphicsPass.add_command_buffer(rMeshView->renderer().get_command_buffer().get_buffer());
+			// if (rMeshView->renderer().mesh_count() > 0)
+			//	mGraphicsPass.add_command_buffer(rMeshView->renderer().get_command_buffer().get_buffer());
 
 			if (!rFontView->renderer().is_empty())
 				mGraphicsPass.add_command_buffer(rFontView->renderer().get_command_buffer().get_buffer());
@@ -115,7 +115,7 @@ private:
 		auto* scriptPtr 	= views.get<ScriptView>(scriptView);
 		physicsScriptView 	= engine->add_view(tur::make_unique<PhysicsScriptView>(physicsPtr, scriptPtr));
 
-		turnipView 			= engine->add_view(tur::make_unique<TurnipRendererView>(&rhi));
+		turnipView 			= engine->add_view(tur::make_unique<TurnipRendererView>(&rhi, &library));
 
 		// Handles:
 		rQuadView 		= views.get<ImmQuadView>(immQuadView);

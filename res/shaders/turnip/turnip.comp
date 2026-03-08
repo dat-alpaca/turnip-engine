@@ -1,7 +1,68 @@
 #version 460
+layout(local_size_x = 64, local_size_y = 1, local_size_z = 1) in;
 
-layout(local_size_x = 1, local_size_y = 1, local_size_z = 1) in;
+struct Object
+{
+    mat4 model;
+    vec4 bounds;
+};
 
+struct DrawCommand
+{
+    uint count;
+    uint instanceCount;
+    uint firstIndex;
+    uint baseVertex;
+    uint baseInstance;
+};
+
+// Buffers:
+layout (std430, binding = 0) readonly buffer Objects 
+{
+    Object objects[];
+} b_objects;
+
+layout (std430, binding = 1) writeonly buffer Commands 
+{
+    DrawCommand commands[];
+} b_commands;
+
+layout (std430, binding = 2) writeonly buffer VisibleIndices
+{
+    uint visible[];
+} b_visible;
+
+layout (std430, binding = 3) buffer Counter 
+{
+    uint visibleCount;
+    uint objectCount;
+} b_count;
+
+/* Culling */
+bool is_visible(vec3 center, float radius) { return true; }
+
+// Main
 void main()
 {
+    uint id = gl_GlobalInvocationID.x;
+    if (id >= b_count.objectCount)
+        return;
+    
+    Object object = b_objects.objects[id];
+    bool visible = is_visible(object.bounds.xyz, object.bounds.w);
+
+    if(!visible)
+    {
+        b_commands.commands[id].instanceCount = 0;
+        return;
+    }
+
+    uint drawIndex = atomicAdd(b_count.visibleCount, 1);
+    b_visible.visible[drawIndex] = id;
+
+    b_commands.commands[id].count = 36;
+    b_commands.commands[id].instanceCount = 1;
+    b_commands.commands[id].firstIndex = 0;
+    b_commands.commands[id].baseVertex = 0;
+    b_commands.commands[id].baseInstance = id;
 }

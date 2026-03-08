@@ -45,7 +45,6 @@ namespace tur
 			BufferIndexType indexType = BufferIndexType::UNSIGNED_BYTE;
 	
 			descriptor_set_handle setHandle = invalid_handle;
-			MetallicRoughnessMaterial material;
 			bool isVisible = true;
 		};
     
@@ -73,9 +72,6 @@ namespace tur
 		void initialize_resources();
 		void initialize_descriptors();
 		void initialize_pipeline();
-
-	private:
-		void write_material(descriptor_set_handle setHandle, const MetallicRoughnessMaterial& material);
 
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
