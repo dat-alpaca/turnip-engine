@@ -6,5 +6,5 @@ layout (location = 1) in vec3 v_normals;
 
 void main()
 {
-    out_color = vec4(v_normals.yxz, 1.0);
+    out_color = vec4(v_uvs.xy, 1.0, 1.0);
 }

@@ -1,7 +1,7 @@
 #pragma once
+#include "graphics/renderer/turnip/common.hpp"
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
-#include "graphics/renderer/turnip/common.hpp"
 #include "graphics/renderer/renderer.hpp"
 #include "graphics/camera.hpp"
 
@@ -16,17 +16,20 @@ namespace tur
 		u32 firstIndex = invalid_handle;
 	};
 
-	struct MeshVertex
-	{
-		glm::vec3 position;
-		float uvx;
-		
-		glm::vec3 normals;
-		float uvy;
-	};
-
 	class TurnipRenderer : public Renderer
 	{
+	public:
+		struct WorldData
+		{
+			glm::mat4 view;
+			glm::mat4 projection;
+		};
+
+		struct ObjectData
+		{
+			glm::mat4 model;
+		};
+
 	public:
 		void initialize(NON_OWNING RenderInterface* rhi);
 		void set_camera(NON_OWNING Camera* camera);
@@ -36,46 +39,12 @@ namespace tur
         void dispatch();
 
 	public:
-		inline void set_draw_commands(const std::vector<DrawCommand>& commands)
-		{
-			mDrawCommands = std::move(commands);
-		}
+		void set_draw_commands(const std::vector<DrawCommand>& commands);
+		void clear_objects();
+		void push_object(const ObjectData& object);
 
-		inline OffsetData upload_mesh(const std::vector<byte>& vertices, const std::vector<byte>& indices)
-		{
-			auto& resources = rRHI->get_resource_handler();
-			resources.update_buffer(vertexBuffer, vertices.data(), Range{ .size = vertices.size(), .offset = vertexOffset });
-			resources.update_buffer(indexBuffer, indices.data(), Range{ .size = indices.size(), .offset = indicesOffset });
-		
-			OffsetData data;
-			{
-				data.baseVertex = vertexOffset;
-				data.firstIndex = indicesOffset;
-			}
-
-			vertexOffset += vertices.size();
-			indicesOffset += indices.size();
-
-			return data;
-		}
-		inline void clear_buffers()
-		{
-			auto& resources = rRHI->get_resource_handler();
-
-			vertexOffset = 0;
-			indicesOffset = 0;
-
-			if(is_valid_handle(vertexBuffer))
-				resources.destroy_buffer(vertexBuffer);
-
-			if(is_valid_handle(indexBuffer))
-				resources.destroy_buffer(indexBuffer);
-
-			if(is_valid_handle(worldSSBO))
-				resources.destroy_buffer(worldSSBO);
-
-			prepare_buffers();
-		}
+		OffsetData upload_mesh(const std::vector<byte>& vertices, const std::vector<byte>& indices);
+		void clear_buffers();
 
 	private:
 		void prepare_buffers();
@@ -93,10 +62,12 @@ namespace tur
     
 	private:
 		std::vector<DrawCommand> mDrawCommands;
+		std::vector<ObjectData> mObjectData;
 
-		buffer_handle vertexBuffer = invalid_handle;
-		buffer_handle indexBuffer  = invalid_handle;
+		buffer_handle vbo    = invalid_handle;
+		buffer_handle ebo    = invalid_handle;
 		buffer_handle worldSSBO    = invalid_handle;
+		buffer_handle objectSSBO   = invalid_handle;
 
 		buffer_handle drawBuffer  = invalid_handle;
 
@@ -107,5 +78,9 @@ namespace tur
 		pipeline_handle mPlaceholderPipeline;
 		descriptor_set_layout_handle setLayout;
 		std::unordered_map<pipeline_handle, descriptor_set_handle> mDescriptorSetMap;
+
+		static inline constexpr u32 sVertexCapacity  = sizeof(float)      * (1 << 24);
+		static inline constexpr u32 sIndexCapacity   = sizeof(float)      * (1 << 24);
+		static inline constexpr u32 sObjectCapacity  = sizeof(ObjectData) * (1 << 10);
 	};
 }

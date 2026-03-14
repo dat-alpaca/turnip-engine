@@ -6,6 +6,7 @@
 
 namespace tur
 {
+	// TODO: use standard meshvertex
 	struct MeshData
     {
         std::vector<byte> vertices;

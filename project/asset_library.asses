@@ -49,6 +49,14 @@
         "assetUUID": 482924622923348500,
         "lifetime": "SCENEBOUND"
       }
+    },
+    {
+      "metadata": {
+        "filepath": "models/crate/wooden crate.gltf",
+        "type": "MESH",
+        "assetUUID": 111114622923348500,
+        "lifetime": "SCENEBOUND"
+      }
     }
   ],
   "textures": [

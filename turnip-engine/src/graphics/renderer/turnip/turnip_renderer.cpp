@@ -1,9 +1,10 @@
 #include "turnip_renderer.hpp"
 #include "defines.hpp"
-#include "glm/ext/matrix_transform.hpp"
+
+#include "graphics/mesh_vertex.hpp"
 #include "graphics/objects/buffer.hpp"
 #include "graphics/renderer/turnip/common.hpp"
-#include <limits>
+
 #include <vector>
 
 namespace tur
@@ -46,25 +47,36 @@ namespace tur
 		if(is_empty())
 			return;
 
-		// Update buffers:
-		std::vector<glm::mat4> data;
-		glm::mat4 model(1.f);
-		model = glm::scale(model, {2.f, 2.f, 2.f});
-		data.push_back(model);
-		data.push_back(rCamera->view());
-		data.push_back(rCamera->projection());
-		
-		resources.update_buffer(drawBuffer, mDrawCommands.data(), Range { .size = mDrawCommands.size() * sizeof(DrawCommand) });
-		
-		resources.update_buffer(worldSSBO, data.data(), Range { .size = data.size() * sizeof(glm::mat4) });
-		resources.write_storage_buffer_to_set
-		(
-			mDescriptorSetMap[mPlaceholderPipeline], 
-			worldSSBO,
-			Range{ .size = sizeof(glm::mat4) *  3, .offset = 0 }, 
-			0
-		);
+		/* Resources */
+		{
+			// Draw buffers:
+			resources.update_buffer(drawBuffer, mDrawCommands.data(), Range { .size = mDrawCommands.size() * sizeof(DrawCommand) });
 
+			// World data:
+			WorldData data = {
+				.view = rCamera->view(),
+				.projection = rCamera->projection()
+			};
+			resources.update_buffer(worldSSBO, &data, Range { .size = sizeof(WorldData) });
+			resources.write_storage_buffer_to_set
+			(
+				mDescriptorSetMap[mPlaceholderPipeline], 
+				worldSSBO,
+				Range{ .size = sizeof(WorldData) }, 
+				0
+			);
+
+			// Object data:
+			resources.update_buffer(objectSSBO, mObjectData.data(), Range { .size = sizeof(ObjectData) * mObjectData.size() });
+			resources.write_storage_buffer_to_set
+			(
+				mDescriptorSetMap[mPlaceholderPipeline], 
+				objectSSBO,
+				Range{ .size = sObjectCapacity, .offset = 0 }, 
+				1
+			);
+		}
+		
 		// Graphics:
 		commandBuffer.begin(renderTarget);
 		commandBuffer.set_viewport(viewport);
@@ -73,8 +85,8 @@ namespace tur
 			/* foreach material get pipeline, bind pipeline */
 			commandBuffer.bind_pipeline(mPlaceholderPipeline);
 
-			commandBuffer.bind_vertex_buffer(vertexBuffer, 0);
-			commandBuffer.bind_index_buffer(indexBuffer, BufferIndexType::UNSIGNED_SHORT);
+			commandBuffer.bind_vertex_buffer(vbo, 0);
+			commandBuffer.bind_index_buffer(ebo, BufferIndexType::UNSIGNED_SHORT);
 
 			commandBuffer.bind_descriptor_set(mDescriptorSetMap[mPlaceholderPipeline]);
 			commandBuffer.draw_indexed_indirect(drawBuffer, 0, mDrawCommands.size(), 0);
@@ -101,6 +113,55 @@ namespace tur
 		commandBuffer.end();
 	}
 
+	void TurnipRenderer::set_draw_commands(const std::vector<DrawCommand>& commands)
+	{
+		mDrawCommands = std::move(commands);
+	}
+	void TurnipRenderer::clear_objects()
+	{
+		mObjectData.clear();
+	}
+	void TurnipRenderer::push_object(const ObjectData& object)
+	{
+		mObjectData.push_back(object);
+	}
+
+	OffsetData TurnipRenderer::upload_mesh(const std::vector<byte>& vertices, const std::vector<byte>& indices)
+	{
+		auto& resources = rRHI->get_resource_handler();
+		resources.update_buffer(vbo, vertices.data(), Range{ .size = vertices.size(), .offset = vertexOffset });
+		resources.update_buffer(ebo, indices.data(), Range{ .size = indices.size(), .offset = indicesOffset });
+		
+		OffsetData data;
+		{
+			data.baseVertex = vertexOffset / sizeof(MeshVertex);
+			data.firstIndex = indicesOffset / sizeof(u16);
+		}
+
+		vertexOffset += vertices.size();
+		indicesOffset += indices.size();
+
+		return data;
+	}
+	void TurnipRenderer::clear_buffers()
+	{
+		auto& resources = rRHI->get_resource_handler();
+
+		vertexOffset = 0;
+		indicesOffset = 0;
+
+		if(is_valid_handle(vbo))
+			resources.destroy_buffer(vbo);
+
+		if(is_valid_handle(ebo))
+			resources.destroy_buffer(ebo);
+
+		if(is_valid_handle(worldSSBO))
+			resources.destroy_buffer(worldSSBO);
+
+		prepare_buffers();
+	}
+
 	void TurnipRenderer::prepare_buffers()
 	{
 		auto& resources = rRHI->get_resource_handler();
@@ -110,21 +171,22 @@ namespace tur
 			.type = BufferType::STORAGE_BUFFER | BufferType::TRANSFER_DST,
 			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 		};
-		worldSSBO = resources.create_empty_buffer(descriptor, 3 * sizeof(glm::mat4));
+		worldSSBO = resources.create_empty_buffer(descriptor, sizeof(WorldData));
+		objectSSBO = resources.create_empty_buffer(descriptor, sObjectCapacity);
 		
-		BufferDescriptor vertexDesc = 
+		BufferDescriptor vboDescriptor =
 		{
 			.type = BufferType::VERTEX_BUFFER,
-			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT
+			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 		};
-		vertexBuffer = resources.create_empty_buffer(vertexDesc, 8 * sizeof(float) * (1 << 14));
+		vbo = resources.create_empty_buffer(vboDescriptor, sVertexCapacity);
 
-		BufferDescriptor indexDesc = 
+		BufferDescriptor eboDescriptor =
 		{
 			.type = BufferType::INDEX_BUFFER,
-			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT
+			.usage = BufferUsage::PERSISTENT | BufferUsage::COHERENT 
 		};
-		indexBuffer = resources.create_empty_buffer(indexDesc, 8 * sizeof(float) * (1 << 14));
+		ebo = resources.create_empty_buffer(eboDescriptor, sIndexCapacity);
 	}
 	
 	void TurnipRenderer::prepare_placeholder_set()
@@ -137,6 +199,13 @@ namespace tur
 			{
 				// World Data
 				.binding = 0,
+			  	.amount = 1,
+			  	.type = DescriptorType::STORAGE_BUFFER,
+			  	.stage = PipelineStage::VERTEX_STAGE
+			},
+			{
+				// Object Data
+				.binding = 1,
 			  	.amount = 1,
 			  	.type = DescriptorType::STORAGE_BUFFER,
 			  	.stage = PipelineStage::VERTEX_STAGE
@@ -203,7 +272,7 @@ namespace tur
 
 		// Pipeline:
 		PipelineDescriptor pipelineDescriptor = {
-			.vertexInputStage =  
+			.vertexInputStage = 
 			{
 				.vertexBindings = VertexBindings,
 				.attributes = Attributes
@@ -217,6 +286,10 @@ namespace tur
 			{
 				.frontFace = FrontFace::COUNTER_CLOCKWISE, 
 				.cullMode = CullMode::FRONT,
+			},
+			.depthDescriptor =
+			{
+				.depthTestEnable = true
 			},
 			.setLayout = setLayout,
 			.viewports = Viewports,

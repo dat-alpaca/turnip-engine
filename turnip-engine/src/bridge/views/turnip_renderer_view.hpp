@@ -1,10 +1,12 @@
 #pragma once
 #include "assets/asset.hpp"
 #include "assets/asset_library.hpp"
+#include "entt/entity/fwd.hpp"
 #include "event/asset_events/mesh_uploaded_event.hpp"
 #include "graphics/renderer/turnip/turnip_renderer.hpp"
 
 #include "event/events.hpp"
+#include "logging/logging.hpp"
 #include "scene/components.hpp"
 #include "scene/scene.hpp"
 #include "view/view.hpp"
@@ -71,8 +73,9 @@ namespace tur
 				return;
 
 			/* CPU Culling */
+			mObjectData.clear();
 			auto cullView = rScene->get_registry().view<const TransformComponent, const CullingComponent, const MeshComponent>();
-			for (auto [entity, transform, culling, mesh] : cullView.each())
+			for (auto [e, transform, culling, mesh] : cullView.each())
 			{
 				if(!mesh.indexCount)
 					continue;
@@ -81,19 +84,38 @@ namespace tur
 				if(!visible)
 					continue;
 
-				if(mMeshBatch.find(mesh.meshUUID) != mMeshBatch.end())
-				{
-					++mMeshBatch[mesh.meshUUID].instanceCount;
+				if(mMeshBatch.find(mesh.meshUUID) == mMeshBatch.end())
 					continue;
-				}
+
+				++mMeshBatch[mesh.meshUUID].instanceCount;
+				
+				// TODO: unordered_map<uuid> -> vector of object data?
+				mObjectData[mesh.meshUUID].push_back({.model = transform.worldTransform.to_matrix() });
 			}
 
+			u32 objectIndexCurrentPosition = 0;
+			mRenderer.clear_objects();
 			mDrawCommands.clear();
 			mDrawCommands.reserve(mMeshBatch.size());
-			for(auto& [_, drawCommand] : mMeshBatch)
+
+			for(auto& [uuid, drawCommand] : mMeshBatch)
 			{
+				// This code goes through all draw commands mapped by uuid and flattens the object data assign to it.
+				// baseInstance is always referenced at the object index position so it can be retrieved by the vertex shader.
+
+				if(mObjectData.find(uuid) == mObjectData.end())
+					TUR_LOG_CRITICAL("Sometimes brains are really stupid, don't mind this codebase's stupidity please.");
+
+				const auto& objectData = mObjectData[uuid];
+
+				drawCommand.baseInstance = objectIndexCurrentPosition;
 				mDrawCommands.push_back(drawCommand);
+
+				for(const auto& object : objectData)
+					mRenderer.push_object(object);
+
 				drawCommand.instanceCount = 0;
+				objectIndexCurrentPosition += objectData.size();
 			}
 
 			/* Uploading commands */
@@ -109,16 +131,16 @@ namespace tur
 		void on_scene_switched()
 		{
 			mRenderer.clear_buffers();
+			mRenderer.clear_objects();
 
-			auto cullView = rScene->get_registry().view<const MeshComponent>();
-			for (auto [entity, mesh] : cullView.each())
+			auto view = rScene->get_registry().view<const MeshComponent>();
+			for (auto [entity, mesh] : view.each())
 			{
 				auto& meshAsset = rLibrary->get_mesh_asset(mesh.assetHandle);
 				if(meshAsset.state == AssetState::LOADING)
 					continue;
 
 				auto offset = mRenderer.upload_mesh(meshAsset.meshData.indices, meshAsset.meshData.vertices);
-				mOffsets[mesh.assetHandle] = offset;
 
 				DrawCommand drawCommand;
 				{
@@ -143,9 +165,11 @@ namespace tur
 
 				auto& meshAsset = rLibrary->get_mesh_asset(mesh.assetHandle);
 				TUR_ASSERT(meshAsset.state == AssetState::READY, "Upload mesh event signaled before mesh marked as ready.");
-					
+				
+				if(mMeshBatch.find(mesh.meshUUID) != mMeshBatch.end())
+					continue;
+
 				auto offset = mRenderer.upload_mesh(meshAsset.meshData.vertices, meshAsset.meshData.indices);				
-				mOffsets[mesh.assetHandle] = offset;
 
 				DrawCommand drawCommand;
 				{
@@ -168,7 +192,7 @@ namespace tur
 		TurnipRenderer mRenderer;
 	
 	private:
-		std::unordered_map<asset_handle, OffsetData> mOffsets;
+		std::unordered_map<uuid, std::vector<TurnipRenderer::ObjectData>> mObjectData;
 		std::unordered_map<uuid, DrawCommand> mMeshBatch;
 		std::vector<DrawCommand> mDrawCommands;
 
