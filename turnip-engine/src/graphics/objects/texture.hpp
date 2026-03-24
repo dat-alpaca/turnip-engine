@@ -214,14 +214,14 @@ namespace tur
 	{
 		switch (textureFormat)
 		{
-			case TextureFormat::R8_UNORM: 			     return "R8U";
-			case TextureFormat::RG8_UNORM: 			     return "RG8U";
-			case TextureFormat::RGB8_UNORM: 		     return "RGB8U";
-			case TextureFormat::RGBA8_UNORM: 		     return "RGBA8U";
-			case TextureFormat::RGBA16_SFLOAT: 		     return "RGBA16S";
-			case TextureFormat::DEPTH_16_UNORM: 		 return "DEPTH16U";
-			case TextureFormat::DEPTH_STENCIL24_S8U_INT: return "DEPTHSTENCIL24S8U";
-			case TextureFormat::B8G8R8A8_UNORM:          return "B8G8R8A8U";
+			case TextureFormat::R8_UNORM: 			     return "R8_UNORM";
+			case TextureFormat::RG8_UNORM: 			     return "RG8_UNORM";
+			case TextureFormat::RGB8_UNORM: 		     return "RGB8_UNORM";
+			case TextureFormat::RGBA8_UNORM: 		     return "RGBA8_UNORM";
+			case TextureFormat::RGBA16_SFLOAT: 		     return "RGBA16_SFLOAT";
+			case TextureFormat::DEPTH_16_UNORM: 		 return "DEPTH_16_UNORM";
+			case TextureFormat::DEPTH_STENCIL24_S8U_INT: return "DEPTH_STENCIL24_S8U_INT";
+			case TextureFormat::B8G8R8A8_UNORM:          return "B8G8R8A8_UNORM";
 		
 			default:
 				return "INVALID";

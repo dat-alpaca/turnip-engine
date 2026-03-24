@@ -24,6 +24,7 @@
 #include "asset_events/scene_deserialization.hpp"
 #include "asset_events/texture_uploaded_event.hpp"
 #include "asset_events/mesh_uploaded_event.hpp"
+#include "asset_events/material_uploaded_event.hpp"
 
 #include "scene_events/scene_switched_event.hpp"
 #include "scene_events/camera_switched_event.hpp"

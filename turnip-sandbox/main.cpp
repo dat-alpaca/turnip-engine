@@ -59,7 +59,7 @@ public:
 		// mGraphicsPass.add_wait_semaphore(computeData.imageReadySemaphore, PipelineStageFlags::VERTEX_INPUT);
 
 			rTurnipView->render_deferred();
-			if(!rTurnipView->renderer().is_empty())
+			if(!rTurnipView->renderer().has_commands())
 				mGraphicsPass.add_command_buffer(rTurnipView->renderer().get_command_buffer().get_buffer());
 
 			// rCubemapView->render_deferred();

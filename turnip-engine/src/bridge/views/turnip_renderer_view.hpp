@@ -1,6 +1,7 @@
 #pragma once
 #include "assets/asset.hpp"
 #include "assets/asset_library.hpp"
+#include "defines.hpp"
 #include "entt/entity/fwd.hpp"
 #include "event/asset_events/mesh_uploaded_event.hpp"
 #include "graphics/renderer/turnip/turnip_renderer.hpp"
@@ -8,10 +9,13 @@
 #include "event/events.hpp"
 #include "logging/logging.hpp"
 #include "scene/components.hpp"
+#include "scene/components/graphics.hpp"
 #include "scene/scene.hpp"
+#include "utils/uuid/uuid.hpp"
 #include "view/view.hpp"
 
 #include "graphics/renderer/turnip/common.hpp"
+#include <unordered_set>
 
 namespace tur
 {
@@ -74,8 +78,8 @@ namespace tur
 
 			/* CPU Culling */
 			mObjectData.clear();
-			auto cullView = rScene->get_registry().view<const TransformComponent, const CullingComponent, const MeshComponent>();
-			for (auto [e, transform, culling, mesh] : cullView.each())
+			auto cullView = rScene->get_registry().view<const TransformComponent, const CullingComponent, const MeshComponent, const MaterialComponent>();
+			for (auto [e, transform, culling, mesh, material] : cullView.each())
 			{
 				if(!mesh.indexCount)
 					continue;
@@ -90,36 +94,55 @@ namespace tur
 				++mMeshBatch[mesh.meshUUID].instanceCount;
 				
 				// TODO: unordered_map<uuid> -> vector of object data?
-				mObjectData[mesh.meshUUID].push_back({.model = transform.worldTransform.to_matrix() });
+				mObjectData[mesh.meshUUID].push_back
+				({
+					.model = transform.worldTransform.to_matrix(),
+					.material = material.materialHandle
+				});
 			}
 
 			u32 objectIndexCurrentPosition = 0;
-			mRenderer.clear_objects();
 			mDrawCommands.clear();
 			mDrawCommands.reserve(mMeshBatch.size());
+			mRenderer.clear_all_objects();
 
+			struct Info
+			{
+				uuid uuid = invalid_uuid;
+				DrawCommand drawCommand;
+			};
+			std::unordered_map<material_handle, Info> infoMap;
 			for(auto& [uuid, drawCommand] : mMeshBatch)
 			{
-				// This code goes through all draw commands mapped by uuid and flattens the object data assign to it.
-				// baseInstance is always referenced at the object index position so it can be retrieved by the vertex shader.
-
 				if(mObjectData.find(uuid) == mObjectData.end())
 					TUR_LOG_CRITICAL("Sometimes brains are really stupid, don't mind this codebase's stupidity please.");
 
-				const auto& objectData = mObjectData[uuid];
-
-				drawCommand.baseInstance = objectIndexCurrentPosition;
-				mDrawCommands.push_back(drawCommand);
-
-				for(const auto& object : objectData)
-					mRenderer.push_object(object);
-
-				drawCommand.instanceCount = 0;
-				objectIndexCurrentPosition += objectData.size();
+				for(const auto& object : mObjectData[uuid])
+				{
+					infoMap[object.material].drawCommand = drawCommand;
+					infoMap[object.material].uuid = uuid; // an extra assignment never hurt anyone
+				}
 			}
 
-			/* Uploading commands */
-			mRenderer.set_draw_commands(mDrawCommands);
+			for(auto& [material, info] : infoMap)
+			{
+				if(mObjectData.find(info.uuid) == mObjectData.end())
+					TUR_LOG_CRITICAL("Sometimes brains are really stupid, don't mind this codebase's stupidity please.");
+
+				const auto& objectData = mObjectData[info.uuid];
+
+				info.drawCommand.baseInstance = objectIndexCurrentPosition;
+				mDrawCommands.push_back(info.drawCommand);
+
+				for(const auto& object : objectData)
+					mRenderer.push_object(material, object);
+
+				info.drawCommand.instanceCount = 0;
+				objectIndexCurrentPosition += objectData.size();
+
+				/* Uploading commands */
+				mRenderer.set_draw_commands(material, mDrawCommands);
+			}
 		}
 
 		void on_render() override
@@ -130,17 +153,22 @@ namespace tur
 	private:
 		void on_scene_switched()
 		{
-			mRenderer.clear_buffers();
-			mRenderer.clear_objects();
+			mRenderer.clear_all_buffers();
+			mRenderer.clear_all_objects();
 
-			auto view = rScene->get_registry().view<const MeshComponent>();
-			for (auto [entity, mesh] : view.each())
+			auto view = rScene->get_registry().view<const MeshComponent, const MaterialComponent>();
+			for (auto [entity, mesh, material] : view.each())
 			{
 				auto& meshAsset = rLibrary->get_mesh_asset(mesh.assetHandle);
 				if(meshAsset.state == AssetState::LOADING)
 					continue;
 
-				auto offset = mRenderer.upload_mesh(meshAsset.meshData.indices, meshAsset.meshData.vertices);
+				auto offset = mRenderer.upload_mesh
+				(
+					material.materialHandle, 
+					meshAsset.meshData.indices, 
+					meshAsset.meshData.vertices
+				);
 
 				DrawCommand drawCommand;
 				{
@@ -157,8 +185,8 @@ namespace tur
 
 		void upload_mesh_data_on_load(const MeshUploadedEvent& event)
 		{
-			auto view = rScene->get_registry().view<const MeshComponent>();
-			for (auto [entity, mesh] : view.each())
+			auto view = rScene->get_registry().view<const MeshComponent, const MaterialComponent>();
+			for (auto [entity, mesh, material] : view.each())
 			{
 				if(mesh.assetHandle != event.data.meshAssetHandle)
 					continue;
@@ -169,7 +197,12 @@ namespace tur
 				if(mMeshBatch.find(mesh.meshUUID) != mMeshBatch.end())
 					continue;
 
-				auto offset = mRenderer.upload_mesh(meshAsset.meshData.vertices, meshAsset.meshData.indices);				
+				auto offset = mRenderer.upload_mesh
+				(
+					material.materialHandle,
+					meshAsset.meshData.vertices,
+					meshAsset.meshData.indices
+				);				
 
 				DrawCommand drawCommand;
 				{

@@ -2,6 +2,7 @@
 #include "assets/texture/texture_asset.hpp"
 
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/material.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/resource_handler.hpp"
 #include "graphics/objects/texture.hpp"
@@ -71,6 +72,9 @@ namespace tur::gl
 		void destroy_buffer(buffer_handle bufferHandle);
 
 	public:
+		material_handle create_material(pipeline_handle pipeline, descriptor_set_layout_handle setLayout);
+
+	public:
 		texture_handle create_texture(const TextureDescriptor& descriptor, const TextureAsset& asset);
 		texture_handle create_empty_texture(const TextureDescriptor& descriptor);
 		void update_texture(texture_handle textureHandle, const TextureAsset& asset);
@@ -94,6 +98,7 @@ namespace tur::gl
 		free_list<RenderTarget>& get_render_targets() { return mRenderTargets; }
 		free_list<DescriptorSetLayout>& get_set_layouts() { return mSetLayouts; }
 		free_list<DescriptorSet>& get_descriptor_sets() { return mDescriptorSets; }
+		free_list<Material>& get_materials() { return mMaterials; }
 
 	private:
 		NON_OWNING RenderInterfaceGL* rRHI = nullptr;
@@ -108,6 +113,7 @@ namespace tur::gl
 		free_list<RenderTarget> mRenderTargets;
 		free_list<DescriptorSetLayout> mSetLayouts;
 		free_list<DescriptorSet> mDescriptorSets;
+		free_list<Material> mMaterials;
 	};
 }
 

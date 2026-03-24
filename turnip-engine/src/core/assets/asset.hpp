@@ -19,7 +19,8 @@ namespace tur
 		CUBEMAP,
 		AUDIO,
 		MESH,
-		FONT
+		FONT,
+		MATERIAL
 	};
 
 	static inline AssetType get_asset_type_value(const std::string& name)

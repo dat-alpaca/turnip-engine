@@ -55,18 +55,6 @@ namespace tur
         { TextureDataFormat::BGRA_INTEGER,      "BGRAINT"},
     });
 
-    NLOHMANN_JSON_SERIALIZE_ENUM(TextureFormat,
-    {
-        { TextureFormat::R8_UNORM,                 "R8U"},
-        { TextureFormat::RG8_UNORM,                "RGU"},
-        { TextureFormat::RGB8_UNORM,               "RGBU"},
-        { TextureFormat::RGBA8_UNORM,              "RGBAU"},
-        { TextureFormat::RGBA16_SFLOAT,            "RGBA16S"},
-        { TextureFormat::DEPTH_16_UNORM,           "DEPTH16U"},
-        { TextureFormat::DEPTH_STENCIL24_S8U_INT,  "DEPTHSTENCIL24S8U"},
-        { TextureFormat::B8G8R8A8_UNORM,           "B8G8R8A8U"}
-    });
-
     NLOHMANN_JSON_SERIALIZE_ENUM(TextureType,
     {
         { TextureType::TEXTURE_2D,          "TEXTURE2D" },

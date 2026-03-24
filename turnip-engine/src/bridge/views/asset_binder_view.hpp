@@ -1,21 +1,29 @@
 #pragma once
 #include "assets/cubemap/cubemap_asset.hpp"
 #include "assets/font/font_asset.hpp"
+#include "assets/material/material_asset.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/texture/texture_asset.hpp"
 #include "assets/texture/texture_options.hpp"
 #include "defines.hpp"
+#include "event/asset_events/material_uploaded_event.hpp"
 #include "event/asset_events/mesh_uploaded_event.hpp"
 #include "event/asset_events/texture_uploaded_event.hpp"
+#include "graphics/mesh_vertex.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/material.hpp"
+#include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/texture.hpp"
 #include "assets/asset.hpp"
 #include "event/events.hpp"
+#include "graphics/types/pipeline_stage.hpp"
 #include "rhi/rhi.hpp"
 #include "scene/components.hpp"
 
 #include "scene/components.hpp"
 #include "assets/asset_library.hpp"
+#include "scene/components/graphics.hpp"
 #include "view/view.hpp"
 #include <cstring>
 
@@ -57,6 +65,14 @@ namespace tur
 				[&](const MeshUploadedEvent& meshUploadedEvent) -> bool
 				{
 					handle_mesh_uploaded_event(meshUploadedEvent);
+					return false;
+				}
+			);
+			
+			subscriber.subscribe<MaterialUploadedEvent>(
+				[&](const MaterialUploadedEvent& materialUploadedEvent) -> bool
+				{
+					handle_material_uploaded_event(materialUploadedEvent);
 					return false;
 				}
 			);
@@ -104,6 +120,13 @@ namespace tur
 					/* Blank */
 				} break;
 
+				case AssetType::MATERIAL:
+				{
+					material_handle materialHandle = create_material_from_asset(event.assetHandle);
+					MaterialUploadedEvent uploadEvent(event.assetHandle, materialHandle);
+					callback(uploadEvent);
+				} break;
+
 				default:
 					return;
 			}
@@ -143,6 +166,11 @@ namespace tur
 		void handle_mesh_uploaded_event(const MeshUploadedEvent& meshUploadedEvent)
 		{
 			update_mesh_handles(meshUploadedEvent);
+		}
+
+		void handle_material_uploaded_event(const MaterialUploadedEvent& materialUploadedEvent)
+		{
+			update_material_handles(materialUploadedEvent);
 		}
 
 	private:
@@ -191,6 +219,12 @@ namespace tur
 		{
 			const FontAsset& fontAsset = rLibrary->get_font_asset(assetHandle);
 			return upload_font_from_asset(fontAsset);
+		}
+
+		material_handle create_material_from_asset(asset_handle assetHandle)
+		{
+			const MaterialAsset& material = rLibrary->get_material_asset(assetHandle);
+			return upload_material_from_asset(material);
 		}
 
 	private:
@@ -246,6 +280,20 @@ namespace tur
 
 				mesh.indexCount = meshUploadedEvent.data.indexCount;
 				mesh.indexType = meshUploadedEvent.data.indexType;
+			}
+		}
+
+		void update_material_handles(const MaterialUploadedEvent& materialUploadedEvent)
+		{
+			auto view = rScene->get_registry().view<MaterialComponent>();
+			for (auto entity : view)
+			{
+				auto& material = view.get<MaterialComponent>(entity);
+
+				if (material.assetHandle != materialUploadedEvent.assetHandle)
+					continue;
+
+				material.materialHandle = materialUploadedEvent.materialHandle;
 			}
 		}
 
@@ -376,6 +424,112 @@ namespace tur
 			}
 		
 			return texture;
+		}
+
+		material_handle upload_material_from_asset(const MaterialAsset& materialAsset)
+		{
+			auto& resources = rRHI->get_resource_handler();
+
+			// Shaders:
+			shader_handle vertexShader = resources.create_shader
+			({
+				materialAsset.vertexShaderFilepath, ShaderType::VERTEX
+			});
+			shader_handle fragmentShader = resources.create_shader
+			({
+				materialAsset.fragmentShaderFilepath, ShaderType::FRAGMENT
+			});
+			// TODO: add rest of shaders.
+			
+			/* TODO: SHOULD ALL BE THE SAME? The vertex shader currently only supports one vertex input stage variation */
+			auto VertexBindings = std::vector<BindingDescriptor>
+			({
+				{
+					.binding = 0,
+					.stride = sizeof(MeshVertex),
+					.inputRate = InputRate::VERTEX
+				}
+			});
+
+			auto Attributes = std::vector<Attribute>
+			({
+				{
+					.binding = 0,
+					.location = 0,
+					.offset = offsetof(MeshVertex, position),
+					.format = AttributeFormat::R32G32B32_SFLOAT
+				},
+				{
+					.binding = 0,
+					.location = 1,
+					.offset = offsetof(MeshVertex, uvx),
+					.format = AttributeFormat::R32_SFLOAT
+				},
+				{
+					.binding = 0,
+					.location = 2,
+					.offset = offsetof(MeshVertex, normals),
+					.format = AttributeFormat::R32G32B32_SFLOAT
+				},
+				{
+					.binding = 0,
+					.location = 3,
+					.offset = offsetof(MeshVertex, uvy),
+					.format = AttributeFormat::R32_SFLOAT
+				},
+			});
+
+			constexpr auto DynamicStates = std::to_array<DynamicState>({
+				DynamicState::VIEWPORT,
+				DynamicState::SCISSOR
+			});
+			
+			constexpr auto Viewports = std::to_array<Viewport>({Viewport{}});
+			constexpr auto Scissors = std::to_array<Extent2D>({Extent2D{}});
+
+			// Pipeline layout:
+			// TODO: bindless textures
+			DescriptorSetLayoutDescriptor setDescriptor = {};
+			{
+				setDescriptor.entries = 
+				{
+					DescriptorSetLayoutEntry
+					{
+						.binding = 0,
+						.amount = 1,
+						.type = DescriptorType::STORAGE_BUFFER,
+						.stage = PipelineStage::VERTEX_STAGE,
+					},
+					DescriptorSetLayoutEntry
+					{
+						.binding = 1,
+						.amount = 1,
+						.type = DescriptorType::STORAGE_BUFFER,
+						.stage = PipelineStage::VERTEX_STAGE,
+					},
+				};
+			}
+			auto setLayout = resources.create_descriptor_set_layout(setDescriptor);
+
+			// Pipeline:
+			PipelineDescriptor pipelineDescriptor = {
+				.vertexInputStage = 
+				{
+					.vertexBindings = VertexBindings,
+					.attributes = Attributes
+				},
+				.inputAssemblyStage = materialAsset.inputAssemblyStage,
+				.rasterizerStage = materialAsset.rasterizerStage,
+				.setLayout = setLayout,
+				.viewports = Viewports,
+				.scissors = Scissors,
+				.dynamicStates = DynamicStates,
+				.vertexShader = vertexShader,
+				.fragmentShader = fragmentShader,
+			};
+
+			auto pipeline = resources.create_graphics_pipeline(pipelineDescriptor);
+			return resources.create_material(pipeline, setLayout);
 		}
 
 	private:

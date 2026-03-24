@@ -8,6 +8,7 @@
 #include "graphics/objects/tile.hpp"
 #include "graphics/objects/texture.hpp"
 #include "graphics/objects/buffer.hpp"
+#include "utils/uuid/uuid.hpp"
 
 namespace tur
 {
@@ -19,7 +20,9 @@ namespace tur
 		MaterialComponent() = default;
 
 	public:
-		material_handle materialHandle = invalid_handle;
+		FIELD_SET_INTERNALLY asset_handle assetHandle = invalid_handle;
+		FIELD_SET_INTERNALLY material_handle materialHandle = invalid_handle;
+		uuid materialUUID;
 	};
 	
 	struct CullingComponent

@@ -2,6 +2,7 @@
   "files.associations": {
     "*.tur": "json",
     "*.scene": "json",
-    "*.asses": "json"
+    "*.asses": "json",
+    "*.turmat": "json"
   }
 }

@@ -26,7 +26,6 @@ layout (location = 1) out vec3 v_normals;
 
 void main()
 {
-    /* Draw index */
     Object object = b_objects.data[gl_InstanceIndex];
 
     gl_Position = b_world.projection * b_world.view * object.model * vec4(a_position, 1.0);  

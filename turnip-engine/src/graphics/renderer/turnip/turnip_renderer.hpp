@@ -1,4 +1,5 @@
 #pragma once
+#include "graphics/objects/material.hpp"
 #include "graphics/renderer/turnip/common.hpp"
 #include "graphics/objects/descriptor.hpp"
 #include "graphics/objects/pipeline.hpp"
@@ -27,7 +28,8 @@ namespace tur
 
 		struct ObjectData
 		{
-			glm::mat4 model;
+			alignas(16) glm::mat4 model;
+			alignas(16) material_handle material;
 		};
 
 	public:
@@ -39,20 +41,27 @@ namespace tur
         void dispatch();
 
 	public:
-		void set_draw_commands(const std::vector<DrawCommand>& commands);
-		void clear_objects();
-		void push_object(const ObjectData& object);
+		void set_draw_commands(material_handle material, const std::vector<DrawCommand>& commands);
+		void clear_objects(material_handle material);
+		void push_object(material_handle material, const ObjectData& object);
+		void clear_all_objects();
 
-		OffsetData upload_mesh(const std::vector<byte>& vertices, const std::vector<byte>& indices);
-		void clear_buffers();
+		OffsetData upload_mesh(material_handle material, const std::vector<byte>& vertices, const std::vector<byte>& indices);
+		void clear_all_buffers();
 
 	private:
 		void prepare_buffers();
-		void prepare_placeholder_set();
-		void prepare_placeholder_pipeline();
 
 	public:
-		bool is_empty() const { return !vertexOffset || !indicesOffset; }
+		inline bool has_commands() const
+		{
+			return mHasCommands;
+		}
+
+		inline bool is_empty(material_handle material) 
+		{ 
+			return !mDrawInstructionMap.at(material).vertexOffset || !mDrawInstructionMap.at(material).indicesOffset; 
+		}
 
 	private:
 		NON_OWNING RenderInterface* rRHI = nullptr;
@@ -61,9 +70,22 @@ namespace tur
         CommandBuffer computeCommandBuffer;
     
 	private:
-		std::vector<DrawCommand> mDrawCommands;
-		std::vector<ObjectData> mObjectData;
+		struct DrawCallInstructions
+		{
+			std::vector<DrawCommand> drawCommands;
+			std::vector<ObjectData> objectData;
+			
+			pipeline_handle pipeline;
+			descriptor_set_layout_handle setLayout;
+			descriptor_set_handle set;
 
+			u32 vertexOffset = 0;
+			u32 indicesOffset = 0;
+		};
+
+		bool mHasCommands = false;
+
+	private:
 		buffer_handle vbo    = invalid_handle;
 		buffer_handle ebo    = invalid_handle;
 		buffer_handle worldSSBO    = invalid_handle;
@@ -71,13 +93,9 @@ namespace tur
 
 		buffer_handle drawBuffer  = invalid_handle;
 
-		u32 vertexOffset = 0;
-		u32 indicesOffset = 0;
-	
 	private:
-		pipeline_handle mPlaceholderPipeline;
-		descriptor_set_layout_handle setLayout;
-		std::unordered_map<pipeline_handle, descriptor_set_handle> mDescriptorSetMap;
+		std::unordered_map<material_handle, DrawCallInstructions> mDrawInstructionMap;
+		WorldData mWorldData;
 
 		static inline constexpr u32 sVertexCapacity  = sizeof(float)      * (1 << 24);
 		static inline constexpr u32 sIndexCapacity   = sizeof(float)      * (1 << 24);

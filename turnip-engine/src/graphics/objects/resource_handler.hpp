@@ -5,6 +5,7 @@
 #include "graphics/objects/buffer.hpp"
 #include "graphics/objects/command_buffer.hpp"
 #include "graphics/objects/descriptor.hpp"
+#include "graphics/objects/material.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "graphics/objects/render_target.hpp"
 #include "graphics/objects/shader.hpp"
@@ -62,7 +63,7 @@ namespace tur
         { t.create_buffer(desc, data, range) }						-> std::same_as<buffer_handle>;
         { t.create_empty_buffer(desc, size) }						-> std::same_as<buffer_handle>;
 	} &&
-	
+
 	requires(T t, buffer_handle handle, const void* data, Range range)
 	{
         { t.update_buffer(handle, data, range) };
@@ -74,6 +75,11 @@ namespace tur
 		{ t.copy_buffer_to_texture(handle, texture, number, number, number) };
 		{ t.destroy_buffer(handle) };
 	} && 
+
+	requires(T t, pipeline_handle pipeline, descriptor_set_layout_handle setLayout)
+	{
+        { t.create_material(pipeline, setLayout) }					-> std::same_as<material_handle>;
+	} &&
 	
 	requires(T t, const TextureDescriptor& desc, texture_handle handle, const TextureAsset& asset, const glm::vec2& offset, u32 layer)
 	{

@@ -1,4 +1,5 @@
 #include "opengl_resource_handler.hpp"
+#include "graphics/objects/material.hpp"
 #include "graphics/objects/pipeline.hpp"
 #include "rhi/opengl/allocators/allocators.hpp"
 #include "rhi/opengl/gl_render_interface.hpp"
@@ -275,6 +276,11 @@ namespace tur::gl
 	{
 		const auto& buffer = mBuffers.remove(bufferHandle);
 		glDeleteBuffers(1, &buffer.handle);
+	}
+
+	material_handle ResourceHandler::create_material(pipeline_handle pipeline, descriptor_set_layout_handle setLayout)
+	{
+		return mMaterials.add({ .pipeline = pipeline, .setLayout = setLayout });
 	}
 
 	texture_handle ResourceHandler::create_texture(const TextureDescriptor& descriptor, const TextureAsset& asset)

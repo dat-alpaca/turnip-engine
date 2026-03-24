@@ -15,12 +15,12 @@
 #include "bridge/views/text_view.hpp"
 #include "bridge/views/turnip_renderer_view.hpp"
 
+#include "bridge/serialization/graphics.hpp"
 #include "bridge/serialization/asset.hpp"
 #include "bridge/serialization/asset_library.hpp"
 #include "bridge/serialization/scene.hpp"
 #include "bridge/serialization/components.hpp"
 #include "bridge/serialization/config.hpp"
-
 
 #include "core/assets/audio/audio_asset.hpp"
 #include "core/assets/audio/audio_loader.hpp"

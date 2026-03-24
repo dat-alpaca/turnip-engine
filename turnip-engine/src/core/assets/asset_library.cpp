@@ -5,6 +5,8 @@
 #include <stb_image.h>
 
 #include "assets/cubemap/cubemap_asset.hpp"
+#include "assets/material/material_asset.hpp"
+#include "assets/material/material_loader.hpp"
 #include "assets/mesh/mesh_asset.hpp"
 #include "assets/asset.hpp"
 
@@ -304,6 +306,31 @@ namespace tur
 				mEventCallback(assetLoadedEvent);
 			}
 		);
+
+		return assetHandle;
+	}
+
+	asset_handle AssetLibrary::load_material_async(const std::filesystem::path& filepath, const AssetMetadata& metadata)
+	{
+		if (mFilepathCache.find(filepath) != mFilepathCache.end())
+			return mFilepathCache[filepath];
+
+		asset_handle assetHandle = mMaterialAssets.add({});
+		MaterialAsset& materialAsset = mMaterialAssets.get(assetHandle);
+		materialAsset.metadata = metadata;
+
+		if(metadata.lifetime == AssetLifetime::SCENE_BOUND)
+			mMaterialRemoveOnSceneChange.push_back(assetHandle);
+
+		mFilepathCache[filepath] = assetHandle;
+		mUUIDCache[materialAsset.metadata.assetUUID] = assetHandle;
+
+		auto loadedMaterial = load_material_task(filepath);
+		materialAsset.vertexShaderFilepath = loadedMaterial->vertexShaderFilepath;
+		materialAsset.fragmentShaderFilepath = loadedMaterial->fragmentShaderFilepath;
+
+		AssetLoadedEvent assetLoadedEvent(assetHandle, AssetType::MATERIAL);
+		mEventCallback(assetLoadedEvent);
 
 		return assetHandle;
 	}

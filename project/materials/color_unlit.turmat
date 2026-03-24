@@ -1,0 +1,6 @@
+{
+    "color_unlit": {
+        "vertex_shader": "color_vert.spv",
+        "fragment_shader": "color_frag.spv"
+    }
+}

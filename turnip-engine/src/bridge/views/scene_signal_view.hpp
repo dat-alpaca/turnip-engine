@@ -1,4 +1,5 @@
 #pragma once
+#include "scene/components/graphics.hpp"
 #include "view/view.hpp"
 #include "assert/assert.hpp"
 #include "assets/asset_library.hpp"
@@ -32,6 +33,7 @@ namespace tur
                     handle_audio(deserializedEvent.scene);
                     handle_script(deserializedEvent.scene, deserializedEvent.project);
                     handle_meshes(deserializedEvent.scene);
+                    handle_materials(deserializedEvent.scene);
                     return false;
 				}
 			);
@@ -122,6 +124,21 @@ namespace tur
                     continue;
 
                 mesh.assetHandle = rLibrary->get_asset_handle(mesh.meshUUID);
+            }
+        }
+        
+        void handle_materials(NON_OWNING Scene* scene)
+        {
+            TUR_ASS(rLibrary);
+            TUR_ASS(scene);
+
+            auto view = scene->get_registry().view<MaterialComponent>();
+            for (auto [e, material] : view.each())
+            {
+                if(material.assetHandle != invalid_handle)
+                    continue;
+
+                material.assetHandle = rLibrary->get_asset_handle(material.materialUUID);
             }
         }
 
